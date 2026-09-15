@@ -80,6 +80,20 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="eventos.recientes" xml:space="preserve"><value>Recent adverse events (all patients)</value></data>
+  <data name="eventos.registrar" xml:space="preserve"><value>Log adverse event</value></data>
+  <data name="eventos.columna.tipo" xml:space="preserve"><value>Event type</value></data>
+  <data name="eventos.columna.gravedad" xml:space="preserve"><value>Severity</value></data>
+  <data name="eventos.columna.accion" xml:space="preserve"><value>Action taken</value></data>
+  <data name="eventos.tipo.hemorragia" xml:space="preserve"><value>Bleeding</value></data>
+  <data name="eventos.tipo.trombosis" xml:space="preserve"><value>Thrombosis</value></data>
+  <data name="eventos.tipo.reaccion" xml:space="preserve"><value>Adverse reaction</value></data>
+  <data name="eventos.tipo.otro" xml:space="preserve"><value>Other</value></data>
+  <data name="eventos.gravedad.leve" xml:space="preserve"><value>Mild</value></data>
+  <data name="eventos.gravedad.moderada" xml:space="preserve"><value>Moderate</value></data>
+  <data name="eventos.gravedad.grave" xml:space="preserve"><value>Severe</value></data>
+  <data name="eventos.sinEventos" xml:space="preserve"><value>No events recorded.</value></data>
+  <data name="eventos.fechaEvento" xml:space="preserve"><value>Event date</value></data>
   <data name="reportes.mensual" xml:space="preserve"><value>Monthly report</value></data>
   <data name="reportes.diagnostico" xml:space="preserve"><value>By diagnosis</value></data>
   <data name="reportes.historial" xml:space="preserve"><value>Patient history</value></data>

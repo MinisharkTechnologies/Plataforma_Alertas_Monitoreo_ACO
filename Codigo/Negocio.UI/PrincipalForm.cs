@@ -33,6 +33,7 @@ namespace Negocio.UI
         private RecepcionRINControl? _controlRecepcion;
         private AgendaControl? _controlAgenda;
         private SeguimientoControl? _controlSeguimiento;
+        private EventosAdversosControl? _controlEventos;
         private ReportesControl? _controlReportes;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
@@ -243,6 +244,14 @@ namespace Negocio.UI
                 _panelVista.Controls.Add(_controlSeguimiento);
                 _controlSeguimiento.Recargar();
             }
+            else if (clave == "mod.eventos")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlEventos ??= new EventosAdversosControl(_sesion.NombreUsuario);
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlEventos);
+                _controlEventos.Recargar();
+            }
             else if (clave == "mod.reportes")
             {
                 _lblModuloDetalle.Text = string.Empty;
@@ -284,6 +293,7 @@ namespace Negocio.UI
             _controlPacientes?.RefrescarTextos();
             _controlAgenda?.RefrescarTextos();
             _controlSeguimiento?.RefrescarTextos();
+            _controlEventos?.RefrescarTextos();
             _controlReportes?.RefrescarTextos();
 
             _actualizandoIdioma = true;

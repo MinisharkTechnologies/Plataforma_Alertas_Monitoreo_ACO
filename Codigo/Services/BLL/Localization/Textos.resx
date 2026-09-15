@@ -80,6 +80,20 @@
   <data name="pacientes.documento" xml:space="preserve"><value>Documento (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Teléfono</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="eventos.recientes" xml:space="preserve"><value>Últimos eventos registrados (todos los pacientes)</value></data>
+  <data name="eventos.registrar" xml:space="preserve"><value>Registrar evento adverso</value></data>
+  <data name="eventos.columna.tipo" xml:space="preserve"><value>Tipo de evento</value></data>
+  <data name="eventos.columna.gravedad" xml:space="preserve"><value>Gravedad</value></data>
+  <data name="eventos.columna.accion" xml:space="preserve"><value>Acción tomada</value></data>
+  <data name="eventos.tipo.hemorragia" xml:space="preserve"><value>Hemorragia</value></data>
+  <data name="eventos.tipo.trombosis" xml:space="preserve"><value>Trombosis</value></data>
+  <data name="eventos.tipo.reaccion" xml:space="preserve"><value>Reacción adversa</value></data>
+  <data name="eventos.tipo.otro" xml:space="preserve"><value>Otro</value></data>
+  <data name="eventos.gravedad.leve" xml:space="preserve"><value>Leve</value></data>
+  <data name="eventos.gravedad.moderada" xml:space="preserve"><value>Moderada</value></data>
+  <data name="eventos.gravedad.grave" xml:space="preserve"><value>Grave</value></data>
+  <data name="eventos.sinEventos" xml:space="preserve"><value>Sin eventos registrados.</value></data>
+  <data name="eventos.fechaEvento" xml:space="preserve"><value>Fecha del evento</value></data>
   <data name="reportes.mensual" xml:space="preserve"><value>Reporte mensual</value></data>
   <data name="reportes.diagnostico" xml:space="preserve"><value>Por diagnóstico</value></data>
   <data name="reportes.historial" xml:space="preserve"><value>Historial del paciente</value></data>

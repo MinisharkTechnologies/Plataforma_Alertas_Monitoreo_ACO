@@ -80,6 +80,20 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="eventos.recientes" xml:space="preserve"><value>最近不良事件（全部患者）</value></data>
+  <data name="eventos.registrar" xml:space="preserve"><value>登记不良事件</value></data>
+  <data name="eventos.columna.tipo" xml:space="preserve"><value>事件类型</value></data>
+  <data name="eventos.columna.gravedad" xml:space="preserve"><value>严重程度</value></data>
+  <data name="eventos.columna.accion" xml:space="preserve"><value>已采取措施</value></data>
+  <data name="eventos.tipo.hemorragia" xml:space="preserve"><value>出血</value></data>
+  <data name="eventos.tipo.trombosis" xml:space="preserve"><value>血栓形成</value></data>
+  <data name="eventos.tipo.reaccion" xml:space="preserve"><value>不良反应</value></data>
+  <data name="eventos.tipo.otro" xml:space="preserve"><value>其他</value></data>
+  <data name="eventos.gravedad.leve" xml:space="preserve"><value>轻度</value></data>
+  <data name="eventos.gravedad.moderada" xml:space="preserve"><value>中度</value></data>
+  <data name="eventos.gravedad.grave" xml:space="preserve"><value>重度</value></data>
+  <data name="eventos.sinEventos" xml:space="preserve"><value>暂无已登记事件。</value></data>
+  <data name="eventos.fechaEvento" xml:space="preserve"><value>事件日期</value></data>
   <data name="reportes.mensual" xml:space="preserve"><value>月度报告</value></data>
   <data name="reportes.diagnostico" xml:space="preserve"><value>按诊断</value></data>
   <data name="reportes.historial" xml:space="preserve"><value>患者病史</value></data>
