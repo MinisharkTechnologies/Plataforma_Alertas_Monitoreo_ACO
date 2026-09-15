@@ -80,6 +80,42 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="seguimiento.detectar" xml:space="preserve"><value>检测逾期病例</value></data>
+  <data name="seguimiento.deteccion" xml:space="preserve"><value>检测完成。新病例：</value></data>
+  <data name="seguimiento.sinPendientes" xml:space="preserve"><value>暂无待处理的随访。使用「检测逾期」查找新病例。</value></data>
+  <data name="seguimiento.columna.ultimoReporte" xml:space="preserve"><value>最近报告</value></data>
+  <data name="seguimiento.columna.diasVencido" xml:space="preserve"><value>逾期天数</value></data>
+  <data name="seguimiento.columna.intentos" xml:space="preserve"><value>尝试次数</value></data>
+  <data name="seguimiento.columna.protocolo" xml:space="preserve"><value>随访状态</value></data>
+  <data name="seguimiento.protocolo.enCurso" xml:space="preserve"><value>进行中</value></data>
+  <data name="seguimiento.protocolo.escalada" xml:space="preserve"><value>已上报医生</value></data>
+  <data name="seguimiento.contacto" xml:space="preserve"><value>登记联系尝试</value></data>
+  <data name="seguimiento.tipoContacto" xml:space="preserve"><value>联系方式</value></data>
+  <data name="seguimiento.contacto.llamado" xml:space="preserve"><value>电话</value></data>
+  <data name="seguimiento.contacto.mensaje" xml:space="preserve"><value>短信</value></data>
+  <data name="seguimiento.contacto.correo" xml:space="preserve"><value>电子邮件</value></data>
+  <data name="seguimiento.contacto.otro" xml:space="preserve"><value>其他</value></data>
+  <data name="seguimiento.resultado" xml:space="preserve"><value>结果</value></data>
+  <data name="seguimiento.resultado.exitoso" xml:space="preserve"><value>成功（关闭警报）</value></data>
+  <data name="seguimiento.resultado.fallido" xml:space="preserve"><value>失败（计为尝试）</value></data>
+  <data name="seguimiento.registrarIntento" xml:space="preserve"><value>登记尝试</value></data>
+  <data name="seguimiento.intentoRegistrado" xml:space="preserve"><value>尝试已登记。</value></data>
+  <data name="seguimiento.contactoOk" xml:space="preserve"><value>联系成功：缺勤警报已关闭。</value></data>
+  <data name="seguimiento.escalada" xml:space="preserve"><value>上报医生</value></data>
+  <data name="seguimiento.escaladaMsg" xml:space="preserve"><value>已达到 3 次失败尝试的阈值：病例已上报医生等待临床决定。</value></data>
+  <data name="seguimiento.decision" xml:space="preserve"><value>临床决定</value></data>
+  <data name="seguimiento.dec.contactar" xml:space="preserve"><value>亲自联系</value></data>
+  <data name="seguimiento.dec.visita" xml:space="preserve"><value>安排家访</value></data>
+  <data name="seguimiento.dec.periodicidad" xml:space="preserve"><value>更改报告周期</value></data>
+  <data name="seguimiento.dec.nocontactable" xml:space="preserve"><value>宣布无法联系</value></data>
+  <data name="seguimiento.nuevaPeriodicidad" xml:space="preserve"><value>新周期（天）</value></data>
+  <data name="seguimiento.detalleDecision" xml:space="preserve"><value>决定详情</value></data>
+  <data name="seguimiento.registrarDecision" xml:space="preserve"><value>登记决定</value></data>
+  <data name="seguimiento.decisionOk" xml:space="preserve"><value>决定已登记；缺勤警报已解决。</value></data>
+  <data name="seguimiento.historial" xml:space="preserve"><value>病例历史</value></data>
+  <data name="seguimiento.columna.decision" xml:space="preserve"><value>决定</value></data>
+  <data name="seguimiento.detalleVacio" xml:space="preserve"><value>请从列表中选择病例。</value></data>
+  <data name="seguimiento.decSinIntentos" xml:space="preserve"><value>临床决定需要至少一次已登记的联系尝试。</value></data>
   <data name="agenda.desde" xml:space="preserve"><value>从：</value></data>
   <data name="agenda.hasta" xml:space="preserve"><value>至：</value></data>
   <data name="agenda.actualizar" xml:space="preserve"><value>刷新日程</value></data>

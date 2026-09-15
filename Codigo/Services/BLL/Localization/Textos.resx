@@ -80,6 +80,42 @@
   <data name="pacientes.documento" xml:space="preserve"><value>Documento (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Teléfono</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="seguimiento.detectar" xml:space="preserve"><value>Detectar plazos vencidos</value></data>
+  <data name="seguimiento.deteccion" xml:space="preserve"><value>Detección completada. Casos nuevos:</value></data>
+  <data name="seguimiento.sinPendientes" xml:space="preserve"><value>Sin seguimientos pendientes. Use «Detectar plazos vencidos» para buscar casos nuevos.</value></data>
+  <data name="seguimiento.columna.ultimoReporte" xml:space="preserve"><value>Último reporte</value></data>
+  <data name="seguimiento.columna.diasVencido" xml:space="preserve"><value>Días vencidos</value></data>
+  <data name="seguimiento.columna.intentos" xml:space="preserve"><value>Intentos</value></data>
+  <data name="seguimiento.columna.protocolo" xml:space="preserve"><value>Protocolo</value></data>
+  <data name="seguimiento.protocolo.enCurso" xml:space="preserve"><value>En curso</value></data>
+  <data name="seguimiento.protocolo.escalada" xml:space="preserve"><value>ESCALADA AL MÉDICO</value></data>
+  <data name="seguimiento.contacto" xml:space="preserve"><value>Registrar intento de contacto</value></data>
+  <data name="seguimiento.tipoContacto" xml:space="preserve"><value>Tipo de contacto</value></data>
+  <data name="seguimiento.contacto.llamado" xml:space="preserve"><value>Llamado telefónico</value></data>
+  <data name="seguimiento.contacto.mensaje" xml:space="preserve"><value>Mensaje de texto</value></data>
+  <data name="seguimiento.contacto.correo" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="seguimiento.contacto.otro" xml:space="preserve"><value>Otro</value></data>
+  <data name="seguimiento.resultado" xml:space="preserve"><value>Resultado</value></data>
+  <data name="seguimiento.resultado.exitoso" xml:space="preserve"><value>Exitoso (cierra la alerta)</value></data>
+  <data name="seguimiento.resultado.fallido" xml:space="preserve"><value>Fallido (suma intento)</value></data>
+  <data name="seguimiento.registrarIntento" xml:space="preserve"><value>Registrar intento</value></data>
+  <data name="seguimiento.intentoRegistrado" xml:space="preserve"><value>Intento registrado.</value></data>
+  <data name="seguimiento.contactoOk" xml:space="preserve"><value>Contacto exitoso: la alerta de ausencia quedó cerrada.</value></data>
+  <data name="seguimiento.escalada" xml:space="preserve"><value>Escalada al médico</value></data>
+  <data name="seguimiento.escaladaMsg" xml:space="preserve"><value>Se alcanzó el umbral de 3 intentos fallidos: el caso fue ESCALADO al médico para su decisión clínica.</value></data>
+  <data name="seguimiento.decision" xml:space="preserve"><value>Decisión clínica</value></data>
+  <data name="seguimiento.dec.contactar" xml:space="preserve"><value>Contactar personalmente</value></data>
+  <data name="seguimiento.dec.visita" xml:space="preserve"><value>Programar visita domiciliaria</value></data>
+  <data name="seguimiento.dec.periodicidad" xml:space="preserve"><value>Cambiar periodicidad</value></data>
+  <data name="seguimiento.dec.nocontactable" xml:space="preserve"><value>Declarar no contactable</value></data>
+  <data name="seguimiento.nuevaPeriodicidad" xml:space="preserve"><value>Nueva periodicidad (días)</value></data>
+  <data name="seguimiento.detalleDecision" xml:space="preserve"><value>Detalle de la decisión</value></data>
+  <data name="seguimiento.registrarDecision" xml:space="preserve"><value>Registrar decisión</value></data>
+  <data name="seguimiento.decisionOk" xml:space="preserve"><value>Decisión registrada; la alerta de ausencia quedó resuelta.</value></data>
+  <data name="seguimiento.historial" xml:space="preserve"><value>Historial del caso</value></data>
+  <data name="seguimiento.columna.decision" xml:space="preserve"><value>Decisión</value></data>
+  <data name="seguimiento.detalleVacio" xml:space="preserve"><value>Seleccione un caso de la lista.</value></data>
+  <data name="seguimiento.decSinIntentos" xml:space="preserve"><value>La decisión clínica requiere al menos un intento de contacto registrado.</value></data>
   <data name="agenda.desde" xml:space="preserve"><value>Desde:</value></data>
   <data name="agenda.hasta" xml:space="preserve"><value>Hasta:</value></data>
   <data name="agenda.actualizar" xml:space="preserve"><value>Actualizar agenda</value></data>

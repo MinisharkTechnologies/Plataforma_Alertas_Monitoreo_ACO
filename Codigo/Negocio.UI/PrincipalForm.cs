@@ -32,6 +32,7 @@ namespace Negocio.UI
         private PacientesControl? _controlPacientes;
         private RecepcionRINControl? _controlRecepcion;
         private AgendaControl? _controlAgenda;
+        private SeguimientoControl? _controlSeguimiento;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
 
@@ -233,6 +234,14 @@ namespace Negocio.UI
                 _panelVista.Controls.Add(_controlAgenda);
                 _controlAgenda.Recargar();
             }
+            else if (clave == "mod.seguimiento")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlSeguimiento ??= new SeguimientoControl(_sesion.Id, _sesion.NombreUsuario);
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlSeguimiento);
+                _controlSeguimiento.Recargar();
+            }
             else
             {
                 _lblModuloDetalle.Text = Texto("shell.enConstruccion");
@@ -265,6 +274,7 @@ namespace Negocio.UI
             _controlTriaje?.RefrescarTextos();
             _controlPacientes?.RefrescarTextos();
             _controlAgenda?.RefrescarTextos();
+            _controlSeguimiento?.RefrescarTextos();
 
             _actualizandoIdioma = true;
             try

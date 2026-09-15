@@ -80,6 +80,42 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="seguimiento.detectar" xml:space="preserve"><value>Detect overdue cases</value></data>
+  <data name="seguimiento.deteccion" xml:space="preserve"><value>Detection completed. New cases:</value></data>
+  <data name="seguimiento.sinPendientes" xml:space="preserve"><value>No pending follow-ups. Use “Detect overdue cases” to scan for new ones.</value></data>
+  <data name="seguimiento.columna.ultimoReporte" xml:space="preserve"><value>Last report</value></data>
+  <data name="seguimiento.columna.diasVencido" xml:space="preserve"><value>Days overdue</value></data>
+  <data name="seguimiento.columna.intentos" xml:space="preserve"><value>Attempts</value></data>
+  <data name="seguimiento.columna.protocolo" xml:space="preserve"><value>Protocol</value></data>
+  <data name="seguimiento.protocolo.enCurso" xml:space="preserve"><value>In progress</value></data>
+  <data name="seguimiento.protocolo.escalada" xml:space="preserve"><value>ESCALATED TO PHYSICIAN</value></data>
+  <data name="seguimiento.contacto" xml:space="preserve"><value>Log contact attempt</value></data>
+  <data name="seguimiento.tipoContacto" xml:space="preserve"><value>Contact type</value></data>
+  <data name="seguimiento.contacto.llamado" xml:space="preserve"><value>Phone call</value></data>
+  <data name="seguimiento.contacto.mensaje" xml:space="preserve"><value>Text message</value></data>
+  <data name="seguimiento.contacto.correo" xml:space="preserve"><value>Email</value></data>
+  <data name="seguimiento.contacto.otro" xml:space="preserve"><value>Other</value></data>
+  <data name="seguimiento.resultado" xml:space="preserve"><value>Result</value></data>
+  <data name="seguimiento.resultado.exitoso" xml:space="preserve"><value>Successful (closes the alert)</value></data>
+  <data name="seguimiento.resultado.fallido" xml:space="preserve"><value>Failed (counts attempt)</value></data>
+  <data name="seguimiento.registrarIntento" xml:space="preserve"><value>Log attempt</value></data>
+  <data name="seguimiento.intentoRegistrado" xml:space="preserve"><value>Attempt logged.</value></data>
+  <data name="seguimiento.contactoOk" xml:space="preserve"><value>Successful contact: the absence alert was closed.</value></data>
+  <data name="seguimiento.escalada" xml:space="preserve"><value>Escalated to physician</value></data>
+  <data name="seguimiento.escaladaMsg" xml:space="preserve"><value>The threshold of 3 failed attempts was reached: the case was ESCALATED to the physician for a clinical decision.</value></data>
+  <data name="seguimiento.decision" xml:space="preserve"><value>Clinical decision</value></data>
+  <data name="seguimiento.dec.contactar" xml:space="preserve"><value>Contact personally</value></data>
+  <data name="seguimiento.dec.visita" xml:space="preserve"><value>Schedule home visit</value></data>
+  <data name="seguimiento.dec.periodicidad" xml:space="preserve"><value>Change reporting frequency</value></data>
+  <data name="seguimiento.dec.nocontactable" xml:space="preserve"><value>Declare unreachable</value></data>
+  <data name="seguimiento.nuevaPeriodicidad" xml:space="preserve"><value>New frequency (days)</value></data>
+  <data name="seguimiento.detalleDecision" xml:space="preserve"><value>Decision detail</value></data>
+  <data name="seguimiento.registrarDecision" xml:space="preserve"><value>Log decision</value></data>
+  <data name="seguimiento.decisionOk" xml:space="preserve"><value>Decision logged; the absence alert was resolved.</value></data>
+  <data name="seguimiento.historial" xml:space="preserve"><value>Case history</value></data>
+  <data name="seguimiento.columna.decision" xml:space="preserve"><value>Decision</value></data>
+  <data name="seguimiento.detalleVacio" xml:space="preserve"><value>Select a case from the list.</value></data>
+  <data name="seguimiento.decSinIntentos" xml:space="preserve"><value>The clinical decision requires at least one logged contact attempt.</value></data>
   <data name="agenda.desde" xml:space="preserve"><value>From:</value></data>
   <data name="agenda.hasta" xml:space="preserve"><value>To:</value></data>
   <data name="agenda.actualizar" xml:space="preserve"><value>Refresh schedule</value></data>
