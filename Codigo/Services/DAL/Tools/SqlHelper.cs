@@ -10,27 +10,34 @@ namespace Services.DAL.Tools
     /// Helper ADO.NET del módulo Services: ejecuta comandos parametrizados contra SQL Server,
     /// normaliza valores nulos y envuelve errores técnicos en <see cref="DataAccessException"/>
     /// para no filtrar detalles de conexión hacia las capas superiores (REQ-ARQ-004).
+    /// Permite elegir la conexión configurada (por defecto "ServicesDB"; los respaldos usan "BackupString").
     /// </summary>
     internal static class SqlHelper
     {
-        private static string ObtenerConexion()
+        private const string ConexionPorDefecto = "ServicesDB";
+
+        private static string ObtenerConexion(string nombreConexion)
         {
-            string? cadena = ConfigurationManager.ConnectionStrings["ServicesDB"]?.ConnectionString;
+            string? cadena = ConfigurationManager.ConnectionStrings[nombreConexion]?.ConnectionString;
             if (string.IsNullOrWhiteSpace(cadena))
             {
                 throw new InvalidOperationException(
-                    "Falta la cadena de conexión 'ServicesDB' en la configuración de la aplicación.");
+                    $"Falta la cadena de conexión '{nombreConexion}' en la configuración de la aplicación.");
             }
             return cadena;
         }
 
-        /// <summary>Ejecuta un comando de escritura y devuelve la cantidad de filas afectadas.</summary>
+        /// <summary>Ejecuta un comando de escritura (conexión por defecto) y devuelve la cantidad de filas afectadas.</summary>
         public static int EjecutarComando(string textoComando, CommandType tipo, params SqlParameter[] parametros)
+            => EjecutarComando(textoComando, tipo, ConexionPorDefecto, parametros);
+
+        /// <summary>Ejecuta un comando de escritura sobre la conexión indicada.</summary>
+        public static int EjecutarComando(string textoComando, CommandType tipo, string nombreConexion, params SqlParameter[] parametros)
         {
             NormalizarNulos(parametros);
             try
             {
-                using (SqlConnection conexion = new SqlConnection(ObtenerConexion()))
+                using (SqlConnection conexion = new SqlConnection(ObtenerConexion(nombreConexion)))
                 using (SqlCommand comando = new SqlCommand(textoComando, conexion))
                 {
                     comando.CommandType = tipo;
@@ -48,13 +55,17 @@ namespace Services.DAL.Tools
             }
         }
 
-        /// <summary>Ejecuta un comando y devuelve el primer valor del primer registro.</summary>
+        /// <summary>Ejecuta un comando y devuelve el primer valor (conexión por defecto).</summary>
         public static object? EjecutarEscalar(string textoComando, CommandType tipo, params SqlParameter[] parametros)
+            => EjecutarEscalar(textoComando, tipo, ConexionPorDefecto, parametros);
+
+        /// <summary>Ejecuta un comando y devuelve el primer valor, sobre la conexión indicada.</summary>
+        public static object? EjecutarEscalar(string textoComando, CommandType tipo, string nombreConexion, params SqlParameter[] parametros)
         {
             NormalizarNulos(parametros);
             try
             {
-                using (SqlConnection conexion = new SqlConnection(ObtenerConexion()))
+                using (SqlConnection conexion = new SqlConnection(ObtenerConexion(nombreConexion)))
                 using (SqlCommand comando = new SqlCommand(textoComando, conexion))
                 {
                     comando.CommandType = tipo;
@@ -72,13 +83,18 @@ namespace Services.DAL.Tools
             }
         }
 
-        /// <summary>Ejecuta un comando y devuelve un lector de datos (la conexión se cierra junto al lector).</summary>
+        /// <summary>Ejecuta un comando y devuelve un lector de datos (conexión por defecto).</summary>
         public static SqlDataReader EjecutarLector(string textoComando, CommandType tipo, params SqlParameter[] parametros)
+            => EjecutarLector(textoComando, tipo, ConexionPorDefecto, parametros);
+
+        /// <summary>Ejecuta un comando y devuelve un lector de datos sobre la conexión indicada
+        /// (la conexión se cierra junto con el lector).</summary>
+        public static SqlDataReader EjecutarLector(string textoComando, CommandType tipo, string nombreConexion, params SqlParameter[] parametros)
         {
             NormalizarNulos(parametros);
             try
             {
-                SqlConnection conexion = new SqlConnection(ObtenerConexion());
+                SqlConnection conexion = new SqlConnection(ObtenerConexion(nombreConexion));
                 using (SqlCommand comando = new SqlCommand(textoComando, conexion))
                 {
                     comando.CommandType = tipo;
