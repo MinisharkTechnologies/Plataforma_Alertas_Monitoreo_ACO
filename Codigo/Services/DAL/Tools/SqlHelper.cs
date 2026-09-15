@@ -10,7 +10,8 @@ namespace Services.DAL.Tools
     /// Helper ADO.NET del módulo Services: ejecuta comandos parametrizados contra SQL Server,
     /// normaliza valores nulos y envuelve errores técnicos en <see cref="DataAccessException"/>
     /// para no filtrar detalles de conexión hacia las capas superiores (REQ-ARQ-004).
-    /// Permite elegir la conexión configurada (por defecto "ServicesDB"; los respaldos usan "BackupString").
+    /// Permite elegir la conexión configurada (por defecto "ServicesDB"; los respaldos usan "BackupString")
+    /// y se ENLISTA automáticamente en la transacción activa (TransaccionDAL) cuando la conexión coincide (REQ-ARQ-007).
     /// </summary>
     internal static class SqlHelper
     {
@@ -31,12 +32,20 @@ namespace Services.DAL.Tools
         public static int EjecutarComando(string textoComando, CommandType tipo, params SqlParameter[] parametros)
             => EjecutarComando(textoComando, tipo, ConexionPorDefecto, parametros);
 
-        /// <summary>Ejecuta un comando de escritura sobre la conexión indicada.</summary>
+        /// <summary>Ejecuta un comando de escritura sobre la conexión indicada (o en la transacción activa si coincide).</summary>
         public static int EjecutarComando(string textoComando, CommandType tipo, string nombreConexion, params SqlParameter[] parametros)
         {
             NormalizarNulos(parametros);
             try
             {
+                if (TransaccionDAL.UsaConexion(nombreConexion))
+                {
+                    using (SqlCommand comando = TransaccionDAL.CrearComando(textoComando, tipo, parametros))
+                    {
+                        return comando.ExecuteNonQuery();
+                    }
+                }
+
                 using (SqlConnection conexion = new SqlConnection(ObtenerConexion(nombreConexion)))
                 using (SqlCommand comando = new SqlCommand(textoComando, conexion))
                 {
@@ -59,12 +68,20 @@ namespace Services.DAL.Tools
         public static object? EjecutarEscalar(string textoComando, CommandType tipo, params SqlParameter[] parametros)
             => EjecutarEscalar(textoComando, tipo, ConexionPorDefecto, parametros);
 
-        /// <summary>Ejecuta un comando y devuelve el primer valor, sobre la conexión indicada.</summary>
+        /// <summary>Ejecuta un comando y devuelve el primer valor, sobre la conexión indicada (o en la transacción activa si coincide).</summary>
         public static object? EjecutarEscalar(string textoComando, CommandType tipo, string nombreConexion, params SqlParameter[] parametros)
         {
             NormalizarNulos(parametros);
             try
             {
+                if (TransaccionDAL.UsaConexion(nombreConexion))
+                {
+                    using (SqlCommand comando = TransaccionDAL.CrearComando(textoComando, tipo, parametros))
+                    {
+                        return comando.ExecuteScalar();
+                    }
+                }
+
                 using (SqlConnection conexion = new SqlConnection(ObtenerConexion(nombreConexion)))
                 using (SqlCommand comando = new SqlCommand(textoComando, conexion))
                 {
@@ -88,12 +105,20 @@ namespace Services.DAL.Tools
             => EjecutarLector(textoComando, tipo, ConexionPorDefecto, parametros);
 
         /// <summary>Ejecuta un comando y devuelve un lector de datos sobre la conexión indicada
-        /// (la conexión se cierra junto con el lector).</summary>
+        /// (fuera de transacción, la conexión se cierra junto con el lector).</summary>
         public static SqlDataReader EjecutarLector(string textoComando, CommandType tipo, string nombreConexion, params SqlParameter[] parametros)
         {
             NormalizarNulos(parametros);
             try
             {
+                if (TransaccionDAL.UsaConexion(nombreConexion))
+                {
+                    // En transacción, el comando usa la conexión compartida: no se cierra junto al lector
+                    // y el comando queda para recolección de basura (se libera al terminar la transacción).
+                    SqlCommand comandoTx = TransaccionDAL.CrearComando(textoComando, tipo, parametros);
+                    return comandoTx.ExecuteReader();
+                }
+
                 SqlConnection conexion = new SqlConnection(ObtenerConexion(nombreConexion));
                 using (SqlCommand comando = new SqlCommand(textoComando, conexion))
                 {
