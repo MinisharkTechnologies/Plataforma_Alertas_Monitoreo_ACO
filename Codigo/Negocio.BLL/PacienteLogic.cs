@@ -41,6 +41,25 @@ namespace Negocio.BLL
         public Paciente? BuscarPorDNI(string dni) => _repositorio.BuscarPorDNI(dni);
 
         /// <summary>
+        /// Pacientes según filtro de nombre/documento (vacío = todos), ordenados por nombre,
+        /// con o sin inactivos (para la pantalla de gestión, REQ-FUNC-001).
+        /// </summary>
+        public List<Paciente> Buscar(string? filtro, bool incluirInactivos)
+        {
+            string patron = (filtro ?? string.Empty).Trim();
+            IQueryable<Paciente> consulta = _contexto.Pacientes.AsNoTracking();
+            if (!incluirInactivos)
+            {
+                consulta = consulta.Where(p => p.Estado == EstadoPaciente.Activo);
+            }
+            if (patron.Length > 0)
+            {
+                consulta = consulta.Where(p => p.NombreCompleto.Contains(patron) || p.DNI.Contains(patron));
+            }
+            return consulta.OrderBy(p => p.NombreCompleto).ToList();
+        }
+
+        /// <summary>
         /// Da de alta un paciente activo: valida los datos, verifica que no exista otro
         /// paciente activo con el mismo documento y genera credenciales únicas del portal.
         /// </summary>

@@ -80,6 +80,37 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="pacientes.buscar" xml:space="preserve"><value>搜索：</value></data>
+  <data name="pacientes.buscarPlaceholder" xml:space="preserve"><value>姓名或证件…</value></data>
+  <data name="pacientes.verInactivos" xml:space="preserve"><value>显示已停用</value></data>
+  <data name="pacientes.baja" xml:space="preserve"><value>停用患者</value></data>
+  <data name="pacientes.historia" xml:space="preserve"><value>病历</value></data>
+  <data name="pacientes.estado" xml:space="preserve"><value>状态</value></data>
+  <data name="pacientes.estadoActivo" xml:space="preserve"><value>已启用</value></data>
+  <data name="pacientes.estadoInactivo" xml:space="preserve"><value>已停用</value></data>
+  <data name="pacientes.obraSocial" xml:space="preserve"><value>医疗保险</value></data>
+  <data name="pacientes.numeroAfiliado" xml:space="preserve"><value>参保编号</value></data>
+  <data name="pacientes.fechaAlta" xml:space="preserve"><value>登记日期</value></data>
+  <data name="pacientes.sinObraSocial" xml:space="preserve"><value>（无医保）</value></data>
+  <data name="pacientes.sinSeleccion" xml:space="preserve"><value>请先从列表中选择患者。</value></data>
+  <data name="pacientes.resultados" xml:space="preserve"><value>找到 {0} 位患者</value></data>
+  <data name="pacientes.cred.titulo" xml:space="preserve"><value>门户凭据已生成</value></data>
+  <data name="pacientes.cred.aviso" xml:space="preserve"><value>请将凭据交给患者。临时密码不会再次显示。</value></data>
+  <data name="pacientes.cred.copiar" xml:space="preserve"><value>复制密码</value></data>
+  <data name="pacientes.cred.copiado" xml:space="preserve"><value>密码已复制到剪贴板。</value></data>
+  <data name="pacientes.baja.motivo" xml:space="preserve"><value>停用原因</value></data>
+  <data name="pacientes.baja.confirmar" xml:space="preserve"><value>确认停用“{0}”？其门户凭据将被禁用（病历将保留）。</value></data>
+  <data name="hc.titulo" xml:space="preserve"><value>血液科病历</value></data>
+  <data name="hc.diagnostico" xml:space="preserve"><value>诊断/适应症</value></data>
+  <data name="hc.sinDiagnostico" xml:space="preserve"><value>（无诊断）</value></data>
+  <data name="hc.limiteInferior" xml:space="preserve"><value>INR 下限</value></data>
+  <data name="hc.limiteSuperior" xml:space="preserve"><value>INR 上限</value></data>
+  <data name="hc.medicamento" xml:space="preserve"><value>药物</value></data>
+  <data name="hc.dosis" xml:space="preserve"><value>剂量</value></data>
+  <data name="hc.periodicidad" xml:space="preserve"><value>报告周期（天）</value></data>
+  <data name="hc.proximoControl" xml:space="preserve"><value>安排下次复诊</value></data>
+  <data name="hc.sinConfigurar" xml:space="preserve"><value>该患者尚未配置病历。</value></data>
+  <data name="hc.soloLectura" xml:space="preserve"><value>只读视图：您的角色无法修改病历。</value></data>
   <data name="rin.reportar" xml:space="preserve"><value>报告 INR</value></data>
   <data name="rin.valor" xml:space="preserve"><value>INR 数值</value></data>
   <data name="rin.fecha" xml:space="preserve"><value>测量日期</value></data>

@@ -29,6 +29,7 @@ namespace Negocio.UI
         private readonly Panel _panelVista = new();
         private readonly List<(Button Boton, string Clave)> _botonesModulo = new();
         private PanelTriajeControl? _controlTriaje;
+        private PacientesControl? _controlPacientes;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
 
@@ -206,6 +207,14 @@ namespace Negocio.UI
                 _panelVista.Controls.Add(_controlTriaje);
                 _controlTriaje.Reanudar();
             }
+            else if (clave == "mod.pacientes")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlPacientes ??= new PacientesControl(_sesion.Id, _sesion.NombreUsuario);
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlPacientes);
+                _controlPacientes.Recargar();
+            }
             else
             {
                 _lblModuloDetalle.Text = Texto("shell.enConstruccion");
@@ -236,6 +245,7 @@ namespace Negocio.UI
             }
 
             _controlTriaje?.RefrescarTextos();
+            _controlPacientes?.RefrescarTextos();
 
             _actualizandoIdioma = true;
             try

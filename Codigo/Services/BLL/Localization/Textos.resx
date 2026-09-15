@@ -80,6 +80,37 @@
   <data name="pacientes.documento" xml:space="preserve"><value>Documento (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Teléfono</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="pacientes.buscar" xml:space="preserve"><value>Buscar:</value></data>
+  <data name="pacientes.buscarPlaceholder" xml:space="preserve"><value>Nombre o documento...</value></data>
+  <data name="pacientes.verInactivos" xml:space="preserve"><value>Ver inactivos</value></data>
+  <data name="pacientes.baja" xml:space="preserve"><value>Dar de baja</value></data>
+  <data name="pacientes.historia" xml:space="preserve"><value>Historia clínica</value></data>
+  <data name="pacientes.estado" xml:space="preserve"><value>Estado</value></data>
+  <data name="pacientes.estadoActivo" xml:space="preserve"><value>Activo</value></data>
+  <data name="pacientes.estadoInactivo" xml:space="preserve"><value>Inactivo</value></data>
+  <data name="pacientes.obraSocial" xml:space="preserve"><value>Obra social</value></data>
+  <data name="pacientes.numeroAfiliado" xml:space="preserve"><value>N° de afiliado</value></data>
+  <data name="pacientes.fechaAlta" xml:space="preserve"><value>Fecha de alta</value></data>
+  <data name="pacientes.sinObraSocial" xml:space="preserve"><value>(Sin obra social)</value></data>
+  <data name="pacientes.sinSeleccion" xml:space="preserve"><value>Seleccione un paciente de la lista.</value></data>
+  <data name="pacientes.resultados" xml:space="preserve"><value>{0} paciente(s) encontrado(s)</value></data>
+  <data name="pacientes.cred.titulo" xml:space="preserve"><value>Credenciales del portal generadas</value></data>
+  <data name="pacientes.cred.aviso" xml:space="preserve"><value>Entregue estas credenciales al paciente. La contraseña temporal no volverá a mostrarse.</value></data>
+  <data name="pacientes.cred.copiar" xml:space="preserve"><value>Copiar contraseña</value></data>
+  <data name="pacientes.cred.copiado" xml:space="preserve"><value>Contraseña copiada al portapapeles.</value></data>
+  <data name="pacientes.baja.motivo" xml:space="preserve"><value>Motivo de la baja</value></data>
+  <data name="pacientes.baja.confirmar" xml:space="preserve"><value>¿Confirmar la baja de '{0}'? Se deshabilitarán sus credenciales del portal (el historial clínico se conserva).</value></data>
+  <data name="hc.titulo" xml:space="preserve"><value>Historia Clínica Hematológica</value></data>
+  <data name="hc.diagnostico" xml:space="preserve"><value>Diagnóstico / indicación</value></data>
+  <data name="hc.sinDiagnostico" xml:space="preserve"><value>(Sin diagnóstico)</value></data>
+  <data name="hc.limiteInferior" xml:space="preserve"><value>Límite inferior del RIN</value></data>
+  <data name="hc.limiteSuperior" xml:space="preserve"><value>Límite superior del RIN</value></data>
+  <data name="hc.medicamento" xml:space="preserve"><value>Medicamento</value></data>
+  <data name="hc.dosis" xml:space="preserve"><value>Dosis</value></data>
+  <data name="hc.periodicidad" xml:space="preserve"><value>Periodicidad de reporte (días)</value></data>
+  <data name="hc.proximoControl" xml:space="preserve"><value>Programar próximo control</value></data>
+  <data name="hc.sinConfigurar" xml:space="preserve"><value>El paciente no posee historia clínica configurada todavía.</value></data>
+  <data name="hc.soloLectura" xml:space="preserve"><value>Vista de solo lectura: su perfil no permite modificar la historia clínica.</value></data>
   <data name="rin.reportar" xml:space="preserve"><value>Reportar RIN</value></data>
   <data name="rin.valor" xml:space="preserve"><value>Valor de RIN</value></data>
   <data name="rin.fecha" xml:space="preserve"><value>Fecha de medición</value></data>

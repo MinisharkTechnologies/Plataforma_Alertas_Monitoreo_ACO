@@ -80,6 +80,37 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="pacientes.buscar" xml:space="preserve"><value>Search:</value></data>
+  <data name="pacientes.buscarPlaceholder" xml:space="preserve"><value>Name or ID...</value></data>
+  <data name="pacientes.verInactivos" xml:space="preserve"><value>Show inactive</value></data>
+  <data name="pacientes.baja" xml:space="preserve"><value>Deactivate</value></data>
+  <data name="pacientes.historia" xml:space="preserve"><value>Clinical record</value></data>
+  <data name="pacientes.estado" xml:space="preserve"><value>Status</value></data>
+  <data name="pacientes.estadoActivo" xml:space="preserve"><value>Active</value></data>
+  <data name="pacientes.estadoInactivo" xml:space="preserve"><value>Inactive</value></data>
+  <data name="pacientes.obraSocial" xml:space="preserve"><value>Health insurance</value></data>
+  <data name="pacientes.numeroAfiliado" xml:space="preserve"><value>Member number</value></data>
+  <data name="pacientes.fechaAlta" xml:space="preserve"><value>Registered on</value></data>
+  <data name="pacientes.sinObraSocial" xml:space="preserve"><value>(No insurance)</value></data>
+  <data name="pacientes.sinSeleccion" xml:space="preserve"><value>Select a patient from the list.</value></data>
+  <data name="pacientes.resultados" xml:space="preserve"><value>{0} patient(s) found</value></data>
+  <data name="pacientes.cred.titulo" xml:space="preserve"><value>Portal credentials generated</value></data>
+  <data name="pacientes.cred.aviso" xml:space="preserve"><value>Give these credentials to the patient. The temporary password will not be shown again.</value></data>
+  <data name="pacientes.cred.copiar" xml:space="preserve"><value>Copy password</value></data>
+  <data name="pacientes.cred.copiado" xml:space="preserve"><value>Password copied to clipboard.</value></data>
+  <data name="pacientes.baja.motivo" xml:space="preserve"><value>Deactivation reason</value></data>
+  <data name="pacientes.baja.confirmar" xml:space="preserve"><value>Confirm deactivation of '{0}'? Portal credentials will be disabled (clinical history is preserved).</value></data>
+  <data name="hc.titulo" xml:space="preserve"><value>Hematology Clinical Record</value></data>
+  <data name="hc.diagnostico" xml:space="preserve"><value>Diagnosis / indication</value></data>
+  <data name="hc.sinDiagnostico" xml:space="preserve"><value>(No diagnosis)</value></data>
+  <data name="hc.limiteInferior" xml:space="preserve"><value>INR lower limit</value></data>
+  <data name="hc.limiteSuperior" xml:space="preserve"><value>INR upper limit</value></data>
+  <data name="hc.medicamento" xml:space="preserve"><value>Medication</value></data>
+  <data name="hc.dosis" xml:space="preserve"><value>Dosage</value></data>
+  <data name="hc.periodicidad" xml:space="preserve"><value>Reporting interval (days)</value></data>
+  <data name="hc.proximoControl" xml:space="preserve"><value>Schedule next visit</value></data>
+  <data name="hc.sinConfigurar" xml:space="preserve"><value>No clinical record configured yet.</value></data>
+  <data name="hc.soloLectura" xml:space="preserve"><value>Read-only view: your profile cannot edit the clinical record.</value></data>
   <data name="rin.reportar" xml:space="preserve"><value>Report INR</value></data>
   <data name="rin.valor" xml:space="preserve"><value>INR value</value></data>
   <data name="rin.fecha" xml:space="preserve"><value>Measurement date</value></data>
