@@ -1,12 +1,16 @@
+using System.Text;
+using Negocio.BLL;
+using Negocio.DAL.Context;
 using Services.DomainModel;
 using Services.Facade;
 
 namespace Negocio.UI
 {
     /// <summary>
-    /// Ventana principal (shell): cabecera de sesión, menú de módulos habilitados según los
-    /// permisos del perfil (REQ-ARQ-006) y área de contenido donde se incrustan las pantallas
-    /// de cada módulo (UserControls). Permite cambiar el idioma en vivo (REQ-ARQ-001).
+    /// Ventana principal (shell): cabecera de sesión con indicador de integridad (DVH/DVV),
+    /// menú de módulos habilitados según los permisos del perfil (REQ-ARQ-006) y área de
+    /// contenido donde se incrustan las pantallas de cada módulo (UserControls). Permite
+    /// cambiar el idioma en vivo (REQ-ARQ-001).
     /// </summary>
     public class PrincipalForm : Form
     {
@@ -17,6 +21,7 @@ namespace Negocio.UI
         private readonly FlowLayoutPanel _flowCabecera = new();
         private readonly Label _lblApp = new();
         private readonly Label _lblSesion = new();
+        private readonly Label _lblIntegridad = new();
         private readonly Button _btnCerrarSesion = new();
         private readonly ComboBox _cmbIdioma = new();
         private readonly Panel _panelMenu = new();
@@ -39,6 +44,7 @@ namespace Negocio.UI
         private SistemaControl? _controlSistema;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
+        private int _problemasIntegridad = -1;
 
         public PrincipalForm(UsuarioAutenticado sesion)
         {
@@ -46,6 +52,7 @@ namespace Negocio.UI
             ConstruirInterfaz();
             ConstruirMenu();
             AplicarTextos();
+            VerificarIntegridad();
         }
 
         private static string Texto(string clave) => LocalizationService.ObtenerTexto(clave);
@@ -74,7 +81,7 @@ namespace Negocio.UI
             _lblSesion.ForeColor = Color.FromArgb(214, 232, 250);
 
             _flowCabecera.Dock = DockStyle.Right;
-            _flowCabecera.Width = 380;
+            _flowCabecera.Width = 560;
             _flowCabecera.FlowDirection = FlowDirection.RightToLeft;
             _flowCabecera.Padding = new Padding(0, 18, 16, 0);
             _flowCabecera.BackColor = Color.FromArgb(41, 98, 176);
@@ -95,8 +102,15 @@ namespace Negocio.UI
             _cmbIdioma.Margin = new Padding(10, 4, 6, 0);
             _cmbIdioma.SelectedIndexChanged += CmbIdioma_SelectedIndexChanged;
 
+            _lblIntegridad.Size = new Size(170, 36);
+            _lblIntegridad.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            _lblIntegridad.TextAlign = ContentAlignment.MiddleCenter;
+            _lblIntegridad.Margin = new Padding(0, 0, 10, 0);
+            _lblIntegridad.ForeColor = Color.FromArgb(214, 232, 250);
+
             _flowCabecera.Controls.Add(_btnCerrarSesion);
             _flowCabecera.Controls.Add(_cmbIdioma);
+            _flowCabecera.Controls.Add(_lblIntegridad);
 
             _panelCabecera.Controls.Add(_lblApp);
             _panelCabecera.Controls.Add(_lblSesion);
@@ -286,6 +300,63 @@ namespace Negocio.UI
             }
         }
 
+        /// <summary>
+        /// Verifica la integridad (DVH/DVV) al iniciar sesión: actualiza el indicador de la
+        /// cabecera y, si hay problemas, los informa con su detalle.
+        /// </summary>
+        private void VerificarIntegridad()
+        {
+            try
+            {
+                using var contexto = new NegocioDbContext();
+                ResultadoAuditoria resultado = new IntegridadLogic(contexto).Auditar();
+                _problemasIntegridad = resultado.Problemas.Count;
+                ActualizarIndicadorIntegridad();
+
+                if (_problemasIntegridad > 0)
+                {
+                    var detalle = new StringBuilder();
+                    detalle.AppendLine(Texto("integridad.mensaje"));
+                    detalle.AppendLine();
+                    foreach (string problema in resultado.Problemas.Take(10))
+                    {
+                        detalle.AppendLine("• " + problema);
+                    }
+                    if (resultado.Problemas.Count > 10)
+                    {
+                        detalle.AppendLine($"… (+{resultado.Problemas.Count - 10})");
+                    }
+                    MessageBox.Show(this, detalle.ToString(), Texto("integridad.titulo"),
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "PrincipalForm", mostrarMensaje: false);
+                _problemasIntegridad = -1;
+                ActualizarIndicadorIntegridad();
+            }
+        }
+
+        private void ActualizarIndicadorIntegridad()
+        {
+            if (_problemasIntegridad < 0)
+            {
+                _lblIntegridad.Text = "—";
+                _lblIntegridad.ForeColor = Color.FromArgb(200, 214, 230);
+            }
+            else if (_problemasIntegridad == 0)
+            {
+                _lblIntegridad.Text = Texto("integridad.ok");
+                _lblIntegridad.ForeColor = Color.FromArgb(190, 245, 205);
+            }
+            else
+            {
+                _lblIntegridad.Text = $"{Texto("integridad.alerta")} {_problemasIntegridad}";
+                _lblIntegridad.ForeColor = Color.FromArgb(255, 190, 190);
+            }
+        }
+
         private void AplicarTextos()
         {
             Text = $"{Texto("app.nombre")} — {Texto("shell.titulo")}";
@@ -316,6 +387,7 @@ namespace Negocio.UI
             _controlReportes?.RefrescarTextos();
             _controlPortal?.RefrescarTextos();
             _controlSistema?.RefrescarTextos();
+            ActualizarIndicadorIntegridad();
 
             _actualizandoIdioma = true;
             try

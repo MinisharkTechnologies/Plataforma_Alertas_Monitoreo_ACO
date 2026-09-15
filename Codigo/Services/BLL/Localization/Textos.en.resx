@@ -80,6 +80,10 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="integridad.ok" xml:space="preserve"><value>🛡️ Integrity OK</value></data>
+  <data name="integridad.alerta" xml:space="preserve"><value>⚠ Integrity:</value></data>
+  <data name="integridad.titulo" xml:space="preserve"><value>Data integrity</value></data>
+  <data name="integridad.mensaje" xml:space="preserve"><value>Data integrity problems were detected in the database:</value></data>
   <data name="sistema.usuarios" xml:space="preserve"><value>Users</value></data>
   <data name="sistema.bitacora" xml:space="preserve"><value>Activity log</value></data>
   <data name="sistema.nuevoUsuario" xml:space="preserve"><value>New user</value></data>

@@ -80,6 +80,10 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="integridad.ok" xml:space="preserve"><value>🛡️ 完整性正常</value></data>
+  <data name="integridad.alerta" xml:space="preserve"><value>⚠ 完整性：</value></data>
+  <data name="integridad.titulo" xml:space="preserve"><value>数据完整性</value></data>
+  <data name="integridad.mensaje" xml:space="preserve"><value>检测到数据库完整性问题：</value></data>
   <data name="sistema.usuarios" xml:space="preserve"><value>用户</value></data>
   <data name="sistema.bitacora" xml:space="preserve"><value>日志</value></data>
   <data name="sistema.nuevoUsuario" xml:space="preserve"><value>新建用户</value></data>
