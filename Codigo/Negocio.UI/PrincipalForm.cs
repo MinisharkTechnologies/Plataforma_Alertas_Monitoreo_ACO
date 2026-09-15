@@ -4,10 +4,9 @@ using Services.Facade;
 namespace Negocio.UI
 {
     /// <summary>
-    /// Ventana principal (shell) posterior al login: muestra la cabecera de sesión, el menú
-    /// de módulos habilitados según los permisos del perfil (REQ-ARQ-006) y el área de
-    /// contenido donde vivirán las pantallas de cada módulo. Permite cambiar el idioma en
-    /// vivo (REQ-ARQ-001).
+    /// Ventana principal (shell): cabecera de sesión, menú de módulos habilitados según los
+    /// permisos del perfil (REQ-ARQ-006) y área de contenido donde se incrustan las pantallas
+    /// de cada módulo (UserControls). Permite cambiar el idioma en vivo (REQ-ARQ-001).
     /// </summary>
     public class PrincipalForm : Form
     {
@@ -24,9 +23,12 @@ namespace Negocio.UI
         private readonly Label _lblMenuTitulo = new();
         private readonly FlowLayoutPanel _flowModulos = new();
         private readonly Panel _panelContenido = new();
+        private readonly Panel _panelTitulo = new();
         private readonly Label _lblModuloTitulo = new();
         private readonly Label _lblModuloDetalle = new();
+        private readonly Panel _panelVista = new();
         private readonly List<(Button Boton, string Clave)> _botonesModulo = new();
+        private PanelTriajeControl? _controlTriaje;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
 
@@ -113,22 +115,32 @@ namespace Negocio.UI
             _panelMenu.Controls.Add(_lblMenuTitulo);
             _panelMenu.Controls.Add(_flowModulos);
 
-            // ---- Contenido ----
+            // ---- Contenido (título + vista del módulo) ----
             _panelContenido.Dock = DockStyle.Fill;
             _panelContenido.BackColor = Color.FromArgb(244, 249, 254);
 
-            _lblModuloTitulo.Location = new Point(36, 30);
+            _panelTitulo.Dock = DockStyle.Top;
+            _panelTitulo.Height = 104;
+            _panelTitulo.BackColor = Color.FromArgb(244, 249, 254);
+
+            _lblModuloTitulo.Location = new Point(36, 22);
             _lblModuloTitulo.Size = new Size(900, 40);
             _lblModuloTitulo.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
             _lblModuloTitulo.ForeColor = Color.FromArgb(30, 66, 120);
 
-            _lblModuloDetalle.Location = new Point(38, 76);
+            _lblModuloDetalle.Location = new Point(38, 68);
             _lblModuloDetalle.Size = new Size(900, 24);
             _lblModuloDetalle.Font = new Font("Segoe UI", 10.5F);
             _lblModuloDetalle.ForeColor = Color.FromArgb(90, 110, 135);
 
-            _panelContenido.Controls.Add(_lblModuloTitulo);
-            _panelContenido.Controls.Add(_lblModuloDetalle);
+            _panelTitulo.Controls.Add(_lblModuloTitulo);
+            _panelTitulo.Controls.Add(_lblModuloDetalle);
+
+            _panelVista.Dock = DockStyle.Fill;
+            _panelVista.BackColor = Color.FromArgb(244, 249, 254);
+
+            _panelContenido.Controls.Add(_panelVista);
+            _panelContenido.Controls.Add(_panelTitulo);
 
             Controls.Add(_panelContenido);
             Controls.Add(_panelMenu);
@@ -182,9 +194,23 @@ namespace Negocio.UI
 
         private void MostrarModulo(string clave)
         {
+            _controlTriaje?.Pausar();
             _claveModuloActual = clave;
             _lblModuloTitulo.Text = Texto(clave);
-            _lblModuloDetalle.Text = Texto("shell.enConstruccion");
+
+            if (clave == "panel.titulo")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlTriaje ??= new PanelTriajeControl();
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlTriaje);
+                _controlTriaje.Reanudar();
+            }
+            else
+            {
+                _lblModuloDetalle.Text = Texto("shell.enConstruccion");
+                _panelVista.Controls.Clear();
+            }
         }
 
         private void AplicarTextos()
@@ -208,6 +234,8 @@ namespace Negocio.UI
             {
                 MostrarModulo(_claveModuloActual);
             }
+
+            _controlTriaje?.RefrescarTextos();
 
             _actualizandoIdioma = true;
             try

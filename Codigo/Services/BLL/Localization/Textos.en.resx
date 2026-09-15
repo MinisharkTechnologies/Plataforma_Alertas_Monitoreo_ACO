@@ -63,6 +63,17 @@
   <data name="panel.criticidadAlta" xml:space="preserve"><value>Critical (High)</value></data>
   <data name="panel.criticidadMedia" xml:space="preserve"><value>Moderate (Medium)</value></data>
   <data name="panel.criticidadBaja" xml:space="preserve"><value>Stable (Low)</value></data>
+  <data name="panel.columna.paciente" xml:space="preserve"><value>Patient</value></data>
+  <data name="panel.columna.documento" xml:space="preserve"><value>ID Document</value></data>
+  <data name="panel.columna.ultimoRin" xml:space="preserve"><value>Latest INR</value></data>
+  <data name="panel.columna.fecha" xml:space="preserve"><value>Last report</value></data>
+  <data name="panel.columna.dias" xml:space="preserve"><value>Days since report</value></data>
+  <data name="panel.columna.criticidad" xml:space="preserve"><value>Criticality</value></data>
+  <data name="panel.columna.alerta" xml:space="preserve"><value>Alert</value></data>
+  <data name="panel.sinDatos" xml:space="preserve"><value>No data</value></data>
+  <data name="panel.actualizar" xml:space="preserve"><value>Refresh</value></data>
+  <data name="panel.leyenda" xml:space="preserve"><value>Legend:</value></data>
+  <data name="panel.refresco" xml:space="preserve"><value>Updated:</value></data>
   <data name="pacientes.titulo" xml:space="preserve"><value>Patient Management</value></data>
   <data name="pacientes.alta" xml:space="preserve"><value>New Patient</value></data>
   <data name="pacientes.nombre" xml:space="preserve"><value>Full name</value></data>
