@@ -7,6 +7,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <ApplicationIcon>openrin.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
