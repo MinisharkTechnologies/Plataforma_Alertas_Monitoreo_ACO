@@ -111,6 +111,24 @@
   <data name="hc.proximoControl" xml:space="preserve"><value>Schedule next visit</value></data>
   <data name="hc.sinConfigurar" xml:space="preserve"><value>No clinical record configured yet.</value></data>
   <data name="hc.soloLectura" xml:space="preserve"><value>Read-only view: your profile cannot edit the clinical record.</value></data>
+  <data name="rin.identificacion" xml:space="preserve"><value>Patient identification (ID):</value></data>
+  <data name="rin.pacienteNoEncontrado" xml:space="preserve"><value>No patient found with that ID.</value></data>
+  <data name="rin.pacienteInactivo" xml:space="preserve"><value>The patient is deactivated; no new reports allowed.</value></data>
+  <data name="rin.sinHistoria" xml:space="preserve"><value>The patient has no clinical record configured (required for triage).</value></data>
+  <data name="rin.ultimaMedicion" xml:space="preserve"><value>Last measurement</value></data>
+  <data name="rin.sinMediciones" xml:space="preserve"><value>No previous measurements.</value></data>
+  <data name="rin.canal" xml:space="preserve"><value>Report channel</value></data>
+  <data name="rin.canal.digital" xml:space="preserve"><value>Digital (portal)</value></data>
+  <data name="rin.canal.telefonico" xml:space="preserve"><value>Phone (manual entry)</value></data>
+  <data name="rin.resultado" xml:space="preserve"><value>Triage result</value></data>
+  <data name="rin.resultadoSinDatos" xml:space="preserve"><value>Search a patient and enter an INR value.</value></data>
+  <data name="rin.alertaGenerada" xml:space="preserve"><value>🔔 Urgent alert generated and notified (physician and administrative staff).</value></data>
+  <data name="rin.tendencia" xml:space="preserve"><value>⚠ Reclassified due to dangerous trend (±0.1 in two consecutive reports).</value></data>
+  <data name="rin.historial" xml:space="preserve"><value>Recent measurements</value></data>
+  <data name="rin.columna.fecha" xml:space="preserve"><value>Date</value></data>
+  <data name="rin.columna.valor" xml:space="preserve"><value>Value</value></data>
+  <data name="rin.columna.canal" xml:space="preserve"><value>Channel</value></data>
+  <data name="rin.rango" xml:space="preserve"><value>Therapeutic range</value></data>
   <data name="rin.reportar" xml:space="preserve"><value>Report INR</value></data>
   <data name="rin.valor" xml:space="preserve"><value>INR value</value></data>
   <data name="rin.fecha" xml:space="preserve"><value>Measurement date</value></data>

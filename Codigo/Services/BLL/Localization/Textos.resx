@@ -111,6 +111,24 @@
   <data name="hc.proximoControl" xml:space="preserve"><value>Programar próximo control</value></data>
   <data name="hc.sinConfigurar" xml:space="preserve"><value>El paciente no posee historia clínica configurada todavía.</value></data>
   <data name="hc.soloLectura" xml:space="preserve"><value>Vista de solo lectura: su perfil no permite modificar la historia clínica.</value></data>
+  <data name="rin.identificacion" xml:space="preserve"><value>Identificación del paciente (DNI):</value></data>
+  <data name="rin.pacienteNoEncontrado" xml:space="preserve"><value>No se encontró un paciente con ese documento.</value></data>
+  <data name="rin.pacienteInactivo" xml:space="preserve"><value>El paciente está dado de baja; no admite nuevos reportes.</value></data>
+  <data name="rin.sinHistoria" xml:space="preserve"><value>El paciente no posee historia clínica configurada (necesaria para el triaje).</value></data>
+  <data name="rin.ultimaMedicion" xml:space="preserve"><value>Última medición</value></data>
+  <data name="rin.sinMediciones" xml:space="preserve"><value>Sin mediciones previas.</value></data>
+  <data name="rin.canal" xml:space="preserve"><value>Canal de reporte</value></data>
+  <data name="rin.canal.digital" xml:space="preserve"><value>Digital (portal)</value></data>
+  <data name="rin.canal.telefonico" xml:space="preserve"><value>Telefónico (carga manual)</value></data>
+  <data name="rin.resultado" xml:space="preserve"><value>Resultado del triaje</value></data>
+  <data name="rin.resultadoSinDatos" xml:space="preserve"><value>Busque un paciente y cargue un valor de RIN.</value></data>
+  <data name="rin.alertaGenerada" xml:space="preserve"><value>🔔 Alerta urgente generada y notificada (médico y administrativo).</value></data>
+  <data name="rin.tendencia" xml:space="preserve"><value>⚠ Reclasificado por tendencia peligrosa (±0.1 en dos reportes consecutivos).</value></data>
+  <data name="rin.historial" xml:space="preserve"><value>Últimas mediciones</value></data>
+  <data name="rin.columna.fecha" xml:space="preserve"><value>Fecha</value></data>
+  <data name="rin.columna.valor" xml:space="preserve"><value>Valor</value></data>
+  <data name="rin.columna.canal" xml:space="preserve"><value>Canal</value></data>
+  <data name="rin.rango" xml:space="preserve"><value>Rango terapéutico</value></data>
   <data name="rin.reportar" xml:space="preserve"><value>Reportar RIN</value></data>
   <data name="rin.valor" xml:space="preserve"><value>Valor de RIN</value></data>
   <data name="rin.fecha" xml:space="preserve"><value>Fecha de medición</value></data>

@@ -111,6 +111,24 @@
   <data name="hc.proximoControl" xml:space="preserve"><value>安排下次复诊</value></data>
   <data name="hc.sinConfigurar" xml:space="preserve"><value>该患者尚未配置病历。</value></data>
   <data name="hc.soloLectura" xml:space="preserve"><value>只读视图：您的角色无法修改病历。</value></data>
+  <data name="rin.identificacion" xml:space="preserve"><value>患者身份（证件号码）：</value></data>
+  <data name="rin.pacienteNoEncontrado" xml:space="preserve"><value>未找到该证件号码的患者。</value></data>
+  <data name="rin.pacienteInactivo" xml:space="preserve"><value>患者已停用，无法新增报告。</value></data>
+  <data name="rin.sinHistoria" xml:space="preserve"><value>患者尚未配置病历（分级所需）。</value></data>
+  <data name="rin.ultimaMedicion" xml:space="preserve"><value>最近测量</value></data>
+  <data name="rin.sinMediciones" xml:space="preserve"><value>暂无历史测量。</value></data>
+  <data name="rin.canal" xml:space="preserve"><value>报告渠道</value></data>
+  <data name="rin.canal.digital" xml:space="preserve"><value>数字（门户）</value></data>
+  <data name="rin.canal.telefonico" xml:space="preserve"><value>电话（人工录入）</value></data>
+  <data name="rin.resultado" xml:space="preserve"><value>分级结果</value></data>
+  <data name="rin.resultadoSinDatos" xml:space="preserve"><value>请先搜索患者并输入 INR 数值。</value></data>
+  <data name="rin.alertaGenerada" xml:space="preserve"><value>🔔 已生成并通知紧急警报（医生与管理员）。</value></data>
+  <data name="rin.tendencia" xml:space="preserve"><value>⚠ 因危险趋势重新分级（连续两次报告处于 ±0.1 边界）。</value></data>
+  <data name="rin.historial" xml:space="preserve"><value>最近测量记录</value></data>
+  <data name="rin.columna.fecha" xml:space="preserve"><value>日期</value></data>
+  <data name="rin.columna.valor" xml:space="preserve"><value>数值</value></data>
+  <data name="rin.columna.canal" xml:space="preserve"><value>渠道</value></data>
+  <data name="rin.rango" xml:space="preserve"><value>治疗范围</value></data>
   <data name="rin.reportar" xml:space="preserve"><value>报告 INR</value></data>
   <data name="rin.valor" xml:space="preserve"><value>INR 数值</value></data>
   <data name="rin.fecha" xml:space="preserve"><value>测量日期</value></data>
