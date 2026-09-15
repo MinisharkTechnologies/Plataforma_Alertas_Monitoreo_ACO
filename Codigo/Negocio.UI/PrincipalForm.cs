@@ -35,6 +35,7 @@ namespace Negocio.UI
         private SeguimientoControl? _controlSeguimiento;
         private EventosAdversosControl? _controlEventos;
         private ReportesControl? _controlReportes;
+        private PortalControl? _controlPortal;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
 
@@ -160,7 +161,8 @@ namespace Negocio.UI
 
             AgregarModulo("mod.pacientes", sysadmin || tiene("GESTION_PACIENTES") || tiene("HISTORIA_CLINICA"));
             AgregarModulo("panel.titulo", sysadmin || tiene("PANEL_VER"));
-            AgregarModulo("mod.rin", sysadmin || tiene("RECEPCION_RIN") || tiene("PORTAL_REPORTAR_RIN"));
+            // Recepción de RIN es una pantalla operativa del personal (no del portal del paciente).
+            AgregarModulo("mod.rin", sysadmin || tiene("RECEPCION_RIN"));
             AgregarModulo("mod.agenda", sysadmin || tiene("GESTION_AGENDA"));
             AgregarModulo("mod.seguimiento", sysadmin || tiene("SEGUIMIENTO_CLINICO"));
             AgregarModulo("mod.eventos", sysadmin || tiene("EVENTOS_ADVERSOS"));
@@ -260,6 +262,14 @@ namespace Negocio.UI
                 _panelVista.Controls.Add(_controlReportes);
                 _controlReportes.Recargar();
             }
+            else if (clave == "mod.portal")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlPortal ??= new PortalControl(_sesion.Id, _sesion.NombreUsuario);
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlPortal);
+                _controlPortal.Recargar();
+            }
             else
             {
                 _lblModuloDetalle.Text = Texto("shell.enConstruccion");
@@ -295,6 +305,7 @@ namespace Negocio.UI
             _controlSeguimiento?.RefrescarTextos();
             _controlEventos?.RefrescarTextos();
             _controlReportes?.RefrescarTextos();
+            _controlPortal?.RefrescarTextos();
 
             _actualizandoIdioma = true;
             try

@@ -80,6 +80,13 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="portal.bienvenida" xml:space="preserve"><value>Hello,</value></data>
+  <data name="portal.reportar" xml:space="preserve"><value>Report my INR</value></data>
+  <data name="portal.enviar" xml:space="preserve"><value>Send report</value></data>
+  <data name="portal.gracias" xml:space="preserve"><value>Thank you! Your report has been recorded.</value></data>
+  <data name="portal.notificado" xml:space="preserve"><value>The medical team has been notified and will review your case.</value></data>
+  <data name="portal.historial" xml:space="preserve"><value>My clinical history</value></data>
+  <data name="portal.sinVinculo" xml:space="preserve"><value>Your account is not linked to a patient record. Please contact the administration.</value></data>
   <data name="eventos.recientes" xml:space="preserve"><value>Recent adverse events (all patients)</value></data>
   <data name="eventos.registrar" xml:space="preserve"><value>Log adverse event</value></data>
   <data name="eventos.columna.tipo" xml:space="preserve"><value>Event type</value></data>
