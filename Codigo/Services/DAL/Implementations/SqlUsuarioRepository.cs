@@ -114,6 +114,18 @@ namespace Services.DAL.Implementations
         }
 
         /// <inheritdoc />
+        public void ActualizarPassword(int idUsuario, string hashPassword)
+        {
+            const string sql = "UPDATE dbo.Usuarios SET HashPassword = @HashPassword WHERE Id = @Id;";
+
+            SqlHelper.EjecutarComando(
+                sql,
+                CommandType.Text,
+                new SqlParameter("@HashPassword", hashPassword),
+                new SqlParameter("@Id", idUsuario));
+        }
+
+        /// <inheritdoc />
         public List<Usuario> ObtenerTodos()
         {
             string sql = $"SELECT {Columnas} FROM dbo.Usuarios ORDER BY NombreUsuario;";

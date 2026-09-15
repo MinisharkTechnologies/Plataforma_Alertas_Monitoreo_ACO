@@ -28,6 +28,9 @@ namespace Services.DAL.Interfaces
         /// <summary>Indica si el perfil indicado posee el permiso indicado.</summary>
         bool PerfilTienePermiso(string perfil, string permiso);
 
+        /// <summary>Actualiza el hash de contraseña del usuario indicado (recuperación de credenciales).</summary>
+        void ActualizarPassword(int idUsuario, string hashPassword);
+
         /// <summary>Todos los usuarios del sistema, ordenados por nombre de usuario.</summary>
         List<Usuario> ObtenerTodos();
     }

@@ -80,6 +80,17 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="rec.titulo" xml:space="preserve"><value>密码找回</value></data>
+  <data name="rec.verPregunta" xml:space="preserve"><value>查看安全问题</value></data>
+  <data name="rec.pregunta" xml:space="preserve"><value>安全问题：</value></data>
+  <data name="rec.sinPregunta" xml:space="preserve"><value>无法获取该用户的安全问题，请联系管理员。</value></data>
+  <data name="rec.respuesta" xml:space="preserve"><value>答案</value></data>
+  <data name="rec.nuevaContrasena" xml:space="preserve"><value>新密码</value></data>
+  <data name="rec.cambiar" xml:space="preserve"><value>更改密码</value></data>
+  <data name="rec.ok" xml:space="preserve"><value>完成！密码已更新，请使用新密码登录。</value></data>
+  <data name="rec.pregunta1" xml:space="preserve"><value>您成长的城市？</value></data>
+  <data name="rec.pregunta2" xml:space="preserve"><value>您第一只宠物的名字？</value></data>
+  <data name="rec.pregunta3" xml:space="preserve"><value>您小学的名字？</value></data>
   <data name="integridad.ok" xml:space="preserve"><value>🛡️ 完整性正常</value></data>
   <data name="integridad.alerta" xml:space="preserve"><value>⚠ 完整性：</value></data>
   <data name="integridad.titulo" xml:space="preserve"><value>数据完整性</value></data>

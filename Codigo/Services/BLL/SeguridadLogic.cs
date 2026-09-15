@@ -210,6 +210,64 @@ namespace Services.BLL
             return listado;
         }
 
+        /// <summary>
+        /// Devuelve la pregunta de seguridad del usuario (flujo de recuperación de contraseña),
+        /// o null si el usuario no existe, está inactivo o no la tiene configurada
+        /// (sin revelar cuál de los casos aplica).
+        /// </summary>
+        public static string? ObtenerPreguntaSeguridad(string nombreUsuario)
+        {
+            if (string.IsNullOrWhiteSpace(nombreUsuario))
+            {
+                return null;
+            }
+            Usuario? usuario = RepositorioUsuarios.ObtenerPorNombreUsuario(nombreUsuario.Trim());
+            if (usuario == null || !usuario.Activo || string.IsNullOrWhiteSpace(usuario.PreguntaSeguridad)
+                || string.IsNullOrWhiteSpace(usuario.RespuestaHash))
+            {
+                return null;
+            }
+            return usuario.PreguntaSeguridad;
+        }
+
+        /// <summary>
+        /// Restablece la contraseña validando la respuesta de seguridad (hash) y audita la
+        /// recuperación en bitácora. La recuperación también libera bloqueos por intentos.
+        /// </summary>
+        public static void RecuperarContrasena(string nombreUsuario, string respuestaSeguridad, string nuevaContrasena)
+        {
+            if (string.IsNullOrWhiteSpace(nombreUsuario))
+            {
+                throw new CredencialesInvalidasException("Usuario o contraseña incorrectos.");
+            }
+            if (string.IsNullOrWhiteSpace(nuevaContrasena) || nuevaContrasena.Length < LargoMinimoContrasena)
+            {
+                throw new ArgumentException($"La contraseña debe tener al menos {LargoMinimoContrasena} caracteres.");
+            }
+
+            Usuario? usuario = RepositorioUsuarios.ObtenerPorNombreUsuario(nombreUsuario.Trim());
+            if (usuario == null || !usuario.Activo || string.IsNullOrWhiteSpace(usuario.PreguntaSeguridad)
+                || string.IsNullOrWhiteSpace(usuario.RespuestaHash))
+            {
+                throw new CredencialesInvalidasException("No se pudo validar la recuperación para ese usuario.");
+            }
+
+            if (string.IsNullOrWhiteSpace(respuestaSeguridad)
+                || !CryptographyLogic.VerificarHash(respuestaSeguridad.Trim(), usuario.RespuestaHash))
+            {
+                BitacoraLogic.Registrar(LogLevel.Warning,
+                    $"Recuperación de contraseña fallida para '{usuario.NombreUsuario}': respuesta de seguridad incorrecta.",
+                    usuario: usuario.NombreUsuario, capa: "Seguridad");
+                throw new CredencialesInvalidasException("La respuesta de seguridad no es correcta.");
+            }
+
+            RepositorioUsuarios.ActualizarPassword(usuario.Id, CryptographyLogic.Hashear(nuevaContrasena));
+            RepositorioUsuarios.ActualizarAcceso(usuario.Id, 0, null);
+            BitacoraLogic.Registrar(LogLevel.Info,
+                $"Contraseña restablecida para '{usuario.NombreUsuario}' mediante pregunta de seguridad.",
+                usuario: usuario.NombreUsuario, capa: "Seguridad");
+        }
+
         private static void RegistrarFallo(Usuario usuario)
         {
             int intentos = usuario.IntentosFallidos + 1;

@@ -39,6 +39,14 @@ namespace Services.Facade
         public static void CambiarEstadoUsuario(string nombreUsuario, bool activo, string? motivo = null)
             => SeguridadLogic.CambiarEstadoUsuario(nombreUsuario, activo, motivo);
 
+        /// <summary>Devuelve la pregunta de seguridad del usuario, o null si no está disponible.</summary>
+        public static string? ObtenerPreguntaSeguridad(string nombreUsuario)
+            => SeguridadLogic.ObtenerPreguntaSeguridad(nombreUsuario);
+
+        /// <summary>Restablece la contraseña validando la respuesta de seguridad (auditado en bitácora).</summary>
+        public static void RecuperarContrasena(string nombreUsuario, string respuestaSeguridad, string nuevaContrasena)
+            => SeguridadLogic.RecuperarContrasena(nombreUsuario, respuestaSeguridad, nuevaContrasena);
+
         /// <summary>Lista los usuarios del sistema (sin datos sensibles) para la pantalla de administración.</summary>
         public static List<UsuarioListado> ObtenerUsuarios()
             => SeguridadLogic.ObtenerUsuarios();

@@ -209,8 +209,8 @@ namespace Negocio.UI
 
         private void LnkRecuperar_Click(object? sender, EventArgs e)
         {
-            MessageBox.Show(this, Texto("shell.enConstruccion"), Texto("login.recuperar.titulo"),
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            using var recuperacion = new RecuperacionForm(_txtUsuario.Text.Trim());
+            recuperacion.ShowDialog(this);
         }
 
         private void MostrarAdvertencia(string mensaje)
