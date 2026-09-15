@@ -156,6 +156,10 @@ namespace Negocio.UI
             _panelMensual.Controls.Add(_lblClasificacionGlobal);
             _panelMensual.Controls.Add(_lblResumen);
             _btnGenerarMensual.BringToFront();
+            _lblTituloIndicador.BringToFront();
+            _lblIndicador.BringToFront();
+            _lblClasificacionGlobal.BringToFront();
+            _lblResumen.BringToFront();
 
             // ---- Vista 2: por diagnóstico ----
             _panelDiagnostico.Dock = DockStyle.Fill;
@@ -268,6 +272,9 @@ namespace Negocio.UI
             _panelHistorial.Controls.Add(_cmbFormato);
             _panelHistorial.Controls.Add(_btnExportar);
             _txtDni.BringToFront();
+            _lblDni.BringToFront();
+            _lblPacienteHistorial.BringToFront();
+            _lblFormato.BringToFront();
             _btnBuscar.BringToFront();
             _cmbFormato.BringToFront();
             _btnExportar.BringToFront();
@@ -435,10 +442,13 @@ namespace Negocio.UI
                             celda.Style.BackColor = ColorClase(clasePaciente);
                             celda.Style.ForeColor = Color.White;
                             celda.Style.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+                            celda.Style.SelectionBackColor = ColorClase(clasePaciente);
+                            celda.Style.SelectionForeColor = Color.White;
                         }
                     }
                 }
 
+                _grillaPacientes.ClearSelection();
                 int conDatos = reporte.CantidadOptimos + reporte.CantidadSuboptimos + reporte.CantidadDeficientes;
                 _lblResumen.Text =
                     $"{Localizacion("reportes.pacientesDatos")} {conDatos}   ·   " +
@@ -480,12 +490,14 @@ namespace Negocio.UI
                     if (fila.BajoDesempeno)
                     {
                         _grillaDiagnosticos.Rows[indice].DefaultCellStyle.BackColor = Color.FromArgb(253, 236, 234);
+                        _grillaDiagnosticos.Rows[indice].DefaultCellStyle.SelectionBackColor = Color.FromArgb(250, 222, 219);
                         _grillaDiagnosticos.Rows[indice].Cells[6].Style.ForeColor = Color.FromArgb(185, 45, 40);
                         _grillaDiagnosticos.Rows[indice].Cells[6].Style.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
                         _grillaDiagnosticos.Rows[indice].Cells[2].Style.ForeColor = Color.FromArgb(185, 45, 40);
                         _grillaDiagnosticos.Rows[indice].Cells[2].Style.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
                     }
                 }
+                _grillaDiagnosticos.ClearSelection();
             }
             catch (ValidacionNegocioException ex)
             {
@@ -525,6 +537,7 @@ namespace Negocio.UI
                 {
                     _lblPacienteHistorial.Text += $" — {Localizacion("reportes.sinItems")}";
                 }
+                _grillaHistorial.ClearSelection();
             }
             catch (ValidacionNegocioException ex)
             {
