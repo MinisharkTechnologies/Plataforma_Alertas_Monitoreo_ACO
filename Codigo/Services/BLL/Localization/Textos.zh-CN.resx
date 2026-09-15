@@ -80,6 +80,30 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="agenda.desde" xml:space="preserve"><value>从：</value></data>
+  <data name="agenda.hasta" xml:space="preserve"><value>至：</value></data>
+  <data name="agenda.actualizar" xml:space="preserve"><value>刷新日程</value></data>
+  <data name="agenda.agendar" xml:space="preserve"><value>预约挂号</value></data>
+  <data name="agenda.columna.fechaHora" xml:space="preserve"><value>日期时间</value></data>
+  <data name="agenda.columna.medico" xml:space="preserve"><value>医生</value></data>
+  <data name="agenda.columna.observaciones" xml:space="preserve"><value>备注</value></data>
+  <data name="agenda.sinTurnos" xml:space="preserve"><value>所选时段内暂无预约。</value></data>
+  <data name="agenda.sugerencias" xml:space="preserve"><value>重新分配建议</value></data>
+  <data name="agenda.sugerenciasVacias" xml:space="preserve"><value>暂无建议。</value></data>
+  <data name="agenda.sug.columna.de" xml:space="preserve"><value>来自（稳定）</value></data>
+  <data name="agenda.sug.columna.a" xml:space="preserve"><value>转给（高危）</value></data>
+  <data name="agenda.rechazar" xml:space="preserve"><value>拒绝</value></data>
+  <data name="agenda.motivoRechazo" xml:space="preserve"><value>拒绝原因</value></data>
+  <data name="agenda.escalar" xml:space="preserve"><value>是否将决定上报给医生？（因临床疑虑拒绝）</value></data>
+  <data name="agenda.reasignacionOk" xml:space="preserve"><value>重新分配完成。已记录通知：</value></data>
+  <data name="agenda.selSugerencia" xml:space="preserve"><value>请从列表中选择一条建议。</value></data>
+  <data name="agenda.hora" xml:space="preserve"><value>时间</value></data>
+  <data name="agenda.sinMedicos" xml:space="preserve"><value>没有可用的医生，请联系管理员。</value></data>
+  <data name="agenda.estado.pendiente" xml:space="preserve"><value>待定</value></data>
+  <data name="agenda.estado.confirmado" xml:space="preserve"><value>已确认</value></data>
+  <data name="agenda.estado.cancelado" xml:space="preserve"><value>已取消</value></data>
+  <data name="agenda.estado.atendido" xml:space="preserve"><value>已就诊</value></data>
+  <data name="agenda.estado.reasignacion" xml:space="preserve"><value>重新分配中</value></data>
   <data name="pacientes.buscar" xml:space="preserve"><value>搜索：</value></data>
   <data name="pacientes.buscarPlaceholder" xml:space="preserve"><value>姓名或证件…</value></data>
   <data name="pacientes.verInactivos" xml:space="preserve"><value>显示已停用</value></data>

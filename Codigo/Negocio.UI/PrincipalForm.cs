@@ -31,6 +31,7 @@ namespace Negocio.UI
         private PanelTriajeControl? _controlTriaje;
         private PacientesControl? _controlPacientes;
         private RecepcionRINControl? _controlRecepcion;
+        private AgendaControl? _controlAgenda;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
 
@@ -224,6 +225,14 @@ namespace Negocio.UI
                 _panelVista.Controls.Add(_controlRecepcion);
                 _controlRecepcion.RefrescarTextos();
             }
+            else if (clave == "mod.agenda")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlAgenda ??= new AgendaControl(_sesion.Id, _sesion.NombreUsuario);
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlAgenda);
+                _controlAgenda.Recargar();
+            }
             else
             {
                 _lblModuloDetalle.Text = Texto("shell.enConstruccion");
@@ -255,6 +264,7 @@ namespace Negocio.UI
 
             _controlTriaje?.RefrescarTextos();
             _controlPacientes?.RefrescarTextos();
+            _controlAgenda?.RefrescarTextos();
 
             _actualizandoIdioma = true;
             try

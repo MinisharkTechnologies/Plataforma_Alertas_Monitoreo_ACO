@@ -80,6 +80,30 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="agenda.desde" xml:space="preserve"><value>From:</value></data>
+  <data name="agenda.hasta" xml:space="preserve"><value>To:</value></data>
+  <data name="agenda.actualizar" xml:space="preserve"><value>Refresh schedule</value></data>
+  <data name="agenda.agendar" xml:space="preserve"><value>Schedule appointment</value></data>
+  <data name="agenda.columna.fechaHora" xml:space="preserve"><value>Date &amp; time</value></data>
+  <data name="agenda.columna.medico" xml:space="preserve"><value>Physician</value></data>
+  <data name="agenda.columna.observaciones" xml:space="preserve"><value>Notes</value></data>
+  <data name="agenda.sinTurnos" xml:space="preserve"><value>No appointments in the selected period.</value></data>
+  <data name="agenda.sugerencias" xml:space="preserve"><value>Reassignment suggestions</value></data>
+  <data name="agenda.sugerenciasVacias" xml:space="preserve"><value>No suggestions right now.</value></data>
+  <data name="agenda.sug.columna.de" xml:space="preserve"><value>From (stable)</value></data>
+  <data name="agenda.sug.columna.a" xml:space="preserve"><value>To (critical)</value></data>
+  <data name="agenda.rechazar" xml:space="preserve"><value>Reject</value></data>
+  <data name="agenda.motivoRechazo" xml:space="preserve"><value>Rejection reason</value></data>
+  <data name="agenda.escalar" xml:space="preserve"><value>Escalate the decision to the physician? (rejection due to clinical doubt)</value></data>
+  <data name="agenda.reasignacionOk" xml:space="preserve"><value>Reassignment completed. Logged notifications:</value></data>
+  <data name="agenda.selSugerencia" xml:space="preserve"><value>Select a suggestion from the list.</value></data>
+  <data name="agenda.hora" xml:space="preserve"><value>Time</value></data>
+  <data name="agenda.sinMedicos" xml:space="preserve"><value>No enabled physicians; contact your administrator.</value></data>
+  <data name="agenda.estado.pendiente" xml:space="preserve"><value>Pending</value></data>
+  <data name="agenda.estado.confirmado" xml:space="preserve"><value>Confirmed</value></data>
+  <data name="agenda.estado.cancelado" xml:space="preserve"><value>Cancelled</value></data>
+  <data name="agenda.estado.atendido" xml:space="preserve"><value>Attended</value></data>
+  <data name="agenda.estado.reasignacion" xml:space="preserve"><value>Under reassignment</value></data>
   <data name="pacientes.buscar" xml:space="preserve"><value>Search:</value></data>
   <data name="pacientes.buscarPlaceholder" xml:space="preserve"><value>Name or ID...</value></data>
   <data name="pacientes.verInactivos" xml:space="preserve"><value>Show inactive</value></data>
