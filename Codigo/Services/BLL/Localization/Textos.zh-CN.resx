@@ -42,6 +42,23 @@
   <data name="login.errorBloqueado" xml:space="preserve"><value>账户因安全原因已被临时锁定。</value></data>
   <data name="login.errorInhabilitado" xml:space="preserve"><value>该用户已被停用，请联系管理员。</value></data>
   <data name="login.bienvenida" xml:space="preserve"><value>欢迎</value></data>
+  <data name="login.idioma" xml:space="preserve"><value>语言</value></data>
+  <data name="login.campoObligatorio" xml:space="preserve"><value>请输入用户名和密码。</value></data>
+  <data name="shell.titulo" xml:space="preserve"><value>主面板</value></data>
+  <data name="shell.sesion" xml:space="preserve"><value>会话：</value></data>
+  <data name="shell.cerrarSesion" xml:space="preserve"><value>退出登录</value></data>
+  <data name="shell.confirmarCerrar" xml:space="preserve"><value>您确定要退出当前登录吗？</value></data>
+  <data name="shell.modulos" xml:space="preserve"><value>模块</value></data>
+  <data name="shell.seleccione" xml:space="preserve"><value>请从侧边菜单选择模块开始使用。</value></data>
+  <data name="shell.enConstruccion" xml:space="preserve"><value>模块建设中，将在下一步更新中提供。</value></data>
+  <data name="mod.pacientes" xml:space="preserve"><value>患者与病历</value></data>
+  <data name="mod.rin" xml:space="preserve"><value>INR 接收</value></data>
+  <data name="mod.agenda" xml:space="preserve"><value>日程与预约</value></data>
+  <data name="mod.seguimiento" xml:space="preserve"><value>临床随访</value></data>
+  <data name="mod.eventos" xml:space="preserve"><value>不良事件</value></data>
+  <data name="mod.reportes" xml:space="preserve"><value>报告</value></data>
+  <data name="mod.portal" xml:space="preserve"><value>患者门户</value></data>
+  <data name="mod.sistema" xml:space="preserve"><value>系统与日志</value></data>
   <data name="panel.titulo" xml:space="preserve"><value>监控面板</value></data>
   <data name="panel.criticidadAlta" xml:space="preserve"><value>高危</value></data>
   <data name="panel.criticidadMedia" xml:space="preserve"><value>中危</value></data>

@@ -42,6 +42,23 @@
   <data name="login.errorBloqueado" xml:space="preserve"><value>Cuenta bloqueada temporalmente por seguridad.</value></data>
   <data name="login.errorInhabilitado" xml:space="preserve"><value>El usuario no está habilitado. Contacte al administrador.</value></data>
   <data name="login.bienvenida" xml:space="preserve"><value>Bienvenido/a</value></data>
+  <data name="login.idioma" xml:space="preserve"><value>Idioma</value></data>
+  <data name="login.campoObligatorio" xml:space="preserve"><value>Complete usuario y contraseña.</value></data>
+  <data name="shell.titulo" xml:space="preserve"><value>Panel Principal</value></data>
+  <data name="shell.sesion" xml:space="preserve"><value>Sesión:</value></data>
+  <data name="shell.cerrarSesion" xml:space="preserve"><value>Cerrar sesión</value></data>
+  <data name="shell.confirmarCerrar" xml:space="preserve"><value>¿Desea cerrar la sesión actual?</value></data>
+  <data name="shell.modulos" xml:space="preserve"><value>Módulos</value></data>
+  <data name="shell.seleccione" xml:space="preserve"><value>Seleccione un módulo del menú lateral para comenzar.</value></data>
+  <data name="shell.enConstruccion" xml:space="preserve"><value>Módulo en construcción; estará disponible en el próximo avance.</value></data>
+  <data name="mod.pacientes" xml:space="preserve"><value>Pacientes e Historias Clínicas</value></data>
+  <data name="mod.rin" xml:space="preserve"><value>Recepción de RIN</value></data>
+  <data name="mod.agenda" xml:space="preserve"><value>Agenda y Turnos</value></data>
+  <data name="mod.seguimiento" xml:space="preserve"><value>Seguimiento Clínico</value></data>
+  <data name="mod.eventos" xml:space="preserve"><value>Eventos Adversos</value></data>
+  <data name="mod.reportes" xml:space="preserve"><value>Reportes</value></data>
+  <data name="mod.portal" xml:space="preserve"><value>Portal del Paciente</value></data>
+  <data name="mod.sistema" xml:space="preserve"><value>Sistema y Bitácora</value></data>
   <data name="panel.titulo" xml:space="preserve"><value>Panel de Monitoreo</value></data>
   <data name="panel.criticidadAlta" xml:space="preserve"><value>Crítico (Alta)</value></data>
   <data name="panel.criticidadMedia" xml:space="preserve"><value>Moderado (Media)</value></data>

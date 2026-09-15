@@ -1,16 +1,27 @@
+using Services.Facade;
+
 namespace Negocio.UI;
 
+/// <summary>
+/// Punto de entrada de la aplicación de escritorio OpenRIN: registra los manejadores
+/// globales de excepciones (REQ-ARQ-004), inicializa el idioma por defecto (REQ-ARQ-001)
+/// y ejecuta el flujo Login → Panel Principal.
+/// </summary>
 static class Program
 {
-    /// <summary>
-    ///  The main entry point for the application.
-    /// </summary>
     [STAThread]
     static void Main()
     {
-        // To customize application configuration such as set high DPI settings or default font,
-        // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
-        Application.Run(new Form1());
-    }    
+        ExceptionManager.RegistrarManejadoresGlobales();
+        LocalizationService.EstablecerIdioma("es");
+
+        using var login = new LoginForm();
+        if (login.ShowDialog() != DialogResult.OK || login.Sesion == null)
+        {
+            return;
+        }
+
+        Application.Run(new PrincipalForm(login.Sesion));
+    }
 }

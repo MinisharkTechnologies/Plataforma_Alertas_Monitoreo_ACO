@@ -42,6 +42,23 @@
   <data name="login.errorBloqueado" xml:space="preserve"><value>Account temporarily locked for security.</value></data>
   <data name="login.errorInhabilitado" xml:space="preserve"><value>This user is disabled. Contact your administrator.</value></data>
   <data name="login.bienvenida" xml:space="preserve"><value>Welcome</value></data>
+  <data name="login.idioma" xml:space="preserve"><value>Language</value></data>
+  <data name="login.campoObligatorio" xml:space="preserve"><value>Please enter your username and password.</value></data>
+  <data name="shell.titulo" xml:space="preserve"><value>Main Panel</value></data>
+  <data name="shell.sesion" xml:space="preserve"><value>Session:</value></data>
+  <data name="shell.cerrarSesion" xml:space="preserve"><value>Sign out</value></data>
+  <data name="shell.confirmarCerrar" xml:space="preserve"><value>Do you want to sign out?</value></data>
+  <data name="shell.modulos" xml:space="preserve"><value>Modules</value></data>
+  <data name="shell.seleccione" xml:space="preserve"><value>Select a module from the side menu to begin.</value></data>
+  <data name="shell.enConstruccion" xml:space="preserve"><value>Module under construction; it will be available in the next milestone.</value></data>
+  <data name="mod.pacientes" xml:space="preserve"><value>Patients &amp; Clinical Records</value></data>
+  <data name="mod.rin" xml:space="preserve"><value>INR Intake</value></data>
+  <data name="mod.agenda" xml:space="preserve"><value>Schedule &amp; Appointments</value></data>
+  <data name="mod.seguimiento" xml:space="preserve"><value>Clinical Follow-up</value></data>
+  <data name="mod.eventos" xml:space="preserve"><value>Adverse Events</value></data>
+  <data name="mod.reportes" xml:space="preserve"><value>Reports</value></data>
+  <data name="mod.portal" xml:space="preserve"><value>Patient Portal</value></data>
+  <data name="mod.sistema" xml:space="preserve"><value>System &amp; Audit Log</value></data>
   <data name="panel.titulo" xml:space="preserve"><value>Monitoring Dashboard</value></data>
   <data name="panel.criticidadAlta" xml:space="preserve"><value>Critical (High)</value></data>
   <data name="panel.criticidadMedia" xml:space="preserve"><value>Moderate (Medium)</value></data>
