@@ -49,6 +49,11 @@ namespace Negocio.UI
         public PrincipalForm(UsuarioAutenticado sesion)
         {
             _sesion = sesion ?? throw new ArgumentNullException(nameof(sesion));
+            System.Drawing.Icon? icono = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (icono != null)
+            {
+                Icon = icono;
+            }
             ConstruirInterfaz();
             ConstruirMenu();
             AplicarTextos();

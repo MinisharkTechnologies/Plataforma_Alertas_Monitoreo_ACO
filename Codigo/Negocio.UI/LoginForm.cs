@@ -33,6 +33,11 @@ namespace Negocio.UI
         public LoginForm()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            System.Drawing.Icon? icono = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
+            if (icono != null)
+            {
+                Icon = icono;
+            }
             ConstruirInterfaz();
             AplicarTextos();
         }
