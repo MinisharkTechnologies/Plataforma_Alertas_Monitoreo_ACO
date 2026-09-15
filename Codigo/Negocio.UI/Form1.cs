@@ -1,4 +1,4 @@
-namespace UI;
+namespace Negocio.UI;
 
 public partial class Form1 : Form
 {

@@ -1,16 +1,15 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\BLL\BLL.csproj" />
+    <ProjectReference Include="..\Negocio.DAL\Negocio.DAL.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
 </Project>
