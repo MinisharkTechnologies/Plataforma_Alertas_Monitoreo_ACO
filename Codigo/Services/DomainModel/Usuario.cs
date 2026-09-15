@@ -4,7 +4,7 @@ namespace Services.DomainModel
 {
     /// <summary>
     /// Usuario del sistema (tabla Usuarios de la base Services). Incluye el estado de acceso
-    /// utilizado por la política anti fuerza bruta (REQ-ARQ-006).
+    /// utilizado por la política anti fuerza bruta (REQ-ARQ-006) y el idioma preferido (REQ-ARQ-001).
     /// </summary>
     public class Usuario
     {
@@ -26,6 +26,9 @@ namespace Services.DomainModel
 
         /// <summary>Hash de la respuesta de seguridad (mismo formato que HashPassword).</summary>
         public string? RespuestaHash { get; set; }
+
+        /// <summary>Idioma preferido del usuario (código de cultura, ej. "es", "en", "zh-CN").</summary>
+        public string? Idioma { get; set; }
 
         public bool Activo { get; set; } = true;
 

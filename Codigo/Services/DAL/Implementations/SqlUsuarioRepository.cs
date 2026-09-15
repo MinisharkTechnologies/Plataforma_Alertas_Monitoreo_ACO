@@ -14,7 +14,7 @@ namespace Services.DAL.Implementations
     {
         private const string Columnas = @"
             Id, NombreUsuario, NombreCompleto, HashPassword, Perfil, Email,
-            PreguntaSeguridad, RespuestaHash, Activo, IntentosFallidos, BloqueadoHasta";
+            PreguntaSeguridad, RespuestaHash, Idioma, Activo, IntentosFallidos, BloqueadoHasta";
 
         /// <inheritdoc />
         public Usuario? ObtenerPorNombreUsuario(string nombreUsuario)
@@ -48,10 +48,10 @@ namespace Services.DAL.Implementations
         {
             const string sql = @"
                 INSERT INTO dbo.Usuarios
-                    (NombreUsuario, NombreCompleto, HashPassword, Perfil, Email, PreguntaSeguridad, RespuestaHash, Activo, IntentosFallidos, BloqueadoHasta)
+                    (NombreUsuario, NombreCompleto, HashPassword, Perfil, Email, PreguntaSeguridad, RespuestaHash, Idioma, Activo, IntentosFallidos, BloqueadoHasta)
                 OUTPUT INSERTED.Id
                 VALUES
-                    (@NombreUsuario, @NombreCompleto, @HashPassword, @Perfil, @Email, @PreguntaSeguridad, @RespuestaHash, @Activo, @IntentosFallidos, @BloqueadoHasta);";
+                    (@NombreUsuario, @NombreCompleto, @HashPassword, @Perfil, @Email, @PreguntaSeguridad, @RespuestaHash, @Idioma, @Activo, @IntentosFallidos, @BloqueadoHasta);";
 
             object? id = SqlHelper.EjecutarEscalar(
                 sql,
@@ -63,6 +63,7 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@Email", (object?)usuario.Email ?? DBNull.Value),
                 new SqlParameter("@PreguntaSeguridad", (object?)usuario.PreguntaSeguridad ?? DBNull.Value),
                 new SqlParameter("@RespuestaHash", (object?)usuario.RespuestaHash ?? DBNull.Value),
+                new SqlParameter("@Idioma", (object?)usuario.Idioma ?? DBNull.Value),
                 new SqlParameter("@Activo", usuario.Activo),
                 new SqlParameter("@IntentosFallidos", usuario.IntentosFallidos),
                 new SqlParameter("@BloqueadoHasta", (object?)usuario.BloqueadoHasta ?? DBNull.Value));
@@ -109,9 +110,10 @@ namespace Services.DAL.Implementations
             Email = lector.IsDBNull(5) ? null : lector.GetString(5),
             PreguntaSeguridad = lector.IsDBNull(6) ? null : lector.GetString(6),
             RespuestaHash = lector.IsDBNull(7) ? null : lector.GetString(7),
-            Activo = lector.GetBoolean(8),
-            IntentosFallidos = lector.GetInt32(9),
-            BloqueadoHasta = lector.IsDBNull(10) ? null : lector.GetDateTime(10)
+            Idioma = lector.IsDBNull(8) ? null : lector.GetString(8),
+            Activo = lector.GetBoolean(9),
+            IntentosFallidos = lector.GetInt32(10),
+            BloqueadoHasta = lector.IsDBNull(11) ? null : lector.GetDateTime(11)
         };
     }
 }

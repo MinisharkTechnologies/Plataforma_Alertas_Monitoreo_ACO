@@ -11,12 +11,18 @@ BEGIN
         Email             NVARCHAR(200)     NULL,
         PreguntaSeguridad NVARCHAR(300)     NULL,     -- recuperación de contraseña (scope creep)
         RespuestaHash     NVARCHAR(400)     NULL,
+        Idioma            VARCHAR(10)       NULL,     -- idioma preferido del usuario (REQ-ARQ-001)
         Activo            BIT               NOT NULL CONSTRAINT DF_Usuarios_Activo DEFAULT (1),
         IntentosFallidos  INT               NOT NULL CONSTRAINT DF_Usuarios_Intentos DEFAULT (0),
         BloqueadoHasta    DATETIME2(0)      NULL,     -- anti fuerza bruta: 5 fallos -> 15 min
         FechaAlta         DATETIME2(0)      NOT NULL CONSTRAINT DF_Usuarios_FechaAlta DEFAULT SYSDATETIME()
     );
 END;
+GO
+
+-- Migración idempotente: idioma preferido (bases creadas antes de REQ-ARQ-001)
+IF COL_LENGTH('dbo.Usuarios', 'Idioma') IS NULL
+    ALTER TABLE dbo.Usuarios ADD Idioma VARCHAR(10) NULL;
 GO
 
 IF OBJECT_ID('dbo.PerfilesPermisos', 'U') IS NULL
