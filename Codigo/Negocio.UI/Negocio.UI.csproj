@@ -6,6 +6,10 @@
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="openrin.ico" />
+  </ItemGroup>
+
   <PropertyGroup>
     <ApplicationIcon>openrin.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>

@@ -1,4 +1,5 @@
 using System.Drawing.Drawing2D;
+using System.Drawing.Text;
 using Services.DomainModel;
 using Services.DomainModel.Exceptions;
 using Services.Facade;
@@ -7,7 +8,8 @@ namespace Negocio.UI
 {
     /// <summary>
     /// Pantalla de inicio de sesión: autentica contra el módulo de seguridad de Services
-    /// (REQ-ARQ-006) y permite cambiar el idioma en vivo (REQ-ARQ-001).
+    /// (REQ-ARQ-006), muestra el logo institucional y permite cambiar el idioma en vivo
+    /// (REQ-ARQ-001) y recuperar la contraseña con pregunta de seguridad.
     /// </summary>
     public class LoginForm : Form
     {
@@ -25,6 +27,7 @@ namespace Negocio.UI
         private readonly Label _lblIdioma = new();
         private readonly ComboBox _cmbIdioma = new();
         private readonly Label _lblVersion = new();
+        private readonly Icon? _logoLogin = Recursos.CargarIcono(96);
         private bool _actualizandoIdioma;
 
         /// <summary>Sesión autenticada; disponible cuando el diálogo devuelve OK.</summary>
@@ -52,7 +55,7 @@ namespace Negocio.UI
             StartPosition = FormStartPosition.CenterScreen;
 
             _lblTitulo.Location = new Point(36, 26);
-            _lblTitulo.Size = new Size(388, 40);
+            _lblTitulo.Size = new Size(268, 40);
             _lblTitulo.Font = new Font("Segoe UI", 22F, FontStyle.Bold);
             _lblTitulo.ForeColor = Color.FromArgb(27, 79, 138);
 
@@ -119,7 +122,7 @@ namespace Negocio.UI
             _lblVersion.Font = new Font("Segoe UI", 8F);
             _lblVersion.ForeColor = Color.FromArgb(110, 130, 150);
 
-            Controls.AddRange(new Control[] { _lblTitulo, _lblSubtitulo, _panelTarjeta, _lblVersion });
+            Controls.Add(_panelTarjeta);
             AcceptButton = _btnIngresar;
         }
 
@@ -131,6 +134,30 @@ namespace Negocio.UI
                 Color.FromArgb(235, 246, 255),
                 LinearGradientMode.Vertical);
             e.Graphics.FillRectangle(pincel, ClientRectangle);
+
+            // Logo institucional (carta de presentación), arriba a la derecha del título.
+            if (_logoLogin != null)
+            {
+                e.Graphics.DrawIcon(_logoLogin, new Rectangle(336, 8, 92, 92));
+            }
+
+            // Títulos dibujados a mano: se funden con el degradé (sin cajas grises de fondo).
+            e.Graphics.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+            using (var fuenteTitulo = new Font("Segoe UI", 22F, FontStyle.Bold))
+            using (var pincelTitulo = new SolidBrush(Color.FromArgb(27, 79, 138)))
+            {
+                e.Graphics.DrawString(_lblTitulo.Text, fuenteTitulo, pincelTitulo, 36, 24);
+            }
+            using (var fuenteSubtitulo = new Font("Segoe UI", 9.5F))
+            using (var pincelSubtitulo = new SolidBrush(Color.FromArgb(74, 107, 138)))
+            {
+                e.Graphics.DrawString(_lblSubtitulo.Text, fuenteSubtitulo, pincelSubtitulo, 38, 68);
+            }
+            using (var fuenteVersion = new Font("Segoe UI", 8F))
+            using (var pincelVersion = new SolidBrush(Color.FromArgb(110, 130, 150)))
+            {
+                e.Graphics.DrawString(_lblVersion.Text, fuenteVersion, pincelVersion, 38, 468);
+            }
         }
 
         private void AplicarTextos()
@@ -143,7 +170,7 @@ namespace Negocio.UI
             _btnIngresar.Text = Texto("login.ingresar");
             _lnkRecuperar.Text = Texto("login.olvidoContrasena");
             _lblIdioma.Text = Texto("login.idioma");
-            _lblVersion.Text = "OpenRIN · .NET 8 · v0.5 (slice UI-1)";
+            _lblVersion.Text = "OpenRIN · .NET 8 · v1.0";
 
             _actualizandoIdioma = true;
             try
@@ -160,6 +187,8 @@ namespace Negocio.UI
             {
                 _actualizandoIdioma = false;
             }
+
+            Invalidate();
         }
 
         private void CmbIdioma_SelectedIndexChanged(object? sender, EventArgs e)

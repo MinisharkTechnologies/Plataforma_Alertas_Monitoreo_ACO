@@ -20,6 +20,7 @@ namespace Negocio.UI
         private readonly Panel _panelCabecera = new();
         private readonly FlowLayoutPanel _flowCabecera = new();
         private readonly Label _lblApp = new();
+        private readonly PictureBox _picLogo = new();
         private readonly Label _lblSesion = new();
         private readonly Label _lblIntegridad = new();
         private readonly Button _btnCerrarSesion = new();
@@ -74,13 +75,19 @@ namespace Negocio.UI
             _panelCabecera.Height = 74;
             _panelCabecera.BackColor = Color.FromArgb(41, 98, 176);
 
-            _lblApp.Location = new Point(22, 10);
+            _lblApp.Location = new Point(80, 10);
             _lblApp.Size = new Size(300, 34);
             _lblApp.Font = new Font("Segoe UI", 19F, FontStyle.Bold);
             _lblApp.ForeColor = Color.White;
             _lblApp.Text = "OpenRIN";
 
-            _lblSesion.Location = new Point(24, 46);
+            _picLogo.Location = new Point(22, 13);
+            _picLogo.Size = new Size(46, 46);
+            _picLogo.SizeMode = PictureBoxSizeMode.Zoom;
+            _picLogo.BackColor = Color.Transparent;
+            _picLogo.Image = Recursos.CargarIcono(64)?.ToBitmap();
+
+            _lblSesion.Location = new Point(82, 46);
             _lblSesion.Size = new Size(640, 20);
             _lblSesion.Font = new Font("Segoe UI", 9.5F);
             _lblSesion.ForeColor = Color.FromArgb(214, 232, 250);
@@ -117,6 +124,7 @@ namespace Negocio.UI
             _flowCabecera.Controls.Add(_cmbIdioma);
             _flowCabecera.Controls.Add(_lblIntegridad);
 
+            _panelCabecera.Controls.Add(_picLogo);
             _panelCabecera.Controls.Add(_lblApp);
             _panelCabecera.Controls.Add(_lblSesion);
             _panelCabecera.Controls.Add(_flowCabecera);
