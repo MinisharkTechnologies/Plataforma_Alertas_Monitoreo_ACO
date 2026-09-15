@@ -80,6 +80,33 @@
   <data name="pacientes.documento" xml:space="preserve"><value>Documento (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Teléfono</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="reportes.mensual" xml:space="preserve"><value>Reporte mensual</value></data>
+  <data name="reportes.diagnostico" xml:space="preserve"><value>Por diagnóstico</value></data>
+  <data name="reportes.historial" xml:space="preserve"><value>Historial del paciente</value></data>
+  <data name="reportes.periodo" xml:space="preserve"><value>Período:</value></data>
+  <data name="reportes.generar" xml:space="preserve"><value>Ver reporte del mes</value></data>
+  <data name="reportes.generarDiag" xml:space="preserve"><value>Generar reporte</value></data>
+  <data name="reportes.indicadorGlobal" xml:space="preserve"><value>Indicador global de eficacia</value></data>
+  <data name="reportes.pacientesDatos" xml:space="preserve"><value>Pacientes con datos:</value></data>
+  <data name="reportes.sinMediciones" xml:space="preserve"><value>Sin mediciones:</value></data>
+  <data name="reportes.clas.optimo" xml:space="preserve"><value>Óptimo</value></data>
+  <data name="reportes.clas.suboptimo" xml:space="preserve"><value>Subóptimo</value></data>
+  <data name="reportes.clas.deficiente" xml:space="preserve"><value>Deficiente</value></data>
+  <data name="reportes.columna.mediciones" xml:space="preserve"><value>Mediciones</value></data>
+  <data name="reportes.columna.porcentaje" xml:space="preserve"><value>% en rango</value></data>
+  <data name="reportes.columna.clasificacion" xml:space="preserve"><value>Clasificación</value></data>
+  <data name="reportes.columna.diagnostico" xml:space="preserve"><value>Diagnóstico</value></data>
+  <data name="reportes.columna.pacientes" xml:space="preserve"><value>Pacientes</value></data>
+  <data name="reportes.columna.indicador" xml:space="preserve"><value>Indicador prom. (%)</value></data>
+  <data name="reportes.bajoDesempeno" xml:space="preserve"><value>⚠ BAJO DESEMPEÑO</value></data>
+  <data name="reportes.sinReporte" xml:space="preserve"><value>Genere el reporte del mes para ver los indicadores.</value></data>
+  <data name="reportes.formato" xml:space="preserve"><value>Formato:</value></data>
+  <data name="reportes.exportar" xml:space="preserve"><value>Exportar historial</value></data>
+  <data name="reportes.exportadoOk" xml:space="preserve"><value>Exportación registrada. Archivo generado:</value></data>
+  <data name="reportes.historialVacio" xml:space="preserve"><value>Busque un paciente para ver su historial unificado.</value></data>
+  <data name="reportes.sinItems" xml:space="preserve"><value>sin registros aún</value></data>
+  <data name="reportes.columna.tipo" xml:space="preserve"><value>Tipo</value></data>
+  <data name="reportes.columna.descripcion" xml:space="preserve"><value>Descripción</value></data>
   <data name="seguimiento.detectar" xml:space="preserve"><value>Detectar plazos vencidos</value></data>
   <data name="seguimiento.deteccion" xml:space="preserve"><value>Detección completada. Casos nuevos:</value></data>
   <data name="seguimiento.sinPendientes" xml:space="preserve"><value>Sin seguimientos pendientes. Use «Detectar plazos vencidos» para buscar casos nuevos.</value></data>

@@ -80,6 +80,33 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="reportes.mensual" xml:space="preserve"><value>月度报告</value></data>
+  <data name="reportes.diagnostico" xml:space="preserve"><value>按诊断</value></data>
+  <data name="reportes.historial" xml:space="preserve"><value>患者病史</value></data>
+  <data name="reportes.periodo" xml:space="preserve"><value>期间：</value></data>
+  <data name="reportes.generar" xml:space="preserve"><value>查看月度报告</value></data>
+  <data name="reportes.generarDiag" xml:space="preserve"><value>生成报告</value></data>
+  <data name="reportes.indicadorGlobal" xml:space="preserve"><value>总体疗效指标</value></data>
+  <data name="reportes.pacientesDatos" xml:space="preserve"><value>有数据患者：</value></data>
+  <data name="reportes.sinMediciones" xml:space="preserve"><value>无测量：</value></data>
+  <data name="reportes.clas.optimo" xml:space="preserve"><value>最优</value></data>
+  <data name="reportes.clas.suboptimo" xml:space="preserve"><value>次优</value></data>
+  <data name="reportes.clas.deficiente" xml:space="preserve"><value>欠佳</value></data>
+  <data name="reportes.columna.mediciones" xml:space="preserve"><value>测量次数</value></data>
+  <data name="reportes.columna.porcentaje" xml:space="preserve"><value>范围内占比</value></data>
+  <data name="reportes.columna.clasificacion" xml:space="preserve"><value>分类</value></data>
+  <data name="reportes.columna.diagnostico" xml:space="preserve"><value>诊断</value></data>
+  <data name="reportes.columna.pacientes" xml:space="preserve"><value>患者数</value></data>
+  <data name="reportes.columna.indicador" xml:space="preserve"><value>平均指标（%）</value></data>
+  <data name="reportes.bajoDesempeno" xml:space="preserve"><value>⚠ 表现不足</value></data>
+  <data name="reportes.sinReporte" xml:space="preserve"><value>请先生成月度报告以查看指标。</value></data>
+  <data name="reportes.formato" xml:space="preserve"><value>格式：</value></data>
+  <data name="reportes.exportar" xml:space="preserve"><value>导出病史</value></data>
+  <data name="reportes.exportadoOk" xml:space="preserve"><value>导出已记录。文件已生成：</value></data>
+  <data name="reportes.historialVacio" xml:space="preserve"><value>请搜索患者以查看统一病史。</value></data>
+  <data name="reportes.sinItems" xml:space="preserve"><value>暂无记录</value></data>
+  <data name="reportes.columna.tipo" xml:space="preserve"><value>类型</value></data>
+  <data name="reportes.columna.descripcion" xml:space="preserve"><value>描述</value></data>
   <data name="seguimiento.detectar" xml:space="preserve"><value>检测逾期病例</value></data>
   <data name="seguimiento.deteccion" xml:space="preserve"><value>检测完成。新病例：</value></data>
   <data name="seguimiento.sinPendientes" xml:space="preserve"><value>暂无待处理的随访。使用「检测逾期」查找新病例。</value></data>

@@ -80,6 +80,33 @@
   <data name="pacientes.documento" xml:space="preserve"><value>ID Document (DNI)</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>Phone</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>Email</value></data>
+  <data name="reportes.mensual" xml:space="preserve"><value>Monthly report</value></data>
+  <data name="reportes.diagnostico" xml:space="preserve"><value>By diagnosis</value></data>
+  <data name="reportes.historial" xml:space="preserve"><value>Patient history</value></data>
+  <data name="reportes.periodo" xml:space="preserve"><value>Period:</value></data>
+  <data name="reportes.generar" xml:space="preserve"><value>View monthly report</value></data>
+  <data name="reportes.generarDiag" xml:space="preserve"><value>Generate report</value></data>
+  <data name="reportes.indicadorGlobal" xml:space="preserve"><value>Global efficacy indicator</value></data>
+  <data name="reportes.pacientesDatos" xml:space="preserve"><value>Patients with data:</value></data>
+  <data name="reportes.sinMediciones" xml:space="preserve"><value>No measurements:</value></data>
+  <data name="reportes.clas.optimo" xml:space="preserve"><value>Optimal</value></data>
+  <data name="reportes.clas.suboptimo" xml:space="preserve"><value>Suboptimal</value></data>
+  <data name="reportes.clas.deficiente" xml:space="preserve"><value>Deficient</value></data>
+  <data name="reportes.columna.mediciones" xml:space="preserve"><value>Measurements</value></data>
+  <data name="reportes.columna.porcentaje" xml:space="preserve"><value>% in range</value></data>
+  <data name="reportes.columna.clasificacion" xml:space="preserve"><value>Classification</value></data>
+  <data name="reportes.columna.diagnostico" xml:space="preserve"><value>Diagnosis</value></data>
+  <data name="reportes.columna.pacientes" xml:space="preserve"><value>Patients</value></data>
+  <data name="reportes.columna.indicador" xml:space="preserve"><value>Avg. indicator (%)</value></data>
+  <data name="reportes.bajoDesempeno" xml:space="preserve"><value>⚠ LOW PERFORMANCE</value></data>
+  <data name="reportes.sinReporte" xml:space="preserve"><value>Generate the monthly report to see the indicators.</value></data>
+  <data name="reportes.formato" xml:space="preserve"><value>Format:</value></data>
+  <data name="reportes.exportar" xml:space="preserve"><value>Export history</value></data>
+  <data name="reportes.exportadoOk" xml:space="preserve"><value>Export logged. File generated:</value></data>
+  <data name="reportes.historialVacio" xml:space="preserve"><value>Search for a patient to view their unified history.</value></data>
+  <data name="reportes.sinItems" xml:space="preserve"><value>no records yet</value></data>
+  <data name="reportes.columna.tipo" xml:space="preserve"><value>Type</value></data>
+  <data name="reportes.columna.descripcion" xml:space="preserve"><value>Description</value></data>
   <data name="seguimiento.detectar" xml:space="preserve"><value>Detect overdue cases</value></data>
   <data name="seguimiento.deteccion" xml:space="preserve"><value>Detection completed. New cases:</value></data>
   <data name="seguimiento.sinPendientes" xml:space="preserve"><value>No pending follow-ups. Use “Detect overdue cases” to scan for new ones.</value></data>
