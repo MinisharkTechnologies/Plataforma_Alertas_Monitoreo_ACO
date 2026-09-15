@@ -89,6 +89,18 @@ namespace Services.DAL.Implementations
         }
 
         /// <inheritdoc />
+        public void ActualizarEstado(string nombreUsuario, bool activo)
+        {
+            const string sql = "UPDATE dbo.Usuarios SET Activo = @Activo WHERE NombreUsuario = @NombreUsuario;";
+
+            SqlHelper.EjecutarComando(
+                sql,
+                CommandType.Text,
+                new SqlParameter("@Activo", activo),
+                new SqlParameter("@NombreUsuario", nombreUsuario));
+        }
+
+        /// <inheritdoc />
         public bool PerfilTienePermiso(string perfil, string permiso)
         {
             const string sql = "SELECT COUNT(*) FROM dbo.PerfilesPermisos WHERE Perfil = @Perfil AND Permiso = @Permiso;";

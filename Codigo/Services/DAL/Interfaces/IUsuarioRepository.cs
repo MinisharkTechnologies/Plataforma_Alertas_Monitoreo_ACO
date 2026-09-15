@@ -21,6 +21,9 @@ namespace Services.DAL.Interfaces
         /// <summary>Actualiza el estado de acceso (intentos fallidos y bloqueo temporal).</summary>
         void ActualizarAcceso(int idUsuario, int intentosFallidos, DateTime? bloqueadoHasta);
 
+        /// <summary>Habilita o deshabilita las credenciales del usuario indicado.</summary>
+        void ActualizarEstado(string nombreUsuario, bool activo);
+
         /// <summary>Indica si el perfil indicado posee el permiso indicado.</summary>
         bool PerfilTienePermiso(string perfil, string permiso);
     }

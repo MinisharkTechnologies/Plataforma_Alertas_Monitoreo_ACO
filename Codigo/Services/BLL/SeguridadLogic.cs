@@ -154,6 +154,39 @@ namespace Services.BLL
             return id;
         }
 
+        /// <summary>Indica si ya existe un usuario registrado con ese nombre.</summary>
+        public static bool ExisteNombreUsuario(string nombreUsuario)
+            => !string.IsNullOrWhiteSpace(nombreUsuario) && RepositorioUsuarios.ExisteNombreUsuario(nombreUsuario.Trim());
+
+        /// <summary>
+        /// Habilita o deshabilita las credenciales de un usuario (por ejemplo, al dar de baja
+        /// o reactivar una cuenta del portal de pacientes). Queda auditado en bitácora.
+        /// </summary>
+        public static void CambiarEstadoUsuario(string nombreUsuario, bool activo, string? motivo = null)
+        {
+            if (string.IsNullOrWhiteSpace(nombreUsuario))
+            {
+                throw new ArgumentException("El nombre de usuario es obligatorio.");
+            }
+
+            Usuario? usuario = RepositorioUsuarios.ObtenerPorNombreUsuario(nombreUsuario.Trim());
+            if (usuario == null)
+            {
+                throw new ArgumentException($"No existe el usuario '{nombreUsuario}'.");
+            }
+
+            if (usuario.Activo == activo)
+            {
+                return; // sin cambios
+            }
+
+            RepositorioUsuarios.ActualizarEstado(usuario.NombreUsuario, activo);
+            BitacoraLogic.Registrar(LogLevel.Info,
+                $"Usuario '{usuario.NombreUsuario}' {(activo ? "habilitado" : "deshabilitado")}" +
+                (string.IsNullOrWhiteSpace(motivo) ? "." : $": {motivo}"),
+                capa: "Seguridad");
+        }
+
         private static void RegistrarFallo(Usuario usuario)
         {
             int intentos = usuario.IntentosFallidos + 1;

@@ -29,5 +29,13 @@ namespace Services.Facade
             string? preguntaSeguridad = null,
             string? respuestaSeguridad = null)
             => SeguridadLogic.RegistrarUsuario(nombreUsuario, nombreCompleto, contrasena, perfil, email, preguntaSeguridad, respuestaSeguridad);
+
+        /// <summary>Indica si ya existe un usuario registrado con ese nombre.</summary>
+        public static bool ExisteNombreUsuario(string nombreUsuario)
+            => SeguridadLogic.ExisteNombreUsuario(nombreUsuario);
+
+        /// <summary>Habilita o deshabilita las credenciales de un usuario (auditado en bitácora).</summary>
+        public static void CambiarEstadoUsuario(string nombreUsuario, bool activo, string? motivo = null)
+            => SeguridadLogic.CambiarEstadoUsuario(nombreUsuario, activo, motivo);
     }
 }
