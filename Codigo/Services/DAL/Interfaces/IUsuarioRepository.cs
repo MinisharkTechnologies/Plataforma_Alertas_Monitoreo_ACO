@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Services.DomainModel;
 
 namespace Services.DAL.Interfaces
@@ -26,5 +27,8 @@ namespace Services.DAL.Interfaces
 
         /// <summary>Indica si el perfil indicado posee el permiso indicado.</summary>
         bool PerfilTienePermiso(string perfil, string permiso);
+
+        /// <summary>Todos los usuarios del sistema, ordenados por nombre de usuario.</summary>
+        List<Usuario> ObtenerTodos();
     }
 }

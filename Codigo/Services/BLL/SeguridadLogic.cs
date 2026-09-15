@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Services.BLL.Infrastructure;
 using Services.DAL.Implementations;
 using Services.DAL.Interfaces;
@@ -185,6 +186,28 @@ namespace Services.BLL
                 $"Usuario '{usuario.NombreUsuario}' {(activo ? "habilitado" : "deshabilitado")}" +
                 (string.IsNullOrWhiteSpace(motivo) ? "." : $": {motivo}"),
                 capa: "Seguridad");
+        }
+
+        /// <summary>
+        /// Lista los usuarios del sistema para la pantalla de administración, exponiendo solo
+        /// datos no sensibles (sin hash de contraseña ni pregunta de seguridad).
+        /// </summary>
+        public static List<UsuarioListado> ObtenerUsuarios()
+        {
+            var listado = new List<UsuarioListado>();
+            foreach (Usuario usuario in RepositorioUsuarios.ObtenerTodos())
+            {
+                listado.Add(new UsuarioListado(
+                    usuario.Id,
+                    usuario.NombreUsuario,
+                    usuario.NombreCompleto,
+                    usuario.Perfil,
+                    usuario.Email,
+                    usuario.Activo,
+                    usuario.IntentosFallidos,
+                    usuario.BloqueadoHasta));
+            }
+            return listado;
         }
 
         private static void RegistrarFallo(Usuario usuario)

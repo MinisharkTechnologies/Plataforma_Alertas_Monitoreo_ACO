@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using Services.DAL.Implementations;
 using Services.DAL.Interfaces;
@@ -9,11 +10,12 @@ namespace Services.BLL
     /// <summary>
     /// Lógica de bitácora (REQ-ARQ-003): filtra por el nivel mínimo configurado (app.config),
     /// persiste en la tabla Logs y cae al archivo de respaldo si la base de datos falla.
-    /// Nunca propaga excepciones hacia el invocante.
+    /// Nunca propaga excepciones hacia el invocante. Expone además la consulta de las últimas
+    /// entradas para la pantalla de administración (Sistema).
     /// </summary>
     internal static class BitacoraLogic
     {
-        private static readonly ILoggerRepository RepositorioSql = new SqlLoggerRepository();
+        private static readonly SqlLoggerRepository RepositorioSql = new SqlLoggerRepository();
         private static readonly ILoggerRepository RepositorioArchivo = new FileLoggerRepository();
         private static readonly object Candado = new object();
 
@@ -52,6 +54,22 @@ namespace Services.BLL
             catch
             {
                 // La bitácora nunca debe romper la aplicación (REQ-ARQ-003).
+            }
+        }
+
+        /// <summary>
+        /// Devuelve las últimas entradas de la bitácora persistida, opcionalmente filtradas por
+        /// nivel mínimo. Ante cualquier error devuelve una lista vacía (nunca propaga).
+        /// </summary>
+        public static List<LogEntry> ObtenerUltimos(int cantidad, LogLevel? nivelMinimo = null)
+        {
+            try
+            {
+                return RepositorioSql.ObtenerUltimos(cantidad, nivelMinimo);
+            }
+            catch
+            {
+                return new List<LogEntry>();
             }
         }
 

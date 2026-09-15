@@ -36,6 +36,7 @@ namespace Negocio.UI
         private EventosAdversosControl? _controlEventos;
         private ReportesControl? _controlReportes;
         private PortalControl? _controlPortal;
+        private SistemaControl? _controlSistema;
         private string? _claveModuloActual;
         private bool _actualizandoIdioma;
 
@@ -270,6 +271,14 @@ namespace Negocio.UI
                 _panelVista.Controls.Add(_controlPortal);
                 _controlPortal.Recargar();
             }
+            else if (clave == "mod.sistema")
+            {
+                _lblModuloDetalle.Text = string.Empty;
+                _controlSistema ??= new SistemaControl();
+                _panelVista.Controls.Clear();
+                _panelVista.Controls.Add(_controlSistema);
+                _controlSistema.Recargar();
+            }
             else
             {
                 _lblModuloDetalle.Text = Texto("shell.enConstruccion");
@@ -306,6 +315,7 @@ namespace Negocio.UI
             _controlEventos?.RefrescarTextos();
             _controlReportes?.RefrescarTextos();
             _controlPortal?.RefrescarTextos();
+            _controlSistema?.RefrescarTextos();
 
             _actualizandoIdioma = true;
             try

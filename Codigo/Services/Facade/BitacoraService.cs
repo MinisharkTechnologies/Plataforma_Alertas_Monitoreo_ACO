@@ -1,12 +1,12 @@
-using System;
+using System.Collections.Generic;
 using Services.BLL;
 using Services.DomainModel;
 
 namespace Services.Facade
 {
     /// <summary>
-    /// Fachada pública de bitácora (REQ-ARQ-003). Todas las capas del sistema registran
-    /// sus eventos a través de esta clase.
+    /// Fachada pública de la bitácora (REQ-ARQ-003): registro de eventos de todas las capas
+    /// y consulta de las últimas entradas para la pantalla de administración del sistema.
     /// </summary>
     public static class BitacoraService
     {
@@ -28,5 +28,9 @@ namespace Services.Facade
 
         /// <summary>Registra un error fatal.</summary>
         public static void Fatal(string mensaje, Exception? ex = null, string usuario = "") => Registrar(LogLevel.Fatal, mensaje, ex, usuario);
+
+        /// <summary>Devuelve las últimas entradas de la bitácora, opcionalmente filtradas por nivel mínimo.</summary>
+        public static List<LogEntry> ObtenerUltimos(int cantidad = 200, LogLevel? nivelMinimo = null)
+            => BitacoraLogic.ObtenerUltimos(cantidad, nivelMinimo);
     }
 }

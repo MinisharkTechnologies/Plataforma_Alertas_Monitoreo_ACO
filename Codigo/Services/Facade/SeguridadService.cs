@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Services.BLL;
 using Services.DomainModel;
 
@@ -5,9 +6,9 @@ namespace Services.Facade
 {
     /// <summary>
     /// Fachada pública del módulo de seguridad (REQ-ARQ-006): autenticación centralizada,
-    /// verificación de permisos y registro de usuarios.
-    /// Consumida por el formulario de login del Negocio y por cualquier otro módulo
-    /// que requiera validar credenciales o permisos.
+    /// verificación de permisos, registro de usuarios y listado para administración.
+    /// Consumida por el formulario de login del Negocio, el portal de pacientes y la pantalla
+    /// de administración del sistema.
     /// </summary>
     public static class SeguridadService
     {
@@ -37,5 +38,9 @@ namespace Services.Facade
         /// <summary>Habilita o deshabilita las credenciales de un usuario (auditado en bitácora).</summary>
         public static void CambiarEstadoUsuario(string nombreUsuario, bool activo, string? motivo = null)
             => SeguridadLogic.CambiarEstadoUsuario(nombreUsuario, activo, motivo);
+
+        /// <summary>Lista los usuarios del sistema (sin datos sensibles) para la pantalla de administración.</summary>
+        public static List<UsuarioListado> ObtenerUsuarios()
+            => SeguridadLogic.ObtenerUsuarios();
     }
 }

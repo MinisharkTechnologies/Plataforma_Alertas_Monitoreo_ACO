@@ -80,6 +80,29 @@
   <data name="pacientes.documento" xml:space="preserve"><value>证件号码（DNI）</value></data>
   <data name="pacientes.telefono" xml:space="preserve"><value>电话</value></data>
   <data name="pacientes.email" xml:space="preserve"><value>电子邮箱</value></data>
+  <data name="sistema.usuarios" xml:space="preserve"><value>用户</value></data>
+  <data name="sistema.bitacora" xml:space="preserve"><value>日志</value></data>
+  <data name="sistema.nuevoUsuario" xml:space="preserve"><value>新建用户</value></data>
+  <data name="sistema.habilitar" xml:space="preserve"><value>启用</value></data>
+  <data name="sistema.deshabilitar" xml:space="preserve"><value>禁用</value></data>
+  <data name="sistema.actualizar" xml:space="preserve"><value>刷新</value></data>
+  <data name="sistema.nivel" xml:space="preserve"><value>最低级别：</value></data>
+  <data name="sistema.nivel.todos" xml:space="preserve"><value>全部</value></data>
+  <data name="sistema.columna.usuario" xml:space="preserve"><value>用户名</value></data>
+  <data name="sistema.columna.nombre" xml:space="preserve"><value>姓名</value></data>
+  <data name="sistema.columna.perfil" xml:space="preserve"><value>角色</value></data>
+  <data name="sistema.columna.activo" xml:space="preserve"><value>启用状态</value></data>
+  <data name="sistema.columna.intentos" xml:space="preserve"><value>尝试次数</value></data>
+  <data name="sistema.columna.bloqueado" xml:space="preserve"><value>锁定至</value></data>
+  <data name="sistema.columna.nivel" xml:space="preserve"><value>级别</value></data>
+  <data name="sistema.columna.capa" xml:space="preserve"><value>层</value></data>
+  <data name="sistema.columna.mensaje" xml:space="preserve"><value>消息</value></data>
+  <data name="sistema.usuarioRegistrado" xml:space="preserve"><value>用户创建成功。</value></data>
+  <data name="sistema.confirmarHabilitar" xml:space="preserve"><value>是否启用所选用户的凭据？</value></data>
+  <data name="sistema.confirmarDeshabilitar" xml:space="preserve"><value>是否停用所选用户的凭据？</value></data>
+  <data name="sistema.selUsuario" xml:space="preserve"><value>请从列表中选择用户。</value></data>
+  <data name="sistema.si" xml:space="preserve"><value>是</value></data>
+  <data name="sistema.no" xml:space="preserve"><value>否</value></data>
   <data name="portal.bienvenida" xml:space="preserve"><value>你好，</value></data>
   <data name="portal.reportar" xml:space="preserve"><value>报告我的 INR</value></data>
   <data name="portal.enviar" xml:space="preserve"><value>提交报告</value></data>

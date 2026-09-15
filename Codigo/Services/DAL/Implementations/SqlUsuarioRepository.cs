@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using Microsoft.Data.SqlClient;
 using Services.DAL.Interfaces;
@@ -110,6 +111,19 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@Perfil", perfil),
                 new SqlParameter("@Permiso", permiso));
             return Convert.ToInt32(cantidad) > 0;
+        }
+
+        /// <inheritdoc />
+        public List<Usuario> ObtenerTodos()
+        {
+            string sql = $"SELECT {Columnas} FROM dbo.Usuarios ORDER BY NombreUsuario;";
+            using SqlDataReader lector = SqlHelper.EjecutarLector(sql, CommandType.Text);
+            var lista = new List<Usuario>();
+            while (lector.Read())
+            {
+                lista.Add(Mapear(lector));
+            }
+            return lista;
         }
 
         private static Usuario Mapear(SqlDataReader lector) => new Usuario
