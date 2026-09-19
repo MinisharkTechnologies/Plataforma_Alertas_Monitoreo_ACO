@@ -18,6 +18,7 @@ namespace Negocio.UI
         private readonly Button _btnVistaUsuarios = new();
         private readonly Button _btnVistaBitacora = new();
         private readonly Button _btnVistaCambios = new();
+        private readonly Button _btnVistaIdiomas = new();
 
         private readonly Panel _panelUsuarios = new();
         private readonly Button _btnNuevoUsuario = new();
@@ -44,6 +45,19 @@ namespace Negocio.UI
         private readonly TextBox _txtCambioNuevo = new();
         private readonly Button _btnRestaurarCambio = new();
         private List<CambioAuditado> _cambios = new();
+
+        private readonly Panel _panelIdiomas = new();
+        private readonly DataGridView _grillaIdiomas = new();
+        private readonly Button _btnNuevoIdioma = new();
+        private readonly Button _btnEliminarIdioma = new();
+        private readonly ComboBox _cmbIdiomaEditor = new();
+        private readonly DataGridView _grillaTextos = new();
+        private readonly TextBox _txtNuevaClave = new();
+        private readonly TextBox _txtNuevoValor = new();
+        private readonly Button _btnAgregarLeyenda = new();
+        private readonly Button _btnGuardarTextos = new();
+        private List<Idioma> _idiomasEditor = new();
+        private List<TextoLocalizacion> _textosEditor = new();
 
         private static readonly string[] EntidadesAuditables =
         {
@@ -75,8 +89,11 @@ namespace Negocio.UI
                 case 1:
                     CargarBitacora();
                     break;
-                default:
+                case 2:
                     CargarCambios();
+                    break;
+                case 3:
+                    CargarIdiomas();
                     break;
             }
         }
@@ -99,9 +116,11 @@ namespace Negocio.UI
             ConfigurarBotonVista(_btnVistaUsuarios, 0, 0);
             ConfigurarBotonVista(_btnVistaBitacora, 176, 1);
             ConfigurarBotonVista(_btnVistaCambios, 352, 2);
+            ConfigurarBotonVista(_btnVistaIdiomas, 528, 3);
             panelBarra.Controls.Add(_btnVistaUsuarios);
             panelBarra.Controls.Add(_btnVistaBitacora);
             panelBarra.Controls.Add(_btnVistaCambios);
+            panelBarra.Controls.Add(_btnVistaIdiomas);
 
             // ---- Vista 1: usuarios ----
             _panelUsuarios.Dock = DockStyle.Fill;
@@ -306,9 +325,85 @@ namespace Negocio.UI
             _txtIdCambios.BringToFront();
             _btnBuscarCambios.BringToFront();
 
+            // ---- Vista 4: idiomas (T05) ----
+            _panelIdiomas.Dock = DockStyle.Fill;
+            _panelIdiomas.BackColor = Color.White;
+
+            var panelIdiomasIzq = new Panel { Dock = DockStyle.Left, Width = 330 };
+            _btnNuevoIdioma.Location = new Point(14, 14);
+            _btnNuevoIdioma.Size = new Size(150, 32);
+            EstiloPrimario(_btnNuevoIdioma);
+            _btnNuevoIdioma.Click += (s, e) => AbrirAltaIdioma();
+
+            _btnEliminarIdioma.Location = new Point(172, 14);
+            _btnEliminarIdioma.Size = new Size(144, 32);
+            EstiloSecundario(_btnEliminarIdioma);
+            _btnEliminarIdioma.Click += (s, e) => EliminarIdiomaSeleccionado();
+
+            var hostIdiomas = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 58, 8, 14) };
+            _grillaIdiomas.Dock = DockStyle.Fill;
+            EstiloGrilla(_grillaIdiomas);
+            _grillaIdiomas.Columns.Add("codigo", "");
+            _grillaIdiomas.Columns.Add("nombre", "");
+            _grillaIdiomas.Columns["codigo"].FillWeight = 30;
+            _grillaIdiomas.Columns["nombre"].FillWeight = 70;
+            hostIdiomas.Controls.Add(_grillaIdiomas);
+            panelIdiomasIzq.Controls.Add(hostIdiomas);
+            panelIdiomasIzq.Controls.Add(_btnNuevoIdioma);
+            panelIdiomasIzq.Controls.Add(_btnEliminarIdioma);
+            _btnNuevoIdioma.BringToFront();
+            _btnEliminarIdioma.BringToFront();
+
+            var panelIdiomasDer = new Panel { Dock = DockStyle.Fill };
+            _cmbIdiomaEditor.Location = new Point(14, 18);
+            _cmbIdiomaEditor.Size = new Size(320, 28);
+            _cmbIdiomaEditor.DropDownStyle = ComboBoxStyle.DropDownList;
+            _cmbIdiomaEditor.Font = new Font("Segoe UI", 9.5F);
+            _cmbIdiomaEditor.SelectedIndexChanged += (s, e) => CargarTextosDelIdioma();
+
+            var hostTextos = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 58, 14, 116) };
+            _grillaTextos.Dock = DockStyle.Fill;
+            EstiloGrilla(_grillaTextos);
+            _grillaTextos.ReadOnly = false;
+            _grillaTextos.Columns.Add("clave", "");
+            _grillaTextos.Columns.Add("valor", "");
+            _grillaTextos.Columns["clave"].ReadOnly = true;
+            _grillaTextos.Columns["clave"].FillWeight = 38;
+            _grillaTextos.Columns["valor"].FillWeight = 62;
+            hostTextos.Controls.Add(_grillaTextos);
+
+            var panelTextosAbajo = new Panel { Dock = DockStyle.Bottom, Height = 108 };
+            _txtNuevaClave.Location = new Point(14, 12);
+            _txtNuevaClave.Size = new Size(220, 28);
+            _txtNuevaClave.Font = new Font("Segoe UI", 9.5F);
+            _txtNuevoValor.Location = new Point(244, 12);
+            _txtNuevoValor.Size = new Size(320, 28);
+            _txtNuevoValor.Font = new Font("Segoe UI", 9.5F);
+            _btnAgregarLeyenda.Location = new Point(576, 11);
+            _btnAgregarLeyenda.Size = new Size(170, 30);
+            EstiloSecundario(_btnAgregarLeyenda);
+            _btnAgregarLeyenda.Click += (s, e) => AgregarLeyendaInline();
+            _btnGuardarTextos.Location = new Point(14, 56);
+            _btnGuardarTextos.Size = new Size(220, 34);
+            EstiloPrimario(_btnGuardarTextos);
+            _btnGuardarTextos.Click += (s, e) => GuardarCambiosTextos();
+            panelTextosAbajo.Controls.Add(_txtNuevaClave);
+            panelTextosAbajo.Controls.Add(_txtNuevoValor);
+            panelTextosAbajo.Controls.Add(_btnAgregarLeyenda);
+            panelTextosAbajo.Controls.Add(_btnGuardarTextos);
+
+            panelIdiomasDer.Controls.Add(hostTextos);
+            panelIdiomasDer.Controls.Add(panelTextosAbajo);
+            panelIdiomasDer.Controls.Add(_cmbIdiomaEditor);
+            _cmbIdiomaEditor.BringToFront();
+
+            _panelIdiomas.Controls.Add(panelIdiomasDer);
+            _panelIdiomas.Controls.Add(panelIdiomasIzq);
+
             Controls.Add(_panelUsuarios);
             Controls.Add(_panelBitacora);
             Controls.Add(_panelCambios);
+            Controls.Add(_panelIdiomas);
             Controls.Add(panelBarra);
         }
 
@@ -376,9 +471,11 @@ namespace Negocio.UI
             _panelUsuarios.Visible = vista == 0;
             _panelBitacora.Visible = vista == 1;
             _panelCambios.Visible = vista == 2;
+            _panelIdiomas.Visible = vista == 3;
             EstiloBotonVista(_btnVistaUsuarios, vista == 0);
             EstiloBotonVista(_btnVistaBitacora, vista == 1);
             EstiloBotonVista(_btnVistaCambios, vista == 2);
+            EstiloBotonVista(_btnVistaIdiomas, vista == 3);
             Recargar();
         }
 
@@ -438,6 +535,16 @@ namespace Negocio.UI
             _lblCambioAnterior.Text = Localizacion("sistema.cambios.anterior");
             _lblCambioNuevo.Text = Localizacion("sistema.cambios.nuevo");
             _btnRestaurarCambio.Text = Localizacion("sistema.cambios.restaurar");
+
+            _btnVistaIdiomas.Text = Localizacion("sistema.idiomas");
+            _btnNuevoIdioma.Text = Localizacion("idiomas.nuevo");
+            _btnEliminarIdioma.Text = Localizacion("idiomas.eliminar");
+            _grillaIdiomas.Columns["codigo"].HeaderText = Localizacion("idiomas.codigo");
+            _grillaIdiomas.Columns["nombre"].HeaderText = Localizacion("idiomas.nombre");
+            _grillaTextos.Columns["clave"].HeaderText = Localizacion("idiomas.clave");
+            _grillaTextos.Columns["valor"].HeaderText = Localizacion("idiomas.valor");
+            _btnAgregarLeyenda.Text = Localizacion("idiomas.agregar");
+            _btnGuardarTextos.Text = Localizacion("idiomas.guardar");
         }
 
         private void CargarUsuarios()
@@ -633,6 +740,154 @@ namespace Negocio.UI
             catch (Exception ex)
             {
                 ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        // ------------------------------------------------------------------ idiomas (T05)
+
+        private void CargarIdiomas()
+        {
+            try
+            {
+                _idiomasEditor = LocalizationService.Idiomas.ToList();
+                _grillaIdiomas.Rows.Clear();
+                foreach (Idioma idioma in _idiomasEditor)
+                {
+                    _grillaIdiomas.Rows.Add(idioma.Codigo, idioma.Nombre);
+                }
+                _grillaIdiomas.ClearSelection();
+
+                int previo = _cmbIdiomaEditor.SelectedIndex;
+                _cmbIdiomaEditor.Items.Clear();
+                foreach (Idioma idioma in _idiomasEditor)
+                {
+                    _cmbIdiomaEditor.Items.Add(idioma);
+                }
+                _cmbIdiomaEditor.SelectedIndex = previo < 0 || previo >= _idiomasEditor.Count ? 0 : previo;
+                CargarTextosDelIdioma();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void CargarTextosDelIdioma()
+        {
+            if (_cmbIdiomaEditor.SelectedIndex < 0 || _cmbIdiomaEditor.SelectedIndex >= _idiomasEditor.Count)
+            {
+                return;
+            }
+            try
+            {
+                string codigo = _idiomasEditor[_cmbIdiomaEditor.SelectedIndex].Codigo;
+                _textosEditor = LocalizationService.ObtenerTextosDe(codigo);
+                _grillaTextos.Rows.Clear();
+                foreach (TextoLocalizacion texto in _textosEditor)
+                {
+                    _grillaTextos.Rows.Add(texto.Clave, texto.Valor);
+                }
+                _grillaTextos.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void GuardarCambiosTextos()
+        {
+            if (_cmbIdiomaEditor.SelectedIndex < 0 || _cmbIdiomaEditor.SelectedIndex >= _idiomasEditor.Count)
+            {
+                MessageBox.Show(FindForm(), Localizacion("idiomas.sinSeleccion"), Localizacion("sistema.idiomas"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            try
+            {
+                string codigo = _idiomasEditor[_cmbIdiomaEditor.SelectedIndex].Codigo;
+                int guardados = 0;
+                for (int i = 0; i < _grillaTextos.Rows.Count && i < _textosEditor.Count; i++)
+                {
+                    string clave = _grillaTextos.Rows[i].Cells[0].Value?.ToString() ?? string.Empty;
+                    string valor = _grillaTextos.Rows[i].Cells[1].Value?.ToString() ?? string.Empty;
+                    if (!string.Equals(valor, _textosEditor[i].Valor, StringComparison.Ordinal))
+                    {
+                        LocalizationService.GuardarTexto(codigo, clave, valor);
+                        guardados++;
+                    }
+                }
+                MessageBox.Show(FindForm(), Localizacion("idiomas.guardadoOk") + $" ({guardados})",
+                    Localizacion("sistema.idiomas"), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                CargarTextosDelIdioma();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void AgregarLeyendaInline()
+        {
+            if (_cmbIdiomaEditor.SelectedIndex < 0 || _cmbIdiomaEditor.SelectedIndex >= _idiomasEditor.Count)
+            {
+                MessageBox.Show(FindForm(), Localizacion("idiomas.sinSeleccion"), Localizacion("sistema.idiomas"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string clave = _txtNuevaClave.Text.Trim();
+            if (clave.Length == 0)
+            {
+                MessageBox.Show(FindForm(), Localizacion("idiomas.claveObligatoria"), Localizacion("sistema.idiomas"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            try
+            {
+                string codigo = _idiomasEditor[_cmbIdiomaEditor.SelectedIndex].Codigo;
+                LocalizationService.GuardarTexto(codigo, clave, _txtNuevoValor.Text);
+                _txtNuevaClave.Clear();
+                _txtNuevoValor.Clear();
+                CargarTextosDelIdioma();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void AbrirAltaIdioma()
+        {
+            using var formulario = new IdiomaNuevoForm();
+            if (formulario.ShowDialog(FindForm()) == DialogResult.OK)
+            {
+                CargarIdiomas();
+            }
+        }
+
+        private void EliminarIdiomaSeleccionado()
+        {
+            if (_grillaIdiomas.SelectedRows.Count == 0)
+            {
+                MessageBox.Show(FindForm(), Localizacion("idiomas.sinSeleccion"), Localizacion("sistema.idiomas"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            string codigo = _grillaIdiomas.SelectedRows[0].Cells[0].Value?.ToString() ?? string.Empty;
+            if (MessageBox.Show(FindForm(), Localizacion("idiomas.confirmarEliminar") + $" ({codigo})",
+                    Localizacion("sistema.idiomas"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+            try
+            {
+                LocalizationService.EliminarIdioma(codigo);
+                CargarIdiomas();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(FindForm(), ex.Message, Localizacion("sistema.idiomas"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
 

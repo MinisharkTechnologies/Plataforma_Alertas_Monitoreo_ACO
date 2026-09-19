@@ -14,7 +14,7 @@ namespace Negocio.UI
     /// </summary>
     public class PrincipalForm : Form
     {
-        private static readonly string[] CodigosIdioma = { "es", "en", "zh-CN" };
+        private List<Idioma> _idiomasDisponibles = new();
 
         private readonly UsuarioAutenticado _sesion;
         private readonly Panel _panelCabecera = new();
@@ -59,6 +59,17 @@ namespace Negocio.UI
             ConstruirMenu();
             AplicarTextos();
             VerificarIntegridad();
+
+            // Observer de localización (T05): al cambiar el idioma o editar sus leyendas,
+            // las vistas se actualizan en caliente sin intervención manual.
+            LocalizationService.Suscribir(AlCambiarIdioma);
+            FormClosed += (s, e) => LocalizationService.Desuscribir(AlCambiarIdioma);
+        }
+
+        /// <summary>Observador de localización (T05): reaplica los textos al cambiar el idioma.</summary>
+        private void AlCambiarIdioma()
+        {
+            AplicarTextos();
         }
 
         private static string Texto(string clave) => LocalizationService.ObtenerTexto(clave);
@@ -406,11 +417,12 @@ namespace Negocio.UI
             try
             {
                 _cmbIdioma.Items.Clear();
-                foreach (string codigo in CodigosIdioma)
+                _idiomasDisponibles = LocalizationService.Idiomas.ToList();
+                foreach (Idioma idioma in _idiomasDisponibles)
                 {
-                    _cmbIdioma.Items.Add(Texto($"idioma.{codigo}"));
+                    _cmbIdioma.Items.Add(idioma.Nombre);
                 }
-                int indice = Array.IndexOf(CodigosIdioma, LocalizationService.IdiomaActual);
+                int indice = _idiomasDisponibles.FindIndex(i => i.Codigo == LocalizationService.IdiomaActual);
                 _cmbIdioma.SelectedIndex = indice >= 0 ? indice : 0;
             }
             finally
@@ -425,8 +437,7 @@ namespace Negocio.UI
             {
                 return;
             }
-            LocalizationService.EstablecerIdioma(CodigosIdioma[_cmbIdioma.SelectedIndex]);
-            AplicarTextos();
+            LocalizationService.EstablecerIdioma(_idiomasDisponibles[_cmbIdioma.SelectedIndex].Codigo);
         }
 
         private void BtnCerrarSesion_Click(object? sender, EventArgs e)

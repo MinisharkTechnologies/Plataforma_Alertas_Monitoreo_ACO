@@ -302,4 +302,17 @@
   <data name="sistema.cambios.selCambio" xml:space="preserve"><value>请从历史中选择一条变更。</value></data>
   <data name="sistema.cambios.confirmar" xml:space="preserve"><value>是否恢复所选记录的原状态？</value></data>
   <data name="sistema.cambios.sinId" xml:space="preserve"><value>记录编号必须为数字。</value></data>
+  <data name="sistema.idiomas" xml:space="preserve"><value>语言</value></data>
+  <data name="idiomas.nuevo" xml:space="preserve"><value>新建语言</value></data>
+  <data name="idiomas.eliminar" xml:space="preserve"><value>删除语言</value></data>
+  <data name="idiomas.codigo" xml:space="preserve"><value>代码：</value></data>
+  <data name="idiomas.nombre" xml:space="preserve"><value>名称：</value></data>
+  <data name="idiomas.guardar" xml:space="preserve"><value>保存更改</value></data>
+  <data name="idiomas.agregar" xml:space="preserve"><value>添加词条</value></data>
+  <data name="idiomas.clave" xml:space="preserve"><value>键</value></data>
+  <data name="idiomas.valor" xml:space="preserve"><value>值</value></data>
+  <data name="idiomas.confirmarEliminar" xml:space="preserve"><value>是否删除所选语言及其全部词条？</value></data>
+  <data name="idiomas.guardadoOk" xml:space="preserve"><value>更改已保存，视图已实时更新。</value></data>
+  <data name="idiomas.sinSeleccion" xml:space="preserve"><value>请选择语言。</value></data>
+  <data name="idiomas.claveObligatoria" xml:space="preserve"><value>请输入词条键。</value></data>
 </root>

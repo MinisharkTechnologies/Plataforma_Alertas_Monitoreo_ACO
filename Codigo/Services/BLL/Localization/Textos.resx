@@ -302,4 +302,17 @@
   <data name="sistema.cambios.selCambio" xml:space="preserve"><value>Seleccione un cambio del historial.</value></data>
   <data name="sistema.cambios.confirmar" xml:space="preserve"><value>¿Recomponer el estado anterior del registro seleccionado?</value></data>
   <data name="sistema.cambios.sinId" xml:space="preserve"><value>El número de registro debe ser numérico.</value></data>
+  <data name="sistema.idiomas" xml:space="preserve"><value>Idiomas</value></data>
+  <data name="idiomas.nuevo" xml:space="preserve"><value>Nuevo idioma</value></data>
+  <data name="idiomas.eliminar" xml:space="preserve"><value>Eliminar idioma</value></data>
+  <data name="idiomas.codigo" xml:space="preserve"><value>Código:</value></data>
+  <data name="idiomas.nombre" xml:space="preserve"><value>Nombre:</value></data>
+  <data name="idiomas.guardar" xml:space="preserve"><value>Guardar cambios</value></data>
+  <data name="idiomas.agregar" xml:space="preserve"><value>Agregar leyenda</value></data>
+  <data name="idiomas.clave" xml:space="preserve"><value>Clave</value></data>
+  <data name="idiomas.valor" xml:space="preserve"><value>Valor</value></data>
+  <data name="idiomas.confirmarEliminar" xml:space="preserve"><value>¿Eliminar el idioma seleccionado y todas sus leyendas?</value></data>
+  <data name="idiomas.guardadoOk" xml:space="preserve"><value>Cambios guardados. Las vistas se actualizaron en caliente.</value></data>
+  <data name="idiomas.sinSeleccion" xml:space="preserve"><value>Seleccione un idioma.</value></data>
+  <data name="idiomas.claveObligatoria" xml:space="preserve"><value>Ingrese la clave de la leyenda.</value></data>
 </root>

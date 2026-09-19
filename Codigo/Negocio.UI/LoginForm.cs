@@ -13,7 +13,7 @@ namespace Negocio.UI
     /// </summary>
     public class LoginForm : Form
     {
-        private static readonly string[] CodigosIdioma = { "es", "en", "zh-CN" };
+        private List<Idioma> _idiomasDisponibles = new();
 
         private readonly Label _lblTitulo = new();
         private readonly Label _lblSubtitulo = new();
@@ -176,11 +176,12 @@ namespace Negocio.UI
             try
             {
                 _cmbIdioma.Items.Clear();
-                foreach (string codigo in CodigosIdioma)
+                _idiomasDisponibles = LocalizationService.Idiomas.ToList();
+                foreach (Idioma idioma in _idiomasDisponibles)
                 {
-                    _cmbIdioma.Items.Add(Texto($"idioma.{codigo}"));
+                    _cmbIdioma.Items.Add(idioma.Nombre);
                 }
-                int indice = Array.IndexOf(CodigosIdioma, LocalizationService.IdiomaActual);
+                int indice = _idiomasDisponibles.FindIndex(i => i.Codigo == LocalizationService.IdiomaActual);
                 _cmbIdioma.SelectedIndex = indice >= 0 ? indice : 0;
             }
             finally
@@ -197,7 +198,7 @@ namespace Negocio.UI
             {
                 return;
             }
-            LocalizationService.EstablecerIdioma(CodigosIdioma[_cmbIdioma.SelectedIndex]);
+            LocalizationService.EstablecerIdioma(_idiomasDisponibles[_cmbIdioma.SelectedIndex].Codigo);
             AplicarTextos();
         }
 
