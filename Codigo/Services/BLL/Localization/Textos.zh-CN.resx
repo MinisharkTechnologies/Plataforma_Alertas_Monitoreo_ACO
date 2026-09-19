@@ -283,4 +283,9 @@
   <data name="error.titulo" xml:space="preserve"><value>错误</value></data>
   <data name="error.generico" xml:space="preserve"><value>发生意外错误，操作未能完成。</value></data>
   <data name="error.contacto" xml:space="preserve"><value>如果问题持续存在，请联系系统管理员。</value></data>
+  <data name="integridad.vulnerada.titulo" xml:space="preserve"><value>数据库已被篡改</value></data>
+  <data name="integridad.vulnerada.mensaje" xml:space="preserve"><value>完整性校验检测到数据库被系统外部修改。访问已被阻止，请紧急联系管理员。</value></data>
+  <data name="integridad.vulnerada.detalle" xml:space="preserve"><value>校验技术详情：</value></data>
+  <data name="integridad.vulnerada.salir" xml:space="preserve"><value>退出</value></data>
+  <data name="integridad.vulnerada.sinConexion" xml:space="preserve"><value>无法执行完整性校验（数据库不可访问？）。请联系管理员。</value></data>
 </root>

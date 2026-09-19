@@ -283,4 +283,9 @@
   <data name="error.titulo" xml:space="preserve"><value>Error</value></data>
   <data name="error.generico" xml:space="preserve"><value>An unexpected error occurred. The operation could not be completed.</value></data>
   <data name="error.contacto" xml:space="preserve"><value>If the problem persists, contact your system administrator.</value></data>
+  <data name="integridad.vulnerada.titulo" xml:space="preserve"><value>Database compromised</value></data>
+  <data name="integridad.vulnerada.mensaje" xml:space="preserve"><value>The integrity check detected alterations to the database made from outside the system. Access has been blocked and the administrator must be contacted urgently.</value></data>
+  <data name="integridad.vulnerada.detalle" xml:space="preserve"><value>Technical detail of the verification:</value></data>
+  <data name="integridad.vulnerada.salir" xml:space="preserve"><value>Exit</value></data>
+  <data name="integridad.vulnerada.sinConexion" xml:space="preserve"><value>The integrity check could not be executed (database unreachable?). Contact the administrator.</value></data>
 </root>

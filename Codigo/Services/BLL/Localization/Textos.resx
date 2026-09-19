@@ -283,4 +283,9 @@
   <data name="error.titulo" xml:space="preserve"><value>Error</value></data>
   <data name="error.generico" xml:space="preserve"><value>Ocurrió un error inesperado. La operación no pudo completarse.</value></data>
   <data name="error.contacto" xml:space="preserve"><value>Si el problema persiste, contacte al administrador del sistema.</value></data>
+  <data name="integridad.vulnerada.titulo" xml:space="preserve"><value>Base de datos vulnerada</value></data>
+  <data name="integridad.vulnerada.mensaje" xml:space="preserve"><value>La verificación de integridad detectó alteraciones en la base de datos realizadas por fuera del sistema. Se bloqueó el acceso y se requiere la intervención del administrador con urgencia.</value></data>
+  <data name="integridad.vulnerada.detalle" xml:space="preserve"><value>Detalle técnico de la verificación:</value></data>
+  <data name="integridad.vulnerada.salir" xml:space="preserve"><value>Salir</value></data>
+  <data name="integridad.vulnerada.sinConexion" xml:space="preserve"><value>No se pudo ejecutar la verificación de integridad (¿base de datos inaccesible?). Contacte al administrador.</value></data>
 </root>
