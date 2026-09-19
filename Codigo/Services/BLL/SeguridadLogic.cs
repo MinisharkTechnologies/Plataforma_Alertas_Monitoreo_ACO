@@ -20,6 +20,7 @@ namespace Services.BLL
         private const int LargoMinimoContrasena = 8;
 
         private static readonly IUsuarioRepository RepositorioUsuarios = new SqlUsuarioRepository();
+        private static readonly IPermisoRepository RepositorioPermisos = new SqlPermisoRepository();
 
         public static UsuarioAutenticado Autenticar(string nombreUsuario, string contrasena)
         {
@@ -81,6 +82,12 @@ namespace Services.BLL
             };
         }
 
+        /// <summary>
+        /// Indica si el usuario posee el permiso indicado (T04). El perfil del usuario se arma
+        /// como un permiso compuesto (patrón composite) con los códigos asignados en la base:
+        /// la verificación es recursiva por el árbol de permisos. El administrador del sistema
+        /// posee acceso total (criterio de diseño, REQ-ARQ-006).
+        /// </summary>
         public static bool TienePermiso(int idUsuario, string permiso)
         {
             if (string.IsNullOrWhiteSpace(permiso))
@@ -94,13 +101,92 @@ namespace Services.BLL
                 return false;
             }
 
-            // El administrador del sistema posee acceso total (criterio de diseño, REQ-ARQ-006).
             if (string.Equals(usuario.Perfil, "sysadmin", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            return RepositorioUsuarios.PerfilTienePermiso(usuario.Perfil, permiso);
+            List<string> asignados = RepositorioPermisos.ObtenerAsignacionesDePerfil(usuario.Perfil);
+            if (asignados.Count == 0)
+            {
+                return false;
+            }
+
+            List<PermisoFila> catalogo = RepositorioPermisos.ObtenerCatalogo();
+            PermisoCompuesto perfilCompuesto = new(usuario.Perfil, usuario.Perfil);
+            foreach (string codigo in asignados)
+            {
+                Permiso? nodo = ConstruirNodo(codigo, catalogo);
+                if (nodo != null)
+                {
+                    perfilCompuesto.Agregar(nodo);
+                }
+            }
+            return perfilCompuesto.Incluye(permiso);
+        }
+
+        /// <summary>Perfiles conocidos por el sistema (con asignaciones o usados por usuarios).</summary>
+        public static List<string> ObtenerPerfiles()
+            => RepositorioPermisos.ObtenerPerfiles();
+
+        /// <summary>Códigos de permisos asignados directamente a un perfil.</summary>
+        public static List<string> ObtenerPermisosDePerfil(string perfil)
+            => RepositorioPermisos.ObtenerAsignacionesDePerfil(perfil);
+
+        /// <summary>
+        /// Devuelve el catálogo de permisos como árbol composite (raíz "CATALOGO" con los
+        /// grupos como hijos), para la administración en un control TreeView (T04).
+        /// </summary>
+        public static PermisoCompuesto ObtenerArbolPermisos()
+        {
+            List<PermisoFila> catalogo = RepositorioPermisos.ObtenerCatalogo();
+            PermisoCompuesto raiz = new("CATALOGO", "Catálogo de permisos");
+            foreach (PermisoFila fila in catalogo.Where(f => f.CodigoPadre == null))
+            {
+                Permiso? nodo = ConstruirNodo(fila.Codigo, catalogo);
+                if (nodo != null)
+                {
+                    raiz.Agregar(nodo);
+                }
+            }
+            return raiz;
+        }
+
+        /// <summary>Reemplaza las asignaciones de un perfil (asignación rápida) y audita el cambio.</summary>
+        public static void GuardarPermisosDePerfil(string perfil, List<string> codigos)
+        {
+            if (string.IsNullOrWhiteSpace(perfil))
+            {
+                throw new ArgumentException("El perfil es obligatorio.");
+            }
+            RepositorioPermisos.ReemplazarAsignaciones(perfil, codigos ?? new List<string>());
+            BitacoraLogic.Registrar(LogLevel.Info,
+                $"Permisos del perfil '{perfil}' actualizados ({(codigos?.Count ?? 0)} asignación/es).",
+                capa: "Seguridad");
+        }
+
+        /// <summary>Construye recursivamente un nodo del árbol de permisos a partir del catálogo.</summary>
+        private static Permiso? ConstruirNodo(string codigo, List<PermisoFila> catalogo)
+        {
+            PermisoFila? fila = catalogo.FirstOrDefault(f => string.Equals(f.Codigo, codigo, StringComparison.OrdinalIgnoreCase));
+            if (fila == null)
+            {
+                return null;
+            }
+            if (!string.Equals(fila.Tipo, "C", StringComparison.OrdinalIgnoreCase))
+            {
+                return new PermisoAtomico(fila.Codigo, fila.Nombre);
+            }
+            PermisoCompuesto compuesto = new(fila.Codigo, fila.Nombre);
+            foreach (PermisoFila hijo in catalogo.Where(f => string.Equals(f.CodigoPadre, fila.Codigo, StringComparison.OrdinalIgnoreCase)))
+            {
+                Permiso? nodoHijo = ConstruirNodo(hijo.Codigo, catalogo);
+                if (nodoHijo != null)
+                {
+                    compuesto.Agregar(nodoHijo);
+                }
+            }
+            return compuesto;
         }
 
         public static int RegistrarUsuario(

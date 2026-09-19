@@ -315,4 +315,10 @@
   <data name="idiomas.guardadoOk" xml:space="preserve"><value>更改已保存，视图已实时更新。</value></data>
   <data name="idiomas.sinSeleccion" xml:space="preserve"><value>请选择语言。</value></data>
   <data name="idiomas.claveObligatoria" xml:space="preserve"><value>请输入词条键。</value></data>
+  <data name="sistema.perfiles" xml:space="preserve"><value>配置与权限</value></data>
+  <data name="perfiles.guardar" xml:space="preserve"><value>保存权限</value></data>
+  <data name="perfiles.marcarTodo" xml:space="preserve"><value>全部勾选</value></data>
+  <data name="perfiles.desmarcarTodo" xml:space="preserve"><value>全部取消</value></data>
+  <data name="perfiles.sinPerfil" xml:space="preserve"><value>请选择配置。</value></data>
+  <data name="perfiles.guardado" xml:space="preserve"><value>权限已成功保存。</value></data>
 </root>

@@ -19,6 +19,7 @@ namespace Negocio.UI
         private readonly Button _btnVistaBitacora = new();
         private readonly Button _btnVistaCambios = new();
         private readonly Button _btnVistaIdiomas = new();
+        private readonly Button _btnVistaPerfiles = new();
 
         private readonly Panel _panelUsuarios = new();
         private readonly Button _btnNuevoUsuario = new();
@@ -59,6 +60,14 @@ namespace Negocio.UI
         private List<Idioma> _idiomasEditor = new();
         private List<TextoLocalizacion> _textosEditor = new();
 
+        private readonly Panel _panelPerfiles = new();
+        private readonly ComboBox _cmbPerfiles = new();
+        private readonly TreeView _treePermisos = new();
+        private readonly Button _btnGuardarPermisos = new();
+        private readonly Button _btnMarcarTodo = new();
+        private readonly Button _btnDesmarcarTodo = new();
+        private bool _actualizandoArbol;
+
         private static readonly string[] EntidadesAuditables =
         {
             "Pacientes", "ObrasSociales", "Diagnosticos", "HistoriasClinicas", "EventosAdversos",
@@ -95,6 +104,9 @@ namespace Negocio.UI
                 case 3:
                     CargarIdiomas();
                     break;
+                case 4:
+                    CargarPerfiles();
+                    break;
             }
         }
 
@@ -117,10 +129,12 @@ namespace Negocio.UI
             ConfigurarBotonVista(_btnVistaBitacora, 176, 1);
             ConfigurarBotonVista(_btnVistaCambios, 352, 2);
             ConfigurarBotonVista(_btnVistaIdiomas, 528, 3);
+            ConfigurarBotonVista(_btnVistaPerfiles, 704, 4);
             panelBarra.Controls.Add(_btnVistaUsuarios);
             panelBarra.Controls.Add(_btnVistaBitacora);
             panelBarra.Controls.Add(_btnVistaCambios);
             panelBarra.Controls.Add(_btnVistaIdiomas);
+            panelBarra.Controls.Add(_btnVistaPerfiles);
 
             // ---- Vista 1: usuarios ----
             _panelUsuarios.Dock = DockStyle.Fill;
@@ -400,10 +414,56 @@ namespace Negocio.UI
             _panelIdiomas.Controls.Add(panelIdiomasDer);
             _panelIdiomas.Controls.Add(panelIdiomasIzq);
 
+            // ---- Vista 5: perfiles y permisos (T04) ----
+            _panelPerfiles.Dock = DockStyle.Fill;
+            _panelPerfiles.BackColor = Color.White;
+
+            _cmbPerfiles.Location = new Point(14, 18);
+            _cmbPerfiles.Size = new Size(280, 28);
+            _cmbPerfiles.DropDownStyle = ComboBoxStyle.DropDownList;
+            _cmbPerfiles.Font = new Font("Segoe UI", 9.5F);
+            _cmbPerfiles.SelectedIndexChanged += (s, e) => CargarArbolDelPerfil();
+
+            _btnMarcarTodo.Location = new Point(310, 17);
+            _btnMarcarTodo.Size = new Size(150, 30);
+            EstiloSecundario(_btnMarcarTodo);
+            _btnMarcarTodo.Click += (s, e) => MarcarTodo(true);
+
+            _btnDesmarcarTodo.Location = new Point(468, 17);
+            _btnDesmarcarTodo.Size = new Size(150, 30);
+            EstiloSecundario(_btnDesmarcarTodo);
+            _btnDesmarcarTodo.Click += (s, e) => MarcarTodo(false);
+
+            _btnGuardarPermisos.Location = new Point(626, 17);
+            _btnGuardarPermisos.Size = new Size(200, 30);
+            EstiloPrimario(_btnGuardarPermisos);
+            _btnGuardarPermisos.Click += (s, e) => GuardarPermisosDelPerfil();
+
+            var hostArbol = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 58, 14, 14) };
+            _treePermisos.Dock = DockStyle.Fill;
+            _treePermisos.CheckBoxes = true;
+            _treePermisos.Font = new Font("Segoe UI", 10F);
+            _treePermisos.HideSelection = false;
+            _treePermisos.BackColor = Color.White;
+            _treePermisos.BorderStyle = BorderStyle.None;
+            _treePermisos.AfterCheck += TreePermisos_AfterCheck;
+            hostArbol.Controls.Add(_treePermisos);
+
+            _panelPerfiles.Controls.Add(hostArbol);
+            _panelPerfiles.Controls.Add(_cmbPerfiles);
+            _panelPerfiles.Controls.Add(_btnMarcarTodo);
+            _panelPerfiles.Controls.Add(_btnDesmarcarTodo);
+            _panelPerfiles.Controls.Add(_btnGuardarPermisos);
+            _cmbPerfiles.BringToFront();
+            _btnMarcarTodo.BringToFront();
+            _btnDesmarcarTodo.BringToFront();
+            _btnGuardarPermisos.BringToFront();
+
             Controls.Add(_panelUsuarios);
             Controls.Add(_panelBitacora);
             Controls.Add(_panelCambios);
             Controls.Add(_panelIdiomas);
+            Controls.Add(_panelPerfiles);
             Controls.Add(panelBarra);
         }
 
@@ -472,10 +532,12 @@ namespace Negocio.UI
             _panelBitacora.Visible = vista == 1;
             _panelCambios.Visible = vista == 2;
             _panelIdiomas.Visible = vista == 3;
+            _panelPerfiles.Visible = vista == 4;
             EstiloBotonVista(_btnVistaUsuarios, vista == 0);
             EstiloBotonVista(_btnVistaBitacora, vista == 1);
             EstiloBotonVista(_btnVistaCambios, vista == 2);
             EstiloBotonVista(_btnVistaIdiomas, vista == 3);
+            EstiloBotonVista(_btnVistaPerfiles, vista == 4);
             Recargar();
         }
 
@@ -545,6 +607,11 @@ namespace Negocio.UI
             _grillaTextos.Columns["valor"].HeaderText = Localizacion("idiomas.valor");
             _btnAgregarLeyenda.Text = Localizacion("idiomas.agregar");
             _btnGuardarTextos.Text = Localizacion("idiomas.guardar");
+
+            _btnVistaPerfiles.Text = Localizacion("sistema.perfiles");
+            _btnGuardarPermisos.Text = Localizacion("perfiles.guardar");
+            _btnMarcarTodo.Text = Localizacion("perfiles.marcarTodo");
+            _btnDesmarcarTodo.Text = Localizacion("perfiles.desmarcarTodo");
         }
 
         private void CargarUsuarios()
@@ -888,6 +955,163 @@ namespace Negocio.UI
             {
                 MessageBox.Show(FindForm(), ex.Message, Localizacion("sistema.idiomas"),
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        // ------------------------------------------------------------------ perfiles y permisos (T04)
+
+        private void CargarPerfiles()
+        {
+            try
+            {
+                string? previo = _cmbPerfiles.SelectedItem?.ToString();
+                _cmbPerfiles.Items.Clear();
+                foreach (string perfil in SeguridadService.ObtenerPerfiles())
+                {
+                    _cmbPerfiles.Items.Add(perfil);
+                }
+                int indice = previo == null ? 0 : Math.Max(0, _cmbPerfiles.Items.IndexOf(previo));
+                _cmbPerfiles.SelectedIndex = _cmbPerfiles.Items.Count > 0 ? indice : -1;
+                CargarArbolDelPerfil();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void CargarArbolDelPerfil()
+        {
+            if (_cmbPerfiles.SelectedIndex < 0)
+            {
+                return;
+            }
+            try
+            {
+                string perfil = _cmbPerfiles.SelectedItem?.ToString() ?? string.Empty;
+                _actualizandoArbol = true;
+                try
+                {
+                    _treePermisos.BeginUpdate();
+                    _treePermisos.Nodes.Clear();
+                    PermisoCompuesto raiz = SeguridadService.ObtenerArbolPermisos();
+                    LlenarArbol(_treePermisos.Nodes, raiz);
+                    AplicarAsignaciones(_treePermisos.Nodes, SeguridadService.ObtenerPermisosDePerfil(perfil));
+                    _treePermisos.ExpandAll();
+                }
+                finally
+                {
+                    _treePermisos.EndUpdate();
+                    _actualizandoArbol = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        /// <summary>Llena el TreeView con el árbol de permisos (función recursiva, T04).</summary>
+        private static void LlenarArbol(TreeNodeCollection destino, PermisoCompuesto raiz)
+        {
+            foreach (Permiso hijo in raiz.Hijos)
+            {
+                TreeNode nodo = destino.Add($"{hijo.Codigo} — {hijo.Nombre}");
+                nodo.Tag = hijo.Codigo;
+                if (hijo is PermisoCompuesto compuesto)
+                {
+                    LlenarArbol(nodo.Nodes, compuesto);
+                }
+            }
+        }
+
+        /// <summary>Aplica las asignaciones del perfil sobre el árbol (función recursiva, T04).</summary>
+        private static void AplicarAsignaciones(TreeNodeCollection nodos, List<string> asignados)
+        {
+            foreach (TreeNode nodo in nodos)
+            {
+                nodo.Checked = nodo.Tag is string codigo && asignados.Contains(codigo);
+                AplicarAsignaciones(nodo.Nodes, asignados);
+            }
+        }
+
+        /// <summary>Propaga el estado marcado a todo el subárbol (función recursiva, T04).</summary>
+        private static void PropagarASubarbol(TreeNode raiz, bool marcado)
+        {
+            foreach (TreeNode hijo in raiz.Nodes)
+            {
+                hijo.Checked = marcado;
+                PropagarASubarbol(hijo, marcado);
+            }
+        }
+
+        /// <summary>Recolecta los códigos marcados del árbol (función recursiva, T04).</summary>
+        private static void RecolectarMarcados(TreeNodeCollection nodos, List<string> destino)
+        {
+            foreach (TreeNode nodo in nodos)
+            {
+                if (nodo.Checked && nodo.Tag is string codigo)
+                {
+                    destino.Add(codigo);
+                }
+                RecolectarMarcados(nodo.Nodes, destino);
+            }
+        }
+
+        private void TreePermisos_AfterCheck(object? sender, TreeViewEventArgs e)
+        {
+            if (_actualizandoArbol || e.Node == null)
+            {
+                return;
+            }
+            _actualizandoArbol = true;
+            try
+            {
+                PropagarASubarbol(e.Node, e.Node.Checked);
+            }
+            finally
+            {
+                _actualizandoArbol = false;
+            }
+        }
+
+        private void MarcarTodo(bool marcado)
+        {
+            _actualizandoArbol = true;
+            try
+            {
+                foreach (TreeNode nodo in _treePermisos.Nodes)
+                {
+                    nodo.Checked = marcado;
+                    PropagarASubarbol(nodo, marcado);
+                }
+            }
+            finally
+            {
+                _actualizandoArbol = false;
+            }
+        }
+
+        private void GuardarPermisosDelPerfil()
+        {
+            if (_cmbPerfiles.SelectedIndex < 0)
+            {
+                MessageBox.Show(FindForm(), Localizacion("perfiles.sinPerfil"), Localizacion("sistema.perfiles"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            try
+            {
+                string perfil = _cmbPerfiles.SelectedItem?.ToString() ?? string.Empty;
+                var codigos = new List<string>();
+                RecolectarMarcados(_treePermisos.Nodes, codigos);
+                SeguridadService.GuardarPermisosDePerfil(perfil, codigos);
+                MessageBox.Show(FindForm(), Localizacion("perfiles.guardado"), Localizacion("sistema.perfiles"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
             }
         }
 

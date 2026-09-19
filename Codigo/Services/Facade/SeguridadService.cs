@@ -50,5 +50,21 @@ namespace Services.Facade
         /// <summary>Lista los usuarios del sistema (sin datos sensibles) para la pantalla de administración.</summary>
         public static List<UsuarioListado> ObtenerUsuarios()
             => SeguridadLogic.ObtenerUsuarios();
+
+        /// <summary>Perfiles conocidos por el sistema (T04) para la administración de permisos.</summary>
+        public static List<string> ObtenerPerfiles()
+            => SeguridadLogic.ObtenerPerfiles();
+
+        /// <summary>Códigos de permisos asignados a un perfil.</summary>
+        public static List<string> ObtenerPermisosDePerfil(string perfil)
+            => SeguridadLogic.ObtenerPermisosDePerfil(perfil);
+
+        /// <summary>Catálogo de permisos como árbol composite, para la vista en TreeView (T04).</summary>
+        public static PermisoCompuesto ObtenerArbolPermisos()
+            => SeguridadLogic.ObtenerArbolPermisos();
+
+        /// <summary>Guarda (reemplaza) las asignaciones de un perfil — asignación rápida auditada.</summary>
+        public static void GuardarPermisosDePerfil(string perfil, List<string> codigos)
+            => SeguridadLogic.GuardarPermisosDePerfil(perfil, codigos);
     }
 }

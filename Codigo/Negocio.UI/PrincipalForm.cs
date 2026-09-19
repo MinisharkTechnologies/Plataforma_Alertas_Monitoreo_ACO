@@ -198,16 +198,16 @@ namespace Negocio.UI
             bool sysadmin = string.Equals(_sesion.Perfil, "sysadmin", StringComparison.OrdinalIgnoreCase);
             bool tiene(string permiso) => SeguridadService.TienePermiso(_sesion.Id, permiso);
 
-            AgregarModulo("mod.pacientes", sysadmin || tiene("GESTION_PACIENTES") || tiene("HISTORIA_CLINICA"));
-            AgregarModulo("panel.titulo", sysadmin || tiene("PANEL_VER"));
+            AgregarModulo("mod.pacientes", sysadmin || tiene("PA002") || tiene("PA006"));
+            AgregarModulo("panel.titulo", sysadmin || tiene("PA001"));
             // Recepción de RIN es una pantalla operativa del personal (no del portal del paciente).
-            AgregarModulo("mod.rin", sysadmin || tiene("RECEPCION_RIN"));
-            AgregarModulo("mod.agenda", sysadmin || tiene("GESTION_AGENDA"));
-            AgregarModulo("mod.seguimiento", sysadmin || tiene("SEGUIMIENTO_CLINICO"));
-            AgregarModulo("mod.eventos", sysadmin || tiene("EVENTOS_ADVERSOS"));
-            AgregarModulo("mod.reportes", sysadmin || tiene("REPORTES_VER"));
-            AgregarModulo("mod.portal", sysadmin || tiene("PORTAL_REPORTAR_RIN") || tiene("PORTAL_VER_HISTORIAL"));
-            AgregarModulo("mod.sistema", sysadmin);
+            AgregarModulo("mod.rin", sysadmin || tiene("PA004"));
+            AgregarModulo("mod.agenda", sysadmin || tiene("PA003"));
+            AgregarModulo("mod.seguimiento", sysadmin || tiene("PA007"));
+            AgregarModulo("mod.eventos", sysadmin || tiene("PA005"));
+            AgregarModulo("mod.reportes", sysadmin || tiene("PA008"));
+            AgregarModulo("mod.portal", sysadmin || tiene("PO001") || tiene("PO002"));
+            AgregarModulo("mod.sistema", sysadmin || tiene("SI001"));
         }
 
         private void AgregarModulo(string clave, bool permitido)

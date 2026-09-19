@@ -315,4 +315,10 @@
   <data name="idiomas.guardadoOk" xml:space="preserve"><value>Cambios guardados. Las vistas se actualizaron en caliente.</value></data>
   <data name="idiomas.sinSeleccion" xml:space="preserve"><value>Seleccione un idioma.</value></data>
   <data name="idiomas.claveObligatoria" xml:space="preserve"><value>Ingrese la clave de la leyenda.</value></data>
+  <data name="sistema.perfiles" xml:space="preserve"><value>Perfiles y permisos</value></data>
+  <data name="perfiles.guardar" xml:space="preserve"><value>Guardar permisos</value></data>
+  <data name="perfiles.marcarTodo" xml:space="preserve"><value>Marcar todo</value></data>
+  <data name="perfiles.desmarcarTodo" xml:space="preserve"><value>Desmarcar todo</value></data>
+  <data name="perfiles.sinPerfil" xml:space="preserve"><value>Seleccione un perfil.</value></data>
+  <data name="perfiles.guardado" xml:space="preserve"><value>Permisos guardados correctamente.</value></data>
 </root>

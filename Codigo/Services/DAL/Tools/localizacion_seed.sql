@@ -2,7 +2,7 @@
 -- Regenerable con PPDD/tools/generar_seed_textos.py — MERGE idempotente por (idioma, clave).
 -- IMPORTANTE: importar SIEMPRE con la bandera UTF-8:  sqlcmd -f 65001 -i localizacion_seed.sql
 
--- Idioma es: 303 claves
+-- Idioma es: 309 claves
 MERGE dbo.Textos AS destino
 USING (VALUES
     ('es', 'agenda.actualizar', N'Actualizar agenda'),
@@ -160,6 +160,11 @@ USING (VALUES
     ('es', 'panel.refresco', N'Actualizado:'),
     ('es', 'panel.sinDatos', N'Sin datos'),
     ('es', 'panel.titulo', N'Panel de Monitoreo'),
+    ('es', 'perfiles.desmarcarTodo', N'Desmarcar todo'),
+    ('es', 'perfiles.guardado', N'Permisos guardados correctamente.'),
+    ('es', 'perfiles.guardar', N'Guardar permisos'),
+    ('es', 'perfiles.marcarTodo', N'Marcar todo'),
+    ('es', 'perfiles.sinPerfil', N'Seleccione un perfil.'),
     ('es', 'portal.bienvenida', N'Hola,'),
     ('es', 'portal.enviar', N'Enviar reporte'),
     ('es', 'portal.gracias', N'¡Gracias! Su reporte quedó registrado.'),
@@ -304,6 +309,7 @@ USING (VALUES
     ('es', 'sistema.nivel.todos', N'Todos'),
     ('es', 'sistema.no', N'No'),
     ('es', 'sistema.nuevoUsuario', N'Nuevo usuario'),
+    ('es', 'sistema.perfiles', N'Perfiles y permisos'),
     ('es', 'sistema.selUsuario', N'Seleccione un usuario de la lista.'),
     ('es', 'sistema.si', N'Sí'),
     ('es', 'sistema.usuarioRegistrado', N'Usuario registrado correctamente.'),
@@ -315,7 +321,7 @@ WHEN NOT MATCHED THEN INSERT (CodigoIdioma, Clave, Valor)
     VALUES (origen.CodigoIdioma, origen.Clave, origen.Valor);
 GO
 
--- Idioma en: 303 claves
+-- Idioma en: 309 claves
 MERGE dbo.Textos AS destino
 USING (VALUES
     ('en', 'agenda.actualizar', N'Refresh schedule'),
@@ -473,6 +479,11 @@ USING (VALUES
     ('en', 'panel.refresco', N'Updated:'),
     ('en', 'panel.sinDatos', N'No data'),
     ('en', 'panel.titulo', N'Monitoring Dashboard'),
+    ('en', 'perfiles.desmarcarTodo', N'Uncheck all'),
+    ('en', 'perfiles.guardado', N'Permissions saved successfully.'),
+    ('en', 'perfiles.guardar', N'Save permissions'),
+    ('en', 'perfiles.marcarTodo', N'Check all'),
+    ('en', 'perfiles.sinPerfil', N'Select a profile.'),
     ('en', 'portal.bienvenida', N'Hello,'),
     ('en', 'portal.enviar', N'Send report'),
     ('en', 'portal.gracias', N'Thank you! Your report has been recorded.'),
@@ -617,6 +628,7 @@ USING (VALUES
     ('en', 'sistema.nivel.todos', N'All'),
     ('en', 'sistema.no', N'No'),
     ('en', 'sistema.nuevoUsuario', N'New user'),
+    ('en', 'sistema.perfiles', N'Profiles & permissions'),
     ('en', 'sistema.selUsuario', N'Select a user from the list.'),
     ('en', 'sistema.si', N'Yes'),
     ('en', 'sistema.usuarioRegistrado', N'User created successfully.'),
@@ -628,7 +640,7 @@ WHEN NOT MATCHED THEN INSERT (CodigoIdioma, Clave, Valor)
     VALUES (origen.CodigoIdioma, origen.Clave, origen.Valor);
 GO
 
--- Idioma zh-CN: 303 claves
+-- Idioma zh-CN: 309 claves
 MERGE dbo.Textos AS destino
 USING (VALUES
     ('zh-CN', 'agenda.actualizar', N'刷新日程'),
@@ -786,6 +798,11 @@ USING (VALUES
     ('zh-CN', 'panel.refresco', N'已更新：'),
     ('zh-CN', 'panel.sinDatos', N'无数据'),
     ('zh-CN', 'panel.titulo', N'监控面板'),
+    ('zh-CN', 'perfiles.desmarcarTodo', N'全部取消'),
+    ('zh-CN', 'perfiles.guardado', N'权限已成功保存。'),
+    ('zh-CN', 'perfiles.guardar', N'保存权限'),
+    ('zh-CN', 'perfiles.marcarTodo', N'全部勾选'),
+    ('zh-CN', 'perfiles.sinPerfil', N'请选择配置。'),
     ('zh-CN', 'portal.bienvenida', N'你好，'),
     ('zh-CN', 'portal.enviar', N'提交报告'),
     ('zh-CN', 'portal.gracias', N'谢谢！您的报告已登记。'),
@@ -930,6 +947,7 @@ USING (VALUES
     ('zh-CN', 'sistema.nivel.todos', N'全部'),
     ('zh-CN', 'sistema.no', N'否'),
     ('zh-CN', 'sistema.nuevoUsuario', N'新建用户'),
+    ('zh-CN', 'sistema.perfiles', N'配置与权限'),
     ('zh-CN', 'sistema.selUsuario', N'请从列表中选择用户。'),
     ('zh-CN', 'sistema.si', N'是'),
     ('zh-CN', 'sistema.usuarioRegistrado', N'用户创建成功。'),

@@ -315,4 +315,10 @@
   <data name="idiomas.guardadoOk" xml:space="preserve"><value>Changes saved. Views were refreshed live.</value></data>
   <data name="idiomas.sinSeleccion" xml:space="preserve"><value>Select a language.</value></data>
   <data name="idiomas.claveObligatoria" xml:space="preserve"><value>Enter the entry key.</value></data>
+  <data name="sistema.perfiles" xml:space="preserve"><value>Profiles &amp; permissions</value></data>
+  <data name="perfiles.guardar" xml:space="preserve"><value>Save permissions</value></data>
+  <data name="perfiles.marcarTodo" xml:space="preserve"><value>Check all</value></data>
+  <data name="perfiles.desmarcarTodo" xml:space="preserve"><value>Uncheck all</value></data>
+  <data name="perfiles.sinPerfil" xml:space="preserve"><value>Select a profile.</value></data>
+  <data name="perfiles.guardado" xml:space="preserve"><value>Permissions saved successfully.</value></data>
 </root>
