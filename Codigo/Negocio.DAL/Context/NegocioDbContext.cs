@@ -61,6 +61,8 @@ namespace Negocio.DAL.Context
         /// DVV de las tablas afectadas por firmas O por borrados. Firmar después de persistir
         /// es imprescindible: firmar antes dejaría a las filas nuevas con un DVH calculado
         /// sobre Id = 0, que la auditoría luego reportaría como manipulación externa.
+        /// Nota: el valor devuelto cuenta solo las filas persistidas en la fase 1; las
+        /// escrituras de firma de las fases 2 y 3 no se incluyen en el total.
         /// </summary>
         public override int SaveChanges()
         {

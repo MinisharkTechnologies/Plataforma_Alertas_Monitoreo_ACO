@@ -11,6 +11,12 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Asegurar la carpeta raiz de respaldos (donde escribe SQL Server) y la de logs: el
+# mecanismo queda autosuficiente incluso en un equipo donde C:\OpenRIN no exista aun.
+$RaizBackups = Split-Path -Parent $LogDir
+if (-not (Test-Path -LiteralPath $RaizBackups)) {
+    New-Item -ItemType Directory -Path $RaizBackups -Force | Out-Null
+}
 if (-not (Test-Path -LiteralPath $LogDir)) {
     New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
 }
