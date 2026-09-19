@@ -9,7 +9,7 @@ BEGIN
         HashPassword      NVARCHAR(400)     NOT NULL, -- formato "sal.iteraciones.hash" (PBKDF2-SHA256), nunca texto plano
         Perfil            VARCHAR(30)       NOT NULL,
         Email             NVARCHAR(200)     NULL,
-        PreguntaSeguridad NVARCHAR(300)     NULL,     -- recuperación de contraseña (scope creep)
+        PreguntaSeguridad NVARCHAR(300)     NULL,     -- recuperación de contraseña
         RespuestaHash     NVARCHAR(400)     NULL,
         Idioma            VARCHAR(10)       NULL,     -- idioma preferido del usuario (REQ-ARQ-001)
         Activo            BIT               NOT NULL CONSTRAINT DF_Usuarios_Activo DEFAULT (1),

@@ -21,7 +21,7 @@ namespace Services.DomainModel
 
         public string? Email { get; set; }
 
-        /// <summary>Pregunta de seguridad para la recuperación de contraseña (scope creep de Gastón).</summary>
+        /// <summary>Pregunta de seguridad para la recuperación de contraseña.</summary>
         public string? PreguntaSeguridad { get; set; }
 
         /// <summary>Hash de la respuesta de seguridad (mismo formato que HashPassword).</summary>
