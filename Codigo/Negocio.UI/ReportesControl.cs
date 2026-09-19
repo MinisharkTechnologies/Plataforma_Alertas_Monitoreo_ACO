@@ -382,6 +382,7 @@ namespace Negocio.UI
             _cmbFormato.Items.Clear();
             _cmbFormato.Items.Add("PDF");
             _cmbFormato.Items.Add("Excel");
+            _cmbFormato.Items.Add("JSON");
             _cmbFormato.SelectedIndex = formatoPrevio < 0 ? 0 : formatoPrevio;
             _btnExportar.Text = Localizacion("reportes.exportar");
             _grillaHistorial.Columns["fecha"].HeaderText = Localizacion("rin.columna.fecha");

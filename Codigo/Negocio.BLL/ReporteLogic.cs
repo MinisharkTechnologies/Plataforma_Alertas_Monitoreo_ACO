@@ -199,11 +199,12 @@ namespace Negocio.BLL
         public ExportacionHistorial ExportarHistorialPaciente(int idPaciente, string formato, string usuarioResponsable = "")
         {
             bool formatoValido = string.Equals(formato, "PDF", StringComparison.OrdinalIgnoreCase)
-                              || string.Equals(formato, "Excel", StringComparison.OrdinalIgnoreCase);
+                              || string.Equals(formato, "Excel", StringComparison.OrdinalIgnoreCase)
+                              || string.Equals(formato, "JSON", StringComparison.OrdinalIgnoreCase);
             if (!formatoValido)
             {
                 throw ReglasNegocio.Rechazar(
-                    new List<string> { "El formato de exportación debe ser PDF o Excel." },
+                    new List<string> { "El formato de exportación debe ser PDF, Excel o JSON." },
                     $"Exportación de historial del paciente Id {idPaciente}", usuarioResponsable);
             }
 
@@ -211,7 +212,12 @@ namespace Negocio.BLL
                 ?? throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
 
             List<ItemHistorial> items = ObtenerHistorialPaciente(idPaciente);
-            string extension = string.Equals(formato, "PDF", StringComparison.OrdinalIgnoreCase) ? "pdf" : "xlsx";
+            string extension = formato.ToUpperInvariant() switch
+            {
+                "PDF" => "pdf",
+                "EXCEL" => "xlsx",
+                _ => "json"
+            };
             string nombreLimpio = string.Concat(paciente.NombreCompleto.Where(char.IsLetterOrDigit));
             string archivo = $"Historial_{nombreLimpio}_{DateTime.Now:yyyyMMdd}.{extension}";
 

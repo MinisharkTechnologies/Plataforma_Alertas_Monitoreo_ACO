@@ -1,5 +1,7 @@
 using System.IO.Compression;
 using System.Text;
+using System.Text.Encodings.Web;
+using System.Text.Json;
 using Negocio.BLL;
 using Negocio.DomainModel;
 
@@ -7,8 +9,9 @@ namespace Negocio.UI
 {
     /// <summary>
     /// Renderizadores de exportación de la capa de presentación (REQ-FUNC-013): generan el
-    /// archivo real del historial clínico unificado en PDF (escritor mínimo sin dependencias)
-    /// o en Excel (.xlsx OOXML generado como paquete ZIP).
+    /// archivo real del historial clínico unificado en PDF (escritor mínimo sin dependencias),
+    /// en Excel (.xlsx OOXML generado como paquete ZIP) o en JSON serializado
+    /// (A03: archivo serializado con información relevante).
     /// </summary>
     public static class Exportadores
     {
@@ -29,11 +32,45 @@ namespace Negocio.UI
             {
                 EscribirXlsx(ruta, paciente, exportacion.Items);
             }
+            else if (string.Equals(formato, "JSON", StringComparison.OrdinalIgnoreCase))
+            {
+                EscribirJson(ruta, paciente, exportacion);
+            }
             else
             {
                 EscribirPdf(ruta, paciente, exportacion.Items);
             }
             return ruta;
+        }
+
+        /// <summary>
+        /// Escribe el historial como archivo JSON serializado (A03): un documento con metadatos
+        /// y la lista de registros. Se genera con UTF-8 sin BOM y sin escapes innecesarios,
+        /// de modo que el contenido sea compacto y directamente legible.
+        /// </summary>
+        private static void EscribirJson(string ruta, string paciente, ExportacionHistorial exportacion)
+        {
+            var documento = new
+            {
+                sistema = "OpenRIN",
+                documento = "Historial clínico unificado",
+                paciente,
+                generado = DateTime.Now.ToString("s"),
+                totalRegistros = exportacion.Items.Count,
+                registros = exportacion.Items.Select(item => new
+                {
+                    fecha = item.Fecha.ToString("yyyy-MM-dd"),
+                    tipo = item.Tipo,
+                    descripcion = item.Descripcion
+                }).ToList()
+            };
+
+            string json = JsonSerializer.Serialize(documento, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            });
+            File.WriteAllText(ruta, json, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
         }
 
         // ------------------------------------------------------------------ PDF
