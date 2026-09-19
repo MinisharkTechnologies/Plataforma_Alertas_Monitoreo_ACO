@@ -165,7 +165,9 @@ namespace Negocio.BLL
 
         /// <summary>
         /// Recalcula y firma TODAS las filas y tablas cubiertas (reparación auditada tras una
-        /// detección). Los DVV se actualizan automáticamente por el contexto EF al guardar.
+        /// detección). Además de las firmas por fila (DVH), recalcula explícitamente el DVV de
+        /// cada tabla —también las que no tienen filas modificadas o están vacías—, porque el
+        /// guardado por sí solo no alcanza a cubrir esos casos.
         /// </summary>
         public int RecalcularTodo()
         {
@@ -177,6 +179,31 @@ namespace Negocio.BLL
                 {
                     _contexto.Entry(fila.Entidad).Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(fila.Entidad);
                     firmadas++;
+                }
+            }
+            _contexto.SaveChanges();
+
+            // Los DVV se recalculan aquí de forma explícita: leer las filas (ya firmadas) tal
+            // como las lee la auditoría garantiza que "esperado" y "registrado" coincidan.
+            foreach ((string tabla, Func<bool, List<FilaAuditoria>> lector) in _tablas)
+            {
+                List<(int Id, string? Dvh)> filas = lector(false).Select(r => (r.Id, r.Dvh)).ToList();
+                string dvv = DigitoVerificador.CalcularDVV(tabla, filas);
+
+                DigitosVerificadores? registro = _contexto.DigitosVerificadores.FirstOrDefault(d => d.NombreTabla == tabla);
+                if (registro == null)
+                {
+                    _contexto.DigitosVerificadores.Add(new DigitosVerificadores
+                    {
+                        NombreTabla = tabla,
+                        DVV = dvv,
+                        FechaCalculo = DateTime.Now
+                    });
+                }
+                else if (!string.Equals(registro.DVV, dvv, StringComparison.Ordinal))
+                {
+                    registro.DVV = dvv;
+                    registro.FechaCalculo = DateTime.Now;
                 }
             }
             _contexto.SaveChanges();

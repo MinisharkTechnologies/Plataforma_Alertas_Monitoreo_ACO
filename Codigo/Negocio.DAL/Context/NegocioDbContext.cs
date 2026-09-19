@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Negocio.DomainModel;
 using Negocio.DomainModel.Enums;
 
@@ -54,47 +55,24 @@ namespace Negocio.DAL.Context
         }
 
         /// <summary>
-        /// Guarda los cambios firmando primero cada fila (DVH) y actualizando después los
-        /// dígitos verticales (DVV) de las tablas afectadas. La recalculación de DVV post-save
-        /// usa SaveChanges base para no re-entrar en esta lógica.
+        /// Guarda los cambios con firma de integridad en TRES fases: (1) persiste los datos —
+        /// las filas nuevas obtienen aquí su Id de identidad—; (2) firma el DVH de cada fila
+        /// agregada o modificada (con su Id ya real) y persiste las firmas; (3) recalcula los
+        /// DVV de las tablas afectadas por firmas O por borrados. Firmar después de persistir
+        /// es imprescindible: firmar antes dejaría a las filas nuevas con un DVH calculado
+        /// sobre Id = 0, que la auditoría luego reportaría como manipulación externa.
         /// </summary>
         public override int SaveChanges()
         {
-            PrepararDigitosHorizontales();
-
+            // Recolectar firmandos y tablas tocadas ANTES de persistir: tras el primer
+            // SaveChanges los estados del ChangeTracker pasan a Unchanged. Los borrados no
+            // se firman, pero su tabla entra igual: al cambiar el conjunto de filas cambia
+            // su DVV y debe recalcularse.
+            var aFirmar = new List<EntityEntry>();
             var tablasTocadas = new HashSet<string>(StringComparer.Ordinal);
             foreach (var entrada in ChangeTracker.Entries())
             {
-                if (entrada.State == EntityState.Unchanged || entrada.State == EntityState.Detached)
-                {
-                    continue;
-                }
-                if (entrada.Entity is DigitosVerificadores)
-                {
-                    continue;
-                }
-                string? tabla = entrada.Metadata.GetTableName();
-                if (tabla != null && entrada.Metadata.FindProperty("DVH") != null)
-                {
-                    tablasTocadas.Add(tabla);
-                }
-            }
-
-            int resultado = base.SaveChanges();
-
-            foreach (string tabla in tablasTocadas)
-            {
-                ActualizarDigitoVertical(tabla);
-            }
-            return resultado;
-        }
-
-        /// <summary>Calcula y asigna el DVH de cada fila agregada o modificada antes de persistir.</summary>
-        private void PrepararDigitosHorizontales()
-        {
-            foreach (var entrada in ChangeTracker.Entries())
-            {
-                if (entrada.State != EntityState.Added && entrada.State != EntityState.Modified)
+                if (entrada.State != EntityState.Added && entrada.State != EntityState.Modified && entrada.State != EntityState.Deleted)
                 {
                     continue;
                 }
@@ -102,8 +80,34 @@ namespace Negocio.DAL.Context
                 {
                     continue;
                 }
+                if (entrada.State != EntityState.Deleted)
+                {
+                    aFirmar.Add(entrada);
+                }
+                string? tabla = entrada.Metadata.GetTableName();
+                if (tabla != null)
+                {
+                    tablasTocadas.Add(tabla);
+                }
+            }
+
+            int resultado = base.SaveChanges();
+
+            // Fase 2: DVH calculado con la identidad de fila ya asignada por la base.
+            foreach (EntityEntry entrada in aFirmar)
+            {
                 entrada.Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(entrada.Entity);
             }
+            if (aFirmar.Count > 0)
+            {
+                base.SaveChanges();
+            }
+
+            foreach (string tabla in tablasTocadas)
+            {
+                ActualizarDigitoVertical(tabla);
+            }
+            return resultado;
         }
 
         /// <summary>Recalcula el DVV de una tabla a partir de los DVH vigentes y lo persiste si cambió.</summary>
