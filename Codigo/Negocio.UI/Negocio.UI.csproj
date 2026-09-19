@@ -10,6 +10,10 @@
     <EmbeddedResource Include="openrin.ico" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2026.9.0" />
+  </ItemGroup>
+
   <PropertyGroup>
     <ApplicationIcon>openrin.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>

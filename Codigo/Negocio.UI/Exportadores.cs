@@ -4,17 +4,29 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using Negocio.BLL;
 using Negocio.DomainModel;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 
 namespace Negocio.UI
 {
     /// <summary>
     /// Renderizadores de exportación de la capa de presentación (REQ-FUNC-013): generan el
-    /// archivo real del historial clínico unificado en PDF (escritor mínimo sin dependencias),
-    /// en Excel (.xlsx OOXML generado como paquete ZIP) o en JSON serializado
-    /// (A03: archivo serializado con información relevante).
+    /// archivo real del historial clínico unificado en PDF (con la librería de terceros
+    /// QuestPDF, requisito A02), en Excel (.xlsx OOXML generado como paquete ZIP) o en
+    /// JSON serializado (A03: archivo serializado con información relevante).
     /// </summary>
     public static class Exportadores
     {
+        static Exportadores()
+        {
+            // Licencia comunitaria de QuestPDF: válida para proyectos sin fines comerciales.
+            QuestPDF.Settings.License = LicenseType.Community;
+            // La aplicación es de escritorio Windows: se usan las fuentes instaladas del sistema
+            // (por ejemplo, Arial). Sin esto, QuestPDF solo dispone de su fuente embebida (Lato).
+            QuestPDF.Settings.UseSystemFonts = true;
+        }
+
         /// <summary>Carpeta de exportaciones del usuario (Documentos\OpenRIN\Exportaciones).</summary>
         public static string CarpetaExportacion()
         {
@@ -75,117 +87,56 @@ namespace Negocio.UI
 
         // ------------------------------------------------------------------ PDF
 
-        private static readonly Encoding Latin1 = Encoding.Latin1;
-
         /// <summary>
-        /// Escribe un PDF mínimo válido (PDF 1.4, una página, Helvetica) con el historial.
-        /// Sin dependencias externas: objetos, stream de contenido y tabla xref calculadas a mano.
+        /// Escribe el historial clínico en PDF utilizando QuestPDF (librería de terceros,
+        /// requisito A02): encabezado con los datos del paciente, listado de registros y pie
+        /// con numeración de páginas. La librería gestiona la paginación y el tamaño A4.
         /// </summary>
         private static void EscribirPdf(string ruta, string paciente, List<ItemHistorial> items)
         {
-            var lineas = new List<string>
+            Document.Create(contenedor =>
             {
-                "OpenRIN - Historial clinico unificado",
-                $"Paciente: {paciente}",
-                $"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}",
-                new string('-', 100)
-            };
-            foreach (ItemHistorial item in items)
-            {
-                string cuerpo = $"{item.Fecha:dd/MM/yyyy} | {item.Tipo} | {item.Descripcion}";
-                lineas.AddRange(Envolver(cuerpo, 105));
-            }
-
-            using var ms = new MemoryStream();
-            var offsets = new List<long>();
-
-            void Escribir(string texto)
-            {
-                byte[] bytes = Latin1.GetBytes(texto);
-                ms.Write(bytes, 0, bytes.Length);
-            }
-
-            Escribir("%PDF-1.4\n");
-
-            offsets.Add(ms.Length);
-            Escribir("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
-
-            offsets.Add(ms.Length);
-            Escribir("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
-
-            offsets.Add(ms.Length);
-            Escribir("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] " +
-                     "/Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n");
-
-            offsets.Add(ms.Length);
-            Escribir("4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n");
-
-            var contenido = new StringBuilder();
-            contenido.Append("BT\n/F1 10 Tf\n14 TL\n40 750 Td\n");
-            foreach (string linea in lineas.Take(52))
-            {
-                contenido.Append('(').Append(EscaparPdf(linea)).Append(") Tj\nT*\n");
-            }
-            if (lineas.Count > 52)
-            {
-                contenido.Append("( ... ) Tj\n");
-            }
-            contenido.Append("ET\n");
-            byte[] contenidoBytes = Latin1.GetBytes(contenido.ToString());
-
-            offsets.Add(ms.Length);
-            Escribir($"5 0 obj\n<< /Length {contenidoBytes.Length} >>\nstream\n");
-            ms.Write(contenidoBytes, 0, contenidoBytes.Length);
-            Escribir("\nendstream\nendobj\n");
-
-            long inicioXref = ms.Length;
-            var xref = new StringBuilder();
-            xref.Append("xref\n0 6\n0000000000 65535 f \n");
-            foreach (long offset in offsets)
-            {
-                xref.Append(offset.ToString("0000000000")).Append(" 00000 n \n");
-            }
-            xref.Append("trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n").Append(inicioXref).Append("\n%%EOF\n");
-            Escribir(xref.ToString());
-
-            File.WriteAllBytes(ruta, ms.ToArray());
-        }
-
-        private static string EscaparPdf(string texto)
-        {
-            var sb = new StringBuilder(texto.Length);
-            foreach (char c in texto)
-            {
-                if (c == '(' || c == ')' || c == '\\')
+                contenedor.Page(pagina =>
                 {
-                    sb.Append('\\').Append(c);
-                }
-                else if (c >= ' ' && c <= 'ÿ')
-                {
-                    sb.Append(c);
-                }
-                else
-                {
-                    sb.Append('?');
-                }
-            }
-            return sb.ToString();
-        }
+                    pagina.Size(PageSizes.A4);
+                    pagina.Margin(2, Unit.Centimetre);
+                    pagina.DefaultTextStyle(estilo => estilo.FontSize(10).FontFamily("Arial"));
 
-        private static IEnumerable<string> Envolver(string texto, int ancho)
-        {
-            string resto = texto;
-            while (resto.Length > ancho)
-            {
-                int corte = resto.LastIndexOf(' ', ancho);
-                if (corte <= 0)
-                {
-                    corte = ancho;
-                }
-                yield return resto[..corte];
-                resto = "    " + resto[(corte + 1 > resto.Length ? resto.Length : corte + 1)..].TrimStart();
-            }
-            yield return resto;
+                    pagina.Header().Column(encabezado =>
+                    {
+                        encabezado.Item().Text("OpenRIN - Historial clínico unificado")
+                            .FontSize(16).Bold().FontColor("#1F3864");
+                        encabezado.Item().Text($"Paciente: {paciente}").FontSize(11).Bold();
+                        encabezado.Item().Text($"Generado: {DateTime.Now:dd/MM/yyyy HH:mm}")
+                            .FontSize(9).FontColor("#666666");
+                        encabezado.Item().PaddingTop(6).LineHorizontal(1).LineColor("#2E5395");
+                    });
+
+                    pagina.Content().PaddingVertical(10).Column(cuerpo =>
+                    {
+                        cuerpo.Spacing(5);
+                        foreach (ItemHistorial item in items)
+                        {
+                            cuerpo.Item().Row(fila =>
+                            {
+                                fila.ConstantItem(80).Text(item.Fecha.ToString("dd/MM/yyyy"))
+                                    .FontSize(9).FontColor("#444444");
+                                fila.ConstantItem(130).Text(item.Tipo).FontSize(9).Bold();
+                                fila.RelativeItem().Text(item.Descripcion).FontSize(9);
+                            });
+                        }
+                    });
+
+                    pagina.Footer().AlignRight().Text(texto =>
+                    {
+                        texto.DefaultTextStyle(estilo => estilo.FontSize(8).FontColor("#666666"));
+                        texto.Span("Página ");
+                        texto.CurrentPageNumber();
+                        texto.Span(" de ");
+                        texto.TotalPages();
+                    });
+                });
+            }).GeneratePdf(ruta);
         }
 
         // ------------------------------------------------------------------ XLSX
