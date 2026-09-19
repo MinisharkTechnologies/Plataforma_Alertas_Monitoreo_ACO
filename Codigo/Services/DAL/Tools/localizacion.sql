@@ -26,18 +26,22 @@ END;
 GO
 
 -- Idiomas iniciales (la semilla de textos se genera desde los .resx del proyecto).
-IF NOT EXISTS (SELECT 1 FROM dbo.Idiomas WHERE Codigo = 'es')
-BEGIN
-    INSERT INTO dbo.Idiomas (Codigo, Nombre, Activo) VALUES ('es', N'Español (Latinoamérica)', 1);
-END;
+-- MERGE idempotente: corrige el nombre si el idioma ya existe.
+MERGE dbo.Idiomas AS destino
+USING (SELECT 'es' AS Codigo, N'Español (Latinoamérica)' AS Nombre) AS origen
+ON destino.Codigo = origen.Codigo
+WHEN MATCHED THEN UPDATE SET Nombre = origen.Nombre
+WHEN NOT MATCHED THEN INSERT (Codigo, Nombre, Activo) VALUES (origen.Codigo, origen.Nombre, 1);
 GO
-IF NOT EXISTS (SELECT 1 FROM dbo.Idiomas WHERE Codigo = 'en')
-BEGIN
-    INSERT INTO dbo.Idiomas (Codigo, Nombre, Activo) VALUES ('en', N'English (US)', 1);
-END;
+MERGE dbo.Idiomas AS destino
+USING (SELECT 'en' AS Codigo, N'English (US)' AS Nombre) AS origen
+ON destino.Codigo = origen.Codigo
+WHEN MATCHED THEN UPDATE SET Nombre = origen.Nombre
+WHEN NOT MATCHED THEN INSERT (Codigo, Nombre, Activo) VALUES (origen.Codigo, origen.Nombre, 1);
 GO
-IF NOT EXISTS (SELECT 1 FROM dbo.Idiomas WHERE Codigo = 'zh-CN')
-BEGIN
-    INSERT INTO dbo.Idiomas (Codigo, Nombre, Activo) VALUES ('zh-CN', N'中文（简体）', 1);
-END;
+MERGE dbo.Idiomas AS destino
+USING (SELECT 'zh-CN' AS Codigo, N'中文（简体）' AS Nombre) AS origen
+ON destino.Codigo = origen.Codigo
+WHEN MATCHED THEN UPDATE SET Nombre = origen.Nombre
+WHEN NOT MATCHED THEN INSERT (Codigo, Nombre, Activo) VALUES (origen.Codigo, origen.Nombre, 1);
 GO
