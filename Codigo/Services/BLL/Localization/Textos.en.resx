@@ -288,4 +288,18 @@
   <data name="integridad.vulnerada.detalle" xml:space="preserve"><value>Technical detail of the verification:</value></data>
   <data name="integridad.vulnerada.salir" xml:space="preserve"><value>Exit</value></data>
   <data name="integridad.vulnerada.sinConexion" xml:space="preserve"><value>The integrity check could not be executed (database unreachable?). Contact the administrator.</value></data>
+  <data name="sistema.cambios" xml:space="preserve"><value>Change control</value></data>
+  <data name="sistema.cambios.todas" xml:space="preserve"><value>All entities</value></data>
+  <data name="sistema.cambios.entidad" xml:space="preserve"><value>Entity:</value></data>
+  <data name="sistema.cambios.idRegistro" xml:space="preserve"><value>Record no.:</value></data>
+  <data name="sistema.cambios.buscar" xml:space="preserve"><value>Search history</value></data>
+  <data name="sistema.cambios.columna.tipo" xml:space="preserve"><value>Type</value></data>
+  <data name="sistema.cambios.columna.entidad" xml:space="preserve"><value>Entity</value></data>
+  <data name="sistema.cambios.columna.registro" xml:space="preserve"><value>Record</value></data>
+  <data name="sistema.cambios.anterior" xml:space="preserve"><value>Previous state (JSON)</value></data>
+  <data name="sistema.cambios.nuevo" xml:space="preserve"><value>New state (JSON)</value></data>
+  <data name="sistema.cambios.restaurar" xml:space="preserve"><value>Restore previous state</value></data>
+  <data name="sistema.cambios.selCambio" xml:space="preserve"><value>Select a change from the history.</value></data>
+  <data name="sistema.cambios.confirmar" xml:space="preserve"><value>Restore the previous state of the selected record?</value></data>
+  <data name="sistema.cambios.sinId" xml:space="preserve"><value>The record number must be numeric.</value></data>
 </root>

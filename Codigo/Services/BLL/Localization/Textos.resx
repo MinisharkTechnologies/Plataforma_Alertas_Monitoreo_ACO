@@ -288,4 +288,18 @@
   <data name="integridad.vulnerada.detalle" xml:space="preserve"><value>Detalle técnico de la verificación:</value></data>
   <data name="integridad.vulnerada.salir" xml:space="preserve"><value>Salir</value></data>
   <data name="integridad.vulnerada.sinConexion" xml:space="preserve"><value>No se pudo ejecutar la verificación de integridad (¿base de datos inaccesible?). Contacte al administrador.</value></data>
+  <data name="sistema.cambios" xml:space="preserve"><value>Control de cambios</value></data>
+  <data name="sistema.cambios.todas" xml:space="preserve"><value>Todas las entidades</value></data>
+  <data name="sistema.cambios.entidad" xml:space="preserve"><value>Entidad:</value></data>
+  <data name="sistema.cambios.idRegistro" xml:space="preserve"><value>N.º de registro:</value></data>
+  <data name="sistema.cambios.buscar" xml:space="preserve"><value>Buscar historial</value></data>
+  <data name="sistema.cambios.columna.tipo" xml:space="preserve"><value>Tipo</value></data>
+  <data name="sistema.cambios.columna.entidad" xml:space="preserve"><value>Entidad</value></data>
+  <data name="sistema.cambios.columna.registro" xml:space="preserve"><value>Registro</value></data>
+  <data name="sistema.cambios.anterior" xml:space="preserve"><value>Estado anterior (JSON)</value></data>
+  <data name="sistema.cambios.nuevo" xml:space="preserve"><value>Estado nuevo (JSON)</value></data>
+  <data name="sistema.cambios.restaurar" xml:space="preserve"><value>Restaurar estado anterior</value></data>
+  <data name="sistema.cambios.selCambio" xml:space="preserve"><value>Seleccione un cambio del historial.</value></data>
+  <data name="sistema.cambios.confirmar" xml:space="preserve"><value>¿Recomponer el estado anterior del registro seleccionado?</value></data>
+  <data name="sistema.cambios.sinId" xml:space="preserve"><value>El número de registro debe ser numérico.</value></data>
 </root>

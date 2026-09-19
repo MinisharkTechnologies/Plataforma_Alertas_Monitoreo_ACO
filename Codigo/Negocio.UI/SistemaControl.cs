@@ -1,3 +1,8 @@
+using System.Text.Encodings.Web;
+using System.Text.Json;
+using Negocio.BLL;
+using Negocio.DAL.Context;
+using Negocio.DomainModel;
 using Services.DomainModel;
 using Services.Facade;
 
@@ -12,6 +17,7 @@ namespace Negocio.UI
     {
         private readonly Button _btnVistaUsuarios = new();
         private readonly Button _btnVistaBitacora = new();
+        private readonly Button _btnVistaCambios = new();
 
         private readonly Panel _panelUsuarios = new();
         private readonly Button _btnNuevoUsuario = new();
@@ -24,6 +30,26 @@ namespace Negocio.UI
         private readonly ComboBox _cmbNivel = new();
         private readonly Button _btnActualizar = new();
         private readonly DataGridView _grillaBitacora = new();
+
+        private readonly Panel _panelCambios = new();
+        private readonly Label _lblEntidadCambios = new();
+        private readonly ComboBox _cmbEntidadCambios = new();
+        private readonly Label _lblIdCambios = new();
+        private readonly TextBox _txtIdCambios = new();
+        private readonly Button _btnBuscarCambios = new();
+        private readonly DataGridView _grillaCambios = new();
+        private readonly Label _lblCambioAnterior = new();
+        private readonly Label _lblCambioNuevo = new();
+        private readonly TextBox _txtCambioAnterior = new();
+        private readonly TextBox _txtCambioNuevo = new();
+        private readonly Button _btnRestaurarCambio = new();
+        private List<CambioAuditado> _cambios = new();
+
+        private static readonly string[] EntidadesAuditables =
+        {
+            "Pacientes", "ObrasSociales", "Diagnosticos", "HistoriasClinicas", "EventosAdversos",
+            "MedicionesRIN", "Alertas", "Turnos", "Seguimientos", "Usuarios", "ReportesEstadisticos"
+        };
 
         private int _vistaActual;
         private List<UsuarioListado> _usuarios = new();
@@ -41,13 +67,17 @@ namespace Negocio.UI
         /// <summary>Recarga la vista activa (al entrar al módulo).</summary>
         public void Recargar()
         {
-            if (_vistaActual == 0)
+            switch (_vistaActual)
             {
-                CargarUsuarios();
-            }
-            else
-            {
-                CargarBitacora();
+                case 0:
+                    CargarUsuarios();
+                    break;
+                case 1:
+                    CargarBitacora();
+                    break;
+                default:
+                    CargarCambios();
+                    break;
             }
         }
 
@@ -66,10 +96,12 @@ namespace Negocio.UI
 
             // ---- Barra superior: vistas ----
             var panelBarra = new Panel { Dock = DockStyle.Top, Height = 58, BackColor = BackColor };
-            ConfigurarBotonVista(_btnVistaUsuarios, 0);
-            ConfigurarBotonVista(_btnVistaBitacora, 176);
+            ConfigurarBotonVista(_btnVistaUsuarios, 0, 0);
+            ConfigurarBotonVista(_btnVistaBitacora, 176, 1);
+            ConfigurarBotonVista(_btnVistaCambios, 352, 2);
             panelBarra.Controls.Add(_btnVistaUsuarios);
             panelBarra.Controls.Add(_btnVistaBitacora);
+            panelBarra.Controls.Add(_btnVistaCambios);
 
             // ---- Vista 1: usuarios ----
             _panelUsuarios.Dock = DockStyle.Fill;
@@ -170,8 +202,113 @@ namespace Negocio.UI
             _cmbNivel.BringToFront();
             _btnActualizar.BringToFront();
 
+            // ---- Vista 3: control de cambios (T06b) ----
+            _panelCambios.Dock = DockStyle.Fill;
+            _panelCambios.BackColor = Color.White;
+
+            _lblEntidadCambios.Location = new Point(14, 20);
+            _lblEntidadCambios.Size = new Size(70, 20);
+            _lblEntidadCambios.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            _lblEntidadCambios.ForeColor = Color.FromArgb(60, 85, 115);
+
+            _cmbEntidadCambios.Location = new Point(88, 16);
+            _cmbEntidadCambios.Size = new Size(200, 28);
+            _cmbEntidadCambios.DropDownStyle = ComboBoxStyle.DropDownList;
+            _cmbEntidadCambios.Font = new Font("Segoe UI", 9.5F);
+
+            _lblIdCambios.Location = new Point(304, 20);
+            _lblIdCambios.Size = new Size(130, 20);
+            _lblIdCambios.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            _lblIdCambios.ForeColor = Color.FromArgb(60, 85, 115);
+
+            _txtIdCambios.Location = new Point(438, 16);
+            _txtIdCambios.Size = new Size(90, 28);
+            _txtIdCambios.Font = new Font("Segoe UI", 9.5F);
+
+            _btnBuscarCambios.Location = new Point(544, 15);
+            _btnBuscarCambios.Size = new Size(160, 30);
+            EstiloSecundario(_btnBuscarCambios);
+            _btnBuscarCambios.Click += (s, e) => CargarCambios();
+
+            var hostCambios = new Panel { Dock = DockStyle.Top, Height = 260, Padding = new Padding(14, 56, 14, 6) };
+            _grillaCambios.Dock = DockStyle.Fill;
+            EstiloGrilla(_grillaCambios);
+            _grillaCambios.Columns.Add("fecha", "");
+            _grillaCambios.Columns.Add("usuario", "");
+            _grillaCambios.Columns.Add("tipo", "");
+            _grillaCambios.Columns.Add("entidad", "");
+            _grillaCambios.Columns.Add("registro", "");
+            _grillaCambios.Columns["fecha"].FillWeight = 18;
+            _grillaCambios.Columns["usuario"].FillWeight = 16;
+            _grillaCambios.Columns["tipo"].FillWeight = 14;
+            _grillaCambios.Columns["entidad"].FillWeight = 30;
+            _grillaCambios.Columns["registro"].FillWeight = 12;
+            foreach (string columna in new[] { "tipo", "registro" })
+            {
+                _grillaCambios.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            }
+            _grillaCambios.SelectionChanged += (s, e) => MostrarDetalleCambio();
+
+            var panelRestaurar = new Panel { Dock = DockStyle.Bottom, Height = 54, Padding = new Padding(0, 10, 0, 12) };
+            _btnRestaurarCambio.Dock = DockStyle.Right;
+            _btnRestaurarCambio.Width = 250;
+            EstiloPrimario(_btnRestaurarCambio);
+            _btnRestaurarCambio.Click += (s, e) => RestaurarCambioSeleccionado();
+            panelRestaurar.Controls.Add(_btnRestaurarCambio);
+
+            var hostDetalleCambios = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 6, 14, 14) };
+            var tablaDetalle = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2 };
+            tablaDetalle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tablaDetalle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tablaDetalle.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
+            tablaDetalle.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            _lblCambioAnterior.Dock = DockStyle.Fill;
+            _lblCambioAnterior.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            _lblCambioAnterior.ForeColor = Color.FromArgb(60, 85, 115);
+            _lblCambioNuevo.Dock = DockStyle.Fill;
+            _lblCambioNuevo.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            _lblCambioNuevo.ForeColor = Color.FromArgb(60, 85, 115);
+
+            _txtCambioAnterior.Multiline = true;
+            _txtCambioAnterior.ReadOnly = true;
+            _txtCambioAnterior.ScrollBars = ScrollBars.Both;
+            _txtCambioAnterior.WordWrap = false;
+            _txtCambioAnterior.Dock = DockStyle.Fill;
+            _txtCambioAnterior.Font = new Font("Consolas", 8.5F);
+            _txtCambioAnterior.BackColor = Color.FromArgb(250, 252, 255);
+            _txtCambioNuevo.Multiline = true;
+            _txtCambioNuevo.ReadOnly = true;
+            _txtCambioNuevo.ScrollBars = ScrollBars.Both;
+            _txtCambioNuevo.WordWrap = false;
+            _txtCambioNuevo.Dock = DockStyle.Fill;
+            _txtCambioNuevo.Font = new Font("Consolas", 8.5F);
+            _txtCambioNuevo.BackColor = Color.FromArgb(250, 252, 255);
+
+            tablaDetalle.Controls.Add(_lblCambioAnterior, 0, 0);
+            tablaDetalle.Controls.Add(_lblCambioNuevo, 1, 0);
+            tablaDetalle.Controls.Add(_txtCambioAnterior, 0, 1);
+            tablaDetalle.Controls.Add(_txtCambioNuevo, 1, 1);
+            hostDetalleCambios.Controls.Add(tablaDetalle);
+
+            _panelCambios.Controls.Add(hostDetalleCambios);
+            _panelCambios.Controls.Add(panelRestaurar);
+            _panelCambios.Controls.Add(hostCambios);
+            hostCambios.Controls.Add(_grillaCambios);
+            _panelCambios.Controls.Add(_lblEntidadCambios);
+            _panelCambios.Controls.Add(_cmbEntidadCambios);
+            _panelCambios.Controls.Add(_lblIdCambios);
+            _panelCambios.Controls.Add(_txtIdCambios);
+            _panelCambios.Controls.Add(_btnBuscarCambios);
+            _lblEntidadCambios.BringToFront();
+            _cmbEntidadCambios.BringToFront();
+            _lblIdCambios.BringToFront();
+            _txtIdCambios.BringToFront();
+            _btnBuscarCambios.BringToFront();
+
             Controls.Add(_panelUsuarios);
             Controls.Add(_panelBitacora);
+            Controls.Add(_panelCambios);
             Controls.Add(panelBarra);
         }
 
@@ -222,7 +359,7 @@ namespace Negocio.UI
             grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
         }
 
-        private void ConfigurarBotonVista(Button boton, int x)
+        private void ConfigurarBotonVista(Button boton, int x, int vista)
         {
             boton.Location = new Point(x, 15);
             boton.Size = new Size(168, 32);
@@ -230,7 +367,7 @@ namespace Negocio.UI
             boton.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             boton.Cursor = Cursors.Hand;
             boton.FlatAppearance.BorderColor = Color.FromArgb(202, 220, 240);
-            boton.Click += (s, e) => MostrarVista(boton == _btnVistaUsuarios ? 0 : 1);
+            boton.Click += (s, e) => MostrarVista(vista);
         }
 
         private void MostrarVista(int vista)
@@ -238,8 +375,10 @@ namespace Negocio.UI
             _vistaActual = vista;
             _panelUsuarios.Visible = vista == 0;
             _panelBitacora.Visible = vista == 1;
+            _panelCambios.Visible = vista == 2;
             EstiloBotonVista(_btnVistaUsuarios, vista == 0);
             EstiloBotonVista(_btnVistaBitacora, vista == 1);
+            EstiloBotonVista(_btnVistaCambios, vista == 2);
             Recargar();
         }
 
@@ -278,6 +417,27 @@ namespace Negocio.UI
             _grillaBitacora.Columns["capa"].HeaderText = Localizacion("sistema.columna.capa");
             _grillaBitacora.Columns["usuario"].HeaderText = Localizacion("sistema.columna.usuario");
             _grillaBitacora.Columns["mensaje"].HeaderText = Localizacion("sistema.columna.mensaje");
+
+            _btnVistaCambios.Text = Localizacion("sistema.cambios");
+            _lblEntidadCambios.Text = Localizacion("sistema.cambios.entidad");
+            _lblIdCambios.Text = Localizacion("sistema.cambios.idRegistro");
+            _btnBuscarCambios.Text = Localizacion("sistema.cambios.buscar");
+            int seleccionPrevia = _cmbEntidadCambios.SelectedIndex;
+            _cmbEntidadCambios.Items.Clear();
+            _cmbEntidadCambios.Items.Add(Localizacion("sistema.cambios.todas"));
+            foreach (string entidad in EntidadesAuditables)
+            {
+                _cmbEntidadCambios.Items.Add(entidad);
+            }
+            _cmbEntidadCambios.SelectedIndex = seleccionPrevia < 0 ? 0 : seleccionPrevia;
+            _grillaCambios.Columns["fecha"].HeaderText = Localizacion("rin.columna.fecha");
+            _grillaCambios.Columns["usuario"].HeaderText = Localizacion("sistema.columna.usuario");
+            _grillaCambios.Columns["tipo"].HeaderText = Localizacion("sistema.cambios.columna.tipo");
+            _grillaCambios.Columns["entidad"].HeaderText = Localizacion("sistema.cambios.columna.entidad");
+            _grillaCambios.Columns["registro"].HeaderText = Localizacion("sistema.cambios.columna.registro");
+            _lblCambioAnterior.Text = Localizacion("sistema.cambios.anterior");
+            _lblCambioNuevo.Text = Localizacion("sistema.cambios.nuevo");
+            _btnRestaurarCambio.Text = Localizacion("sistema.cambios.restaurar");
         }
 
         private void CargarUsuarios()
@@ -351,6 +511,124 @@ namespace Negocio.UI
                     celdaNivel.Style.SelectionForeColor = celdaNivel.Style.ForeColor;
                 }
                 _grillaBitacora.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void CargarCambios()
+        {
+            try
+            {
+                string? entidad = _cmbEntidadCambios.SelectedIndex <= 0 ? null : _cmbEntidadCambios.SelectedItem?.ToString();
+                int? idRegistro = null;
+                if (_txtIdCambios.Text.Trim().Length > 0)
+                {
+                    if (!int.TryParse(_txtIdCambios.Text.Trim(), out int id))
+                    {
+                        MessageBox.Show(FindForm(), Localizacion("sistema.cambios.sinId"), Localizacion("sistema.cambios"),
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    idRegistro = id;
+                }
+
+                using var contexto = new NegocioDbContext();
+                _cambios = new AuditoriaLogic(contexto).ObtenerHistorial(entidad, idRegistro);
+                _grillaCambios.Rows.Clear();
+                foreach (CambioAuditado cambio in _cambios)
+                {
+                    int indice = _grillaCambios.Rows.Add(
+                        cambio.FechaCambio.ToString("dd/MM/yyyy HH:mm:ss"),
+                        cambio.Usuario,
+                        cambio.TipoCambio,
+                        cambio.Entidad,
+                        cambio.IdRegistro);
+
+                    DataGridViewCell celdaTipo = _grillaCambios.Rows[indice].Cells[2];
+                    celdaTipo.Style.ForeColor = cambio.TipoCambio switch
+                    {
+                        "Alta" => Color.FromArgb(30, 130, 75),
+                        "Baja" => Color.FromArgb(185, 45, 40),
+                        _ => Color.FromArgb(190, 125, 20)
+                    };
+                    celdaTipo.Style.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+                    celdaTipo.Style.SelectionForeColor = celdaTipo.Style.ForeColor;
+                }
+                _grillaCambios.ClearSelection();
+                MostrarDetalleCambio();
+            }
+            catch (Exception ex)
+            {
+                ExceptionManager.ManejarExcepcion(ex, "SistemaControl");
+            }
+        }
+
+        private void MostrarDetalleCambio()
+        {
+            if (_grillaCambios.SelectedRows.Count == 0 || _grillaCambios.SelectedRows[0].Index >= _cambios.Count)
+            {
+                _txtCambioAnterior.Text = string.Empty;
+                _txtCambioNuevo.Text = string.Empty;
+                return;
+            }
+            CambioAuditado cambio = _cambios[_grillaCambios.SelectedRows[0].Index];
+            _txtCambioAnterior.Text = EmbellecerJson(cambio.DatosAnteriores);
+            _txtCambioNuevo.Text = EmbellecerJson(cambio.DatosNuevos);
+        }
+
+        /// <summary>Reformatea un JSON de auditoría con sangría para su lectura (sin escapes).</summary>
+        private static string EmbellecerJson(string? json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                return string.Empty;
+            }
+            try
+            {
+                using JsonDocument documento = JsonDocument.Parse(json);
+                return JsonSerializer.Serialize(documento.RootElement, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                });
+            }
+            catch (JsonException)
+            {
+                return json;
+            }
+        }
+
+        private void RestaurarCambioSeleccionado()
+        {
+            if (_grillaCambios.SelectedRows.Count == 0 || _grillaCambios.SelectedRows[0].Index >= _cambios.Count)
+            {
+                MessageBox.Show(FindForm(), Localizacion("sistema.cambios.selCambio"), Localizacion("sistema.cambios"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            CambioAuditado cambio = _cambios[_grillaCambios.SelectedRows[0].Index];
+            if (MessageBox.Show(FindForm(), Localizacion("sistema.cambios.confirmar"), Localizacion("sistema.cambios"),
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            try
+            {
+                string usuario = SesionActual.Instancia.NombreUsuario;
+                if (usuario.Length == 0)
+                {
+                    usuario = "sistema";
+                }
+                using var contexto = new NegocioDbContext();
+                (bool ok, string mensaje) = new AuditoriaLogic(contexto).Restaurar(cambio.Id, usuario);
+                MessageBox.Show(FindForm(), mensaje, Localizacion("sistema.cambios"),
+                    MessageBoxButtons.OK, ok ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                CargarCambios();
             }
             catch (Exception ex)
             {

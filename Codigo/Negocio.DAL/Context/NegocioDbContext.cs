@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Negocio.DAL.Auditoria;
 using Negocio.DomainModel;
 using Negocio.DomainModel.Enums;
 
@@ -31,6 +32,11 @@ namespace Negocio.DAL.Context
         public DbSet<Usuario> Usuarios => Set<Usuario>();
         public DbSet<ReporteEstadistico> ReportesEstadisticos => Set<ReporteEstadistico>();
         public DbSet<DigitosVerificadores> DigitosVerificadores => Set<DigitosVerificadores>();
+        public DbSet<CambioAuditado> AuditoriaCambios => Set<CambioAuditado>();
+
+        /// <summary>Usuario explícito para los registros de auditoría de cambios (T06b); si es null,
+        /// se usa el usuario de la sesión activa y, en su defecto, "sistema".</summary>
+        public string? UsuarioAuditoria { get; set; }
 
         public NegocioDbContext()
         {
@@ -72,13 +78,14 @@ namespace Negocio.DAL.Context
             // su DVV y debe recalcularse.
             var aFirmar = new List<EntityEntry>();
             var tablasTocadas = new HashSet<string>(StringComparer.Ordinal);
+            var cambios = new List<CambioPendiente>();
             foreach (var entrada in ChangeTracker.Entries())
             {
                 if (entrada.State != EntityState.Added && entrada.State != EntityState.Modified && entrada.State != EntityState.Deleted)
                 {
                     continue;
                 }
-                if (entrada.Entity is DigitosVerificadores || entrada.Metadata.FindProperty("DVH") == null)
+                if (entrada.Entity is DigitosVerificadores || entrada.Entity is CambioAuditado || entrada.Metadata.FindProperty("DVH") == null)
                 {
                     continue;
                 }
@@ -91,16 +98,57 @@ namespace Negocio.DAL.Context
                 {
                     tablasTocadas.Add(tabla);
                 }
+
+                // T06b: fotografía del cambio (el "qué"); el usuario y el momento se completan
+                // al persistir, cuando ya hay identidad real para las filas nuevas.
+                string? pkName = entrada.Metadata.FindPrimaryKey()?.Properties[0].Name;
+                int idPrevio = entrada.State == EntityState.Added || pkName == null
+                    ? 0
+                    : Convert.ToInt32(entrada.Property(pkName).CurrentValue ?? 0);
+                cambios.Add(new CambioPendiente(
+                    entrada,
+                    pkName,
+                    idPrevio,
+                    entrada.State == EntityState.Added ? "Alta"
+                        : entrada.State == EntityState.Modified ? "Modificacion" : "Baja",
+                    AuditoriaDeCambios.Serializar(entrada.State == EntityState.Added ? null : entrada.OriginalValues),
+                    AuditoriaDeCambios.Serializar(entrada.State == EntityState.Deleted ? null : entrada.CurrentValues)));
             }
 
             int resultado = base.SaveChanges();
 
-            // Fase 2: DVH calculado con la identidad de fila ya asignada por la base.
+            // Fase 2: DVH calculado con la identidad de fila ya asignada por la base y
+            // registros de auditoría de cambios (T06b), que también necesitan el Id real.
             foreach (EntityEntry entrada in aFirmar)
             {
                 entrada.Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(entrada.Entity);
             }
-            if (aFirmar.Count > 0)
+
+            if (cambios.Count > 0)
+            {
+                string usuario = ResolverUsuarioAuditoria();
+                DateTime momento = DateTime.Now;
+                foreach (CambioPendiente pendiente in cambios)
+                {
+                    int idRegistro = pendiente.IdPrevio;
+                    if (idRegistro == 0 && pendiente.PkName != null && pendiente.Entrada.State != EntityState.Detached)
+                    {
+                        idRegistro = Convert.ToInt32(pendiente.Entrada.Property(pendiente.PkName).CurrentValue ?? 0);
+                    }
+                    AuditoriaCambios.Add(new CambioAuditado
+                    {
+                        Entidad = pendiente.Entrada.Metadata.GetTableName() ?? "?",
+                        IdRegistro = idRegistro,
+                        FechaCambio = momento,
+                        Usuario = usuario,
+                        TipoCambio = pendiente.Tipo,
+                        DatosAnteriores = pendiente.Antes,
+                        DatosNuevos = pendiente.Nuevos
+                    });
+                }
+            }
+
+            if (aFirmar.Count > 0 || cambios.Count > 0)
             {
                 base.SaveChanges();
             }
@@ -110,6 +158,20 @@ namespace Negocio.DAL.Context
                 ActualizarDigitoVertical(tabla);
             }
             return resultado;
+        }
+
+        /// <summary>Fotografía pendiente de un cambio para el control de cambios (T06b).</summary>
+        private sealed record CambioPendiente(EntityEntry Entrada, string? PkName, int IdPrevio, string Tipo, string? Antes, string? Nuevos);
+
+        /// <summary>Usuario a registrar en la auditoría: el explícito, la sesión activa o "sistema".</summary>
+        private string ResolverUsuarioAuditoria()
+        {
+            if (!string.IsNullOrWhiteSpace(UsuarioAuditoria))
+            {
+                return UsuarioAuditoria!;
+            }
+            string deSesion = Services.Facade.SesionActual.Instancia.NombreUsuario;
+            return string.IsNullOrWhiteSpace(deSesion) ? "sistema" : deSesion;
         }
 
         /// <summary>Recalcula el DVV de una tabla a partir de los DVH vigentes y lo persiste si cambió.</summary>
@@ -329,6 +391,16 @@ namespace Negocio.DAL.Context
                 entidad.Property(d => d.NombreTabla).HasMaxLength(100).IsRequired();
                 entidad.HasIndex(d => d.NombreTabla).IsUnique();
                 entidad.Property(d => d.DVV).HasMaxLength(128).IsRequired();
+            });
+
+            // ---------- CambioAuditado (control de cambios, T06b) ----------
+            modelBuilder.Entity<CambioAuditado>(entidad =>
+            {
+                entidad.ToTable("AuditoriaCambios");
+                entidad.Property(c => c.Entidad).HasMaxLength(100).IsRequired();
+                entidad.Property(c => c.Usuario).HasMaxLength(100).IsRequired();
+                entidad.Property(c => c.TipoCambio).HasMaxLength(30).IsRequired();
+                entidad.HasIndex(c => new { c.Entidad, c.IdRegistro });
             });
 
             // ---------- Datos semilla ----------

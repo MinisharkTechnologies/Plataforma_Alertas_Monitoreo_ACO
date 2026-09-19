@@ -288,4 +288,18 @@
   <data name="integridad.vulnerada.detalle" xml:space="preserve"><value>校验技术详情：</value></data>
   <data name="integridad.vulnerada.salir" xml:space="preserve"><value>退出</value></data>
   <data name="integridad.vulnerada.sinConexion" xml:space="preserve"><value>无法执行完整性校验（数据库不可访问？）。请联系管理员。</value></data>
+  <data name="sistema.cambios" xml:space="preserve"><value>变更控制</value></data>
+  <data name="sistema.cambios.todas" xml:space="preserve"><value>所有实体</value></data>
+  <data name="sistema.cambios.entidad" xml:space="preserve"><value>实体：</value></data>
+  <data name="sistema.cambios.idRegistro" xml:space="preserve"><value>记录编号：</value></data>
+  <data name="sistema.cambios.buscar" xml:space="preserve"><value>查询历史</value></data>
+  <data name="sistema.cambios.columna.tipo" xml:space="preserve"><value>类型</value></data>
+  <data name="sistema.cambios.columna.entidad" xml:space="preserve"><value>实体</value></data>
+  <data name="sistema.cambios.columna.registro" xml:space="preserve"><value>记录</value></data>
+  <data name="sistema.cambios.anterior" xml:space="preserve"><value>原状态（JSON）</value></data>
+  <data name="sistema.cambios.nuevo" xml:space="preserve"><value>新状态（JSON）</value></data>
+  <data name="sistema.cambios.restaurar" xml:space="preserve"><value>恢复原状态</value></data>
+  <data name="sistema.cambios.selCambio" xml:space="preserve"><value>请从历史中选择一条变更。</value></data>
+  <data name="sistema.cambios.confirmar" xml:space="preserve"><value>是否恢复所选记录的原状态？</value></data>
+  <data name="sistema.cambios.sinId" xml:space="preserve"><value>记录编号必须为数字。</value></data>
 </root>
