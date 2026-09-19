@@ -216,6 +216,7 @@ namespace Negocio.UI
             try
             {
                 Sesion = SeguridadService.Autenticar(usuario, contrasena);
+                SesionActual.Instancia.Iniciar(Sesion);
                 DialogResult = DialogResult.OK;
             }
             catch (UsuarioBloqueadoException ex)

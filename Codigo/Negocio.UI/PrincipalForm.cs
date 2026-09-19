@@ -435,6 +435,7 @@ namespace Negocio.UI
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (respuesta == DialogResult.Yes)
             {
+                SesionActual.Instancia.Cerrar();
                 Application.Restart();
             }
         }
