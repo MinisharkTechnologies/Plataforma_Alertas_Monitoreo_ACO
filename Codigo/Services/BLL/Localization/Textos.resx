@@ -125,7 +125,8 @@
   <data name="portal.notificado" xml:space="preserve"><value>El equipo médico fue notificado y revisará su caso.</value></data>
   <data name="portal.historial" xml:space="preserve"><value>Mi historial clínico</value></data>
   <data name="portal.sinVinculo" xml:space="preserve"><value>Su cuenta no está vinculada a un paciente del centro. Contacte a la administración.</value></data>
-  <data name="eventos.recientes" xml:space="preserve"><value>Últimos eventos registrados (todos los pacientes)</value></data>
+  <data name="eventos.recientes" xml:space="preserve"><value>Últimos eventos registrados</value></data>
+  <data name="eventos.selPaciente" xml:space="preserve"><value>Busque un paciente para registrar un evento.</value></data>
   <data name="eventos.registrar" xml:space="preserve"><value>Registrar evento adverso</value></data>
   <data name="eventos.columna.tipo" xml:space="preserve"><value>Tipo de evento</value></data>
   <data name="eventos.columna.gravedad" xml:space="preserve"><value>Gravedad</value></data>

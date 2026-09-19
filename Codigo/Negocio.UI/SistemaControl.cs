@@ -157,6 +157,9 @@ namespace Negocio.UI
             {
                 _grillaBitacora.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
+            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
+            _grillaBitacora.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            _grillaBitacora.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
             _panelBitacora.Controls.Add(hostBitacora);
             hostBitacora.Controls.Add(_grillaBitacora);

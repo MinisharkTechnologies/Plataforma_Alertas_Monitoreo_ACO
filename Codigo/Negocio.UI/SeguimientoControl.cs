@@ -283,6 +283,9 @@ namespace Negocio.UI
             _grillaHistorial.Columns["resultado"].FillWeight = 16;
             _grillaHistorial.Columns["decision"].FillWeight = 20;
             _grillaHistorial.Columns["observaciones"].FillWeight = 24;
+            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
+            _grillaHistorial.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            _grillaHistorial.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
             _panelDetalle.Controls.Add(_grillaHistorial);
             _panelDetalle.Controls.Add(_lblPacienteDetalle);

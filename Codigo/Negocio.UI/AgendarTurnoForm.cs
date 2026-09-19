@@ -85,7 +85,7 @@ namespace Negocio.UI
             _dtpFecha.Font = new Font("Segoe UI", 10F);
             _dtpFecha.Value = DateTime.Today.AddDays(1);
 
-            Controls.Add(Etiqueta("agenda.hora", 18, 128));
+            Controls.Add(Etiqueta("agenda.hora", 18, 128, 120));
             _dtpHora.Location = new Point(18, 148);
             _dtpHora.Size = new Size(110, 28);
             _dtpHora.Format = DateTimePickerFormat.Custom;

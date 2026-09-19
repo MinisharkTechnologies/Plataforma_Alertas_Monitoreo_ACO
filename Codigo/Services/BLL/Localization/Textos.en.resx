@@ -125,7 +125,8 @@
   <data name="portal.notificado" xml:space="preserve"><value>The medical team has been notified and will review your case.</value></data>
   <data name="portal.historial" xml:space="preserve"><value>My clinical history</value></data>
   <data name="portal.sinVinculo" xml:space="preserve"><value>Your account is not linked to a patient record. Please contact the administration.</value></data>
-  <data name="eventos.recientes" xml:space="preserve"><value>Recent adverse events (all patients)</value></data>
+  <data name="eventos.recientes" xml:space="preserve"><value>Recent events</value></data>
+  <data name="eventos.selPaciente" xml:space="preserve"><value>Search for a patient to log an event.</value></data>
   <data name="eventos.registrar" xml:space="preserve"><value>Log adverse event</value></data>
   <data name="eventos.columna.tipo" xml:space="preserve"><value>Event type</value></data>
   <data name="eventos.columna.gravedad" xml:space="preserve"><value>Severity</value></data>

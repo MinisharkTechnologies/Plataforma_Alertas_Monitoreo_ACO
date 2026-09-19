@@ -88,7 +88,8 @@ namespace Negocio.UI
             _btnBuscar.Click += (s, e) => BuscarPaciente();
 
             _lblPaciente.Location = new Point(314, 28);
-            _lblPaciente.Size = new Size(420, 24);
+            _lblPaciente.Size = new Size(205, 24);
+            _lblPaciente.AutoEllipsis = true;
             _lblPaciente.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
             _lblPaciente.ForeColor = Color.FromArgb(30, 66, 120);
 
@@ -100,7 +101,6 @@ namespace Negocio.UI
             _btnRegistrar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             _btnRegistrar.FlatAppearance.BorderSize = 0;
             _btnRegistrar.Cursor = Cursors.Hand;
-            _btnRegistrar.Enabled = false;
             _btnRegistrar.Click += (s, e) => RegistrarEvento();
 
             panelBarra.Controls.Add(_lblDni);
@@ -108,6 +108,7 @@ namespace Negocio.UI
             panelBarra.Controls.Add(_btnBuscar);
             panelBarra.Controls.Add(_lblPaciente);
             panelBarra.Controls.Add(_btnRegistrar);
+            _btnRegistrar.BringToFront();
 
             // ---- Grilla de eventos ----
             _grilla.Dock = DockStyle.Fill;
@@ -128,6 +129,9 @@ namespace Negocio.UI
             {
                 _grilla.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
             }
+            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
+            _grilla.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            _grilla.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
             _lblSinEventos.Dock = DockStyle.Bottom;
             _lblSinEventos.Height = 24;
@@ -230,7 +234,6 @@ namespace Negocio.UI
             try
             {
                 _pacienteActual = null;
-                _btnRegistrar.Enabled = false;
                 if (_lblPaciente.Text.Length == 0 || _lblPaciente.Text == Localizacion("rin.pacienteNoEncontrado"))
                 {
                     _lblPaciente.Text = Localizacion("eventos.recientes");
@@ -296,7 +299,6 @@ namespace Negocio.UI
 
                 _pacienteActual = paciente;
                 _lblPaciente.Text = $"{paciente.NombreCompleto} ({paciente.DNI})";
-                _btnRegistrar.Enabled = paciente.Estado == EstadoPaciente.Activo;
                 CargarDePaciente(paciente.Id);
             }
             catch (Exception ex)
@@ -309,6 +311,8 @@ namespace Negocio.UI
         {
             if (_pacienteActual == null)
             {
+                MessageBox.Show(FindForm(), Localizacion("eventos.selPaciente"), Localizacion("eventos.registrar"),
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
             using var formulario = new EventoAdversoForm(_pacienteActual, _nombreUsuario);

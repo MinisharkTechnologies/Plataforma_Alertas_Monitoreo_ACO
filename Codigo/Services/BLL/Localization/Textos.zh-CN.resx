@@ -125,7 +125,8 @@
   <data name="portal.notificado" xml:space="preserve"><value>医疗团队已收到通知并将审核您的情况。</value></data>
   <data name="portal.historial" xml:space="preserve"><value>我的病历</value></data>
   <data name="portal.sinVinculo" xml:space="preserve"><value>您的账户尚未关联患者档案，请联系管理人员。</value></data>
-  <data name="eventos.recientes" xml:space="preserve"><value>最近不良事件（全部患者）</value></data>
+  <data name="eventos.recientes" xml:space="preserve"><value>最近事件</value></data>
+  <data name="eventos.selPaciente" xml:space="preserve"><value>请先搜索患者再登记事件。</value></data>
   <data name="eventos.registrar" xml:space="preserve"><value>登记不良事件</value></data>
   <data name="eventos.columna.tipo" xml:space="preserve"><value>事件类型</value></data>
   <data name="eventos.columna.gravedad" xml:space="preserve"><value>严重程度</value></data>

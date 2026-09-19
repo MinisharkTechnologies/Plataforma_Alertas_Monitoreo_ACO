@@ -81,7 +81,7 @@ namespace Negocio.UI
             ConfigurarBotonVista(_btnVistaHistorial, 352);
 
             _lblPeriodo.Location = new Point(760, 20);
-            _lblPeriodo.Size = new Size(80, 20);
+            _lblPeriodo.Size = new Size(72, 20);
             _lblPeriodo.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             _lblPeriodo.ForeColor = Color.FromArgb(60, 85, 115);
 
@@ -261,6 +261,9 @@ namespace Negocio.UI
             _grillaHistorial.Columns["fecha"].FillWeight = 16;
             _grillaHistorial.Columns["tipo"].FillWeight = 16;
             _grillaHistorial.Columns["descripcion"].FillWeight = 68;
+            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
+            _grillaHistorial.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            _grillaHistorial.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
 
             _panelHistorial.Controls.Add(hostHistorial);
             hostHistorial.Controls.Add(_grillaHistorial);

@@ -68,7 +68,7 @@ namespace Negocio.UI
             var panelBarra = new Panel { Dock = DockStyle.Top, Height = 58, BackColor = BackColor };
 
             _lblDesde.Location = new Point(0, 20);
-            _lblDesde.Size = new Size(56, 20);
+            _lblDesde.Size = new Size(50, 20);
             _lblDesde.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             _lblDesde.ForeColor = colorEtiqueta;
 
@@ -79,7 +79,7 @@ namespace Negocio.UI
             _dtpDesde.Value = DateTime.Today;
 
             _lblHasta.Location = new Point(188, 20);
-            _lblHasta.Size = new Size(56, 20);
+            _lblHasta.Size = new Size(50, 20);
             _lblHasta.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             _lblHasta.ForeColor = colorEtiqueta;
 
