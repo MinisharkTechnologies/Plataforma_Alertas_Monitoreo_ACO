@@ -74,6 +74,10 @@ On startup, the application verifies database integrity **before** showing the l
 
 The **[Project Folder](Documentacion/)** contains the complete deliverable document: global product description, per-layer class diagrams, data model, the five business processes and the **thirteen use cases** (with sequences, affected classes and real system screenshots), and the technical aspects (architecture, session, encryption, profiles, multi-language, activity log, change control, backups and integrity). Manuals (installation, user, programming) are under [`Documentacion/Manuales/`](Documentacion/Manuales/).
 
+## License
+
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés. Published under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE) and [`NOTICE.txt`](NOTICE.txt)). You may redistribute OpenRIN and its derivatives under the terms of the GPLv3: derivatives must remain open source under the same license (strong copyleft). Third-party dependencies retain their own licenses (QuestPDF Community License, free for open-source projects and smaller entities; the rest, MIT).
+
 ## Project status
 
 Deliverable for November 2026. Functional scope is complete and verified; remaining items are specific to the final course stage.

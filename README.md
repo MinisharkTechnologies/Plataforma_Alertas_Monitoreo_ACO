@@ -74,6 +74,10 @@ Al iniciar, la aplicación verifica la integridad de la base **antes** de mostra
 
 La **[Carpeta de Proyecto](Documentacion/)** contiene el documento entregable completo: descripción global del producto, diagramas de clases por capa, modelo de datos, especificación de los cinco procesos de negocio y de los **trece casos de uso** (con secuencias, clases afectadas y pantallas reales del sistema), y los aspectos técnicos (arquitectura, sesión, encriptación, perfiles, multiidioma, bitácora, control de cambios, respaldos e integridad). Los manuales (instalación, usuario, programación) están en [`Documentacion/Manuales/`](Documentacion/Manuales/).
 
+## Licencia
+
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés. Publicado bajo la **GNU General Public License v3.0** (ver [`LICENSE`](LICENSE) y [`NOTICE.txt`](NOTICE.txt)). Puede redistribuir OpenRIN y sus derivados bajo los términos de la GPLv3: los derivados deben mantenerse abiertos bajo la misma licencia (copyleft fuerte). Las dependencias de terceros conservan sus licencias propias (QuestPDF Community License, gratuita para proyectos open source y entidades pequeñas; el resto, MIT).
+
 ## Estado del proyecto
 
 Entregable de Noviembre 2026. El alcance funcional está completo y verificado; los pendientes son propios de la fase final de cátedra.

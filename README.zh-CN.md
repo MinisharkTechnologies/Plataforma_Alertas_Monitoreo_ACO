@@ -74,6 +74,10 @@ OpenRIN 是一款面向血液科诊所的桌面平台，专注于抗凝患者的
 
 **[项目文档册](Documentacion/)** 包含完整的交付文档：产品全局说明、各层类图、数据模型、五个业务过程与**十三个用例**（含顺序图、受影响类与真实系统截图），以及技术专题（架构、会话、加密、权限配置、多语言、活动日志、变更控制、备份与完整性）。手册（安装、用户、程序员）位于 [`Documentacion/Manuales/`](Documentacion/Manuales/)。
 
+## 许可证
+
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés。依据 **GNU General Public License v3.0** 发布（见 [`LICENSE`](LICENSE) 与 [`NOTICE.txt`](NOTICE.txt)）。可依据 GPLv3 分发 OpenRIN 及其衍生作品：衍生作品必须在同一许可证下保持开源（强 copyleft 传染性）。第三方依赖保留其自身许可证（QuestPDF Community License，面向开源项目与小型实体免费；其余为 MIT）。
+
 ## 项目状态
 
 2026 年 11 月交付。功能范围已完成并验证；剩余事项仅属于课程收尾阶段。
