@@ -28,7 +28,7 @@ El instalador (`Instalar.ps1`), con elevación de administrador:
 1. Instala SQL Server 2022 Express vía winget **si no hay ninguna instancia utilizable** (requiere sysadmin en la instancia elegida; no instala nada si ya existe).
 2. Crea las bases `OpenRIN_Services` y `OpenRIN_Negocio` (si no existen) aplicando los scripts SQL (esquema + semillas de seguridad, permisos e idiomas).
 3. Instala la aplicación en `Archivos de programa\OpenRIN`, escribe la configuración con autenticación integrada de Windows (sin contraseñas, `TrustServerCertificate=True`, respaldos en `C:\OpenRIN\Backups`).
-4. Siembra los datos de demostración (`OpenRIN.Herramientas.exe sembrar`): crea `sysadmin`, `medico`, `recepcion`. **La clave de demostración se genera aleatoria y se muestra una única vez por consola** (o se usa `-ClaveDemo` para indicarla).
+4. Siembra los datos de demostración (`OpenRIN.Herramientas.exe sembrar`): crea `sysadmin`, `medico`, `recepcion`. **La clave de demostración y la respuesta a la pregunta de recuperación se generan aleatorias en esa instalación** (o se usa `-ClaveDemo` para indicar la clave), se muestran por consola y quedan guardadas en `OpenRIN - Credenciales demo.txt` en el Escritorio del usuario que instala.
 5. Crea accesos directos (escritorio y menú Inicio) y la tarea programada diaria 03:00 «OpenRIN - Respaldo Nocturno (app)» (`OpenRIN.Herramientas.exe respaldo-auto`, SYSTEM).
 6. Registra la desinstalación en «Agregar o quitar programas» (ícono, versión, publisher, sin modificar/reparar).
 

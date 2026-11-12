@@ -184,8 +184,37 @@ Write-Host "  Configuración escrita (autenticación integrada de Windows, sin c
 # ---- 5. datos de demostración ------------------------------------------------------------------
 Paso 5 "Cargando usuarios y datos de demostración"
 $herr = Join-Path $Destino "OpenRIN.Herramientas.exe"
-& $herr sembrar $ClaveDemo | Out-Host
+& $herr sembrar $ClaveDemo 2>&1 | Tee-Object -Variable salidaSembrar | Out-Host
 if ($LASTEXITCODE -ne 0) { Fallar "La carga de datos de demostración terminó con error ($LASTEXITCODE)." }
+# La respuesta a la pregunta de recuperación la genera «sembrar» (aleatoria) y se imprime una sola vez:
+# se captura para dejarla guardada junto a la clave en el archivo de credenciales del Escritorio.
+$respuestaRecuperacion = ""
+$linea = ($salidaSembrar | Select-String -Pattern 'respuesta a .*?: (\S+)\s*$' | Select-Object -Last 1)
+if ($linea) { $respuestaRecuperacion = $linea.Matches[0].Groups[1].Value }
+
+$rutaCredenciales = Join-Path ([Environment]::GetFolderPath("Desktop")) "OpenRIN - Credenciales demo.txt"
+$textoCredenciales = @"
+OpenRIN - credenciales de la instalación
+=========================================
+Usuarios de demostración (perfiles): sysadmin / medico / recepcion
+Contraseña: $ClaveDemo
+
+Pregunta de recuperación: ¿Clave de recuperación de demostración?
+Respuesta: $respuestaRecuperacion
+
+Notas:
+- Estas credenciales valen para esta instalación. Cámbielas después de la prueba.
+- La contraseña es aleatoria y no está en ningún repositorio: si se pierde, un
+  administrador puede restablecerla con la herramienta OpenRIN.Herramientas.exe.
+- Para la demostración de integridad (DVH/DVV): altere un dato con SSMS, abra
+  OpenRIN, ingrese con 'sysadmin' (permiso SI004) y restaure el respaldo sano.
+"@
+try {
+    [IO.File]::WriteAllText($rutaCredenciales, $textoCredenciales, (New-Object Text.UTF8Encoding($true)))
+    Write-Host "  Credenciales guardadas en: $rutaCredenciales" -ForegroundColor Yellow
+} catch {
+    Write-Warning "No se pudo guardar el archivo de credenciales: $($_.Exception.Message)"
+}
 
 # ---- 6. accesos directos -----------------------------------------------------------------------
 Paso 6 "Creando accesos directos"
@@ -229,10 +258,19 @@ Write-Host "  Aplicación   : $Destino"
 Write-Host "  Base de datos: $Servidor  (OpenRIN_Services, OpenRIN_Negocio)"
 Write-Host "  Usuarios de demostración: sysadmin, medico, recepcion"
 if ($claveGenerada) {
-    Write-Host "  Clave de demostración generada para esta instalación (¡anótela, solo se muestra así y por sembrar!): $ClaveDemo" -ForegroundColor Yellow
-    Write-Host "  (La respuesta a la pregunta de recuperación la imprime también «OpenRIN.Herramientas.exe sembrar» la primera vez.)" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  ================= CREDENCIALES DE LA DEMO (anótelas) =================" -ForegroundColor Yellow
+    Write-Host "   Usuarios        : sysadmin / medico / recepcion" -ForegroundColor Yellow
+    Write-Host "   Contraseña      : $ClaveDemo" -ForegroundColor Yellow
+    Write-Host "   Recuperación    : pregunta «¿Clave de recuperación de demostración?»" -ForegroundColor Yellow
+    if ($respuestaRecuperacion) { Write-Host "   Respuesta       : $respuestaRecuperacion" -ForegroundColor Yellow }
+    else { Write-Host "   Respuesta       : (ver la salida de OpenRIN.Herramientas.exe sembrar)" -ForegroundColor Yellow }
+    Write-Host "   También quedaron guardadas en el Escritorio:" -ForegroundColor Yellow
+    Write-Host "   $rutaCredenciales" -ForegroundColor Yellow
+    Write-Host "  =====================================================================" -ForegroundColor Yellow
 } else {
-    Write-Host "  (Clave de demostración indicada con -ClaveDemo; cámbiela después de probar.)" }
+    Write-Host "  (Clave de demostración indicada con -ClaveDemo; cámbiela después de probar.)"
+    Write-Host "  (Credenciales guardadas en: $rutaCredenciales)" }
 Write-Host "  Registro     : $log"
 Stop-Transcript | Out-Null
 if (-not $Silencioso) { [void](Read-Host "Presione Enter para cerrar") }
