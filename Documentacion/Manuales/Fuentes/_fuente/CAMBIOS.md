@@ -15,3 +15,13 @@ Regeneración de los manuales desde los archivos de contenido de esta carpeta (E
 node construir_manuales.mjs <carpeta-de-capturas> <carpeta-de-salida> [hhc.exe] [msedge.exe]
 ```
 Los PDFs se generan con Microsoft Edge headless (`--print-to-pdf`). El CHM requiere un `hhc.exe` operativo (HTML Help Workshop clásico); no es imprescindible para el entregable.
+
+## Actualización 2026-11-12 (tarde): cifrado AES-256 determinístico documentado
+
+- Se agregó a la sección **Seguridad** (manual de programación y de usuario) la descripción del **cifrado AES-256
+  determinístico** aplicado a los 7 campos clínicos de texto libre, con IV derivado del contexto para conservar el DVH,
+  prefijo `AES1$` en la columna y fallback de datos legacy.
+- «103 comprobaciones» → **109 comprobaciones** (la suite ahora valida también el cifrado: determinismo, round-trip,
+  aislamiento por contexto y verificación end-to-end del ciphertext en la base).
+- Nota de la sección: las contraseñas/respuestas siguen con PBKDF2 (hash irreversible) y DNI/teléfono/email quedan en claro
+  a propósito (igualdad/unicidad), documentado para la defensa.

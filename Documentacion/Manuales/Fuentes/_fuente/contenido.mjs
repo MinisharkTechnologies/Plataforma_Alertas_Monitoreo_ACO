@@ -379,7 +379,7 @@ export const PROGRAMADOR = [
     ] } },
   ] },
   { id: 'seguridad', titulo: 'Seguridad', bloques: [
-    { ul: ['Contraseñas y respuestas de seguridad: PBKDF2-SHA256, 120 000 iteraciones y sal aleatoria de 16 bytes; formato «sal.iteraciones.hash»; comparación en tiempo constante.', 'Cifrado simétrico: AES-CBC de 256 bits (CryptographyService). La clave se genera la primera vez y se guarda con DPAPI en %LOCALAPPDATA%\\OpenRIN\\enc.key.', 'Anti fuerza bruta: 5 intentos fallidos bloquean la cuenta 15 minutos.', 'Acceso a base: autenticación integrada de Windows; no se guardan contraseñas de base en la configuración.', 'Permisos: cada módulo y acción se habilita consultando el árbol de permisos por código (PA001, PO001, SI001…).'] },
+    { ul: ['Contraseñas y respuestas de seguridad: PBKDF2-SHA256, 120 000 iteraciones y sal aleatoria de 16 bytes; formato «sal.iteraciones.hash»; comparación en tiempo constante.', 'Cifrado simétrico AES-256 (System.Security.Cryptography) aplicado a los campos clínicos de texto libre: EventoAdverso.Descripcion y AccionTomada, Turno.Observaciones, Seguimiento.Observaciones y DetalleDecision, Alerta.Descripcion y AccionResolucion. El IV se deriva del CONTEXTO del campo (entidad:propiedad) con HMAC-SHA256 sobre la clave, de modo que el cifrado es determinístico: el DVH —que firma el texto plano— sigue siendo estable y las lecturas devuelven el texto claro. La columna guarda «AES1$» + Base64; los valores anteriores (sin prefijo) se leen tal cual y se cifran en su próximo guardado. La clave se genera la primera vez y se protege con DPAPI en %LOCALAPPDATA%\OpenRIN\enc.key.', 'Anti fuerza bruta: 5 intentos fallidos bloquean la cuenta 15 minutos.', 'Acceso a base: autenticación integrada de Windows; no se guardan contraseñas de base en la configuración.', 'Permisos: cada módulo y acción se habilita consultando el árbol de permisos por código (PA001, PO001, SI001…).'] },
   ] },
   { id: 'integridad', titulo: 'Integridad DVH/DVV y control de cambios', bloques: [
     { p: 'NegocioDbContext.SaveChanges se sobrescribe y trabaja en tres fases:' },
@@ -404,7 +404,7 @@ export const PROGRAMADOR = [
     { p: 'Las constantes de las reglas están en la lógica correspondiente: MedicionRINLogic (DistanciaAlta = 0,5; MargenBorde = 0,1), SeguimientoLogic (UmbralIntentosFallidos = 3) y ReporteLogic (UmbralOptimo = 80; UmbralSuboptimo = 50). Actualice también las pruebas.' },
   ] },
   { id: 'pruebas', titulo: 'Pruebas', bloques: [
-    { p: 'El proyecto Codigo/Pruebas es un programa de consola que recorre los casos de uso contra una base real y verifica 62 comprobaciones: idiomas, seguridad, pacientes, historia clínica, RIN y criticidad, alertas, eventos, agenda, seguimiento, reportes, exportación, control de cambios, integridad y respaldo.' },
+    { p: 'El proyecto Codigo/Pruebas es un programa de consola que recorre los casos de uso contra una base real y verifica 109 comprobaciones: idiomas, seguridad, pacientes, historia clínica, RIN y criticidad, alertas, eventos, agenda, seguimiento, reportes, exportación, control de cambios, integridad y respaldo.' },
     { cod: 'copy Pruebas\\App.config.ejemplo Pruebas\\App.config\ndotnet run --project Pruebas' },
     { p: 'Termina con código 0 si todas pasan. Úselo después de cualquier cambio en la lógica o en la base.' },
   ] },

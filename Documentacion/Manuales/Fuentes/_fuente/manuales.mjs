@@ -396,7 +396,7 @@ export const PROGRAMACION = {
           ['Services', 'Transversal', 'Seguridad, criptografía, localización, bitácora, respaldos, transacciones y manejo de excepciones, con su fachada.'],
           ['Negocio.UI', 'Interfaz', 'Formularios y un UserControl por módulo.'],
           ['Herramientas', 'Utilitario', 'Comandos sembrar, respaldo e integridad.'],
-          ['Pruebas', 'Pruebas', 'Programa de consola con 103 comprobaciones contra una base real.'],
+          ['Pruebas', 'Pruebas', 'Programa de consola con 109 comprobaciones contra una base real.'],
         ] } },
         { p: 'Las dependencias van así: Negocio.UI → Negocio.BLL → Negocio.DAL → Negocio.DomainModel, y Services lo usan todas las capas a través de sus fachadas.' },
         { img: '../../Diagramas/Arquitectura/G06 - Logica de negocio (clases).png', cap: 'Diagrama de clases de la capa de lógica de negocio (draw.io).' },
@@ -437,8 +437,8 @@ export const PROGRAMACION = {
       ] },
     ] },
     { titulo: 'Seguridad', bloques: [
-      { ul: ['Contraseñas y respuestas de seguridad: PBKDF2-SHA256, 120 000 iteraciones y sal aleatoria de 16 bytes; formato «sal.iteraciones.hash»; comparación en tiempo constante.', 'Cifrado simétrico: AES-CBC de 256 bits (CryptographyService). La clave se genera la primera vez y se guarda con DPAPI en %LOCALAPPDATA%\\OpenRIN\\enc.key.', 'Anti fuerza bruta: 5 intentos fallidos bloquean la cuenta 15 minutos.', 'Acceso a base: autenticación integrada de Windows; las consultas ADO.NET son siempre parametrizadas.', 'Permisos: cada módulo y acción se habilita consultando el árbol de permisos por código (PA001, PO001, SI001...).', 'Integridad: dígitos verificadores horizontales (por fila) y verticales (por tabla). SaveChanges trabaja en tres fases: persistir, firmar el DVH de cada fila y recalcular el DVV de cada tabla tocada.', 'Control de cambios: AuditoriaDeCambios serializa en JSON el estado anterior y el nuevo; AuditoriaLogic.Restaurar recompone un estado anterior y lo vuelve a firmar.'] },
-      { nota: 'La clave AES existe como servicio, pero hoy no se aplica a campos de la base: las contraseñas y respuestas de seguridad se almacenan con hash PBKDF2.' },
+      { ul: ['Contraseñas y respuestas de seguridad: PBKDF2-SHA256, 120 000 iteraciones y sal aleatoria de 16 bytes; formato «sal.iteraciones.hash»; comparación en tiempo constante.', 'Cifrado simétrico AES-256 (System.Security.Cryptography) aplicado a los campos clínicos de texto libre: EventoAdverso.Descripcion y AccionTomada, Turno.Observaciones, Seguimiento.Observaciones y DetalleDecision, Alerta.Descripcion y AccionResolucion. El IV se deriva del CONTEXTO del campo (entidad:propiedad) con HMAC-SHA256 sobre la clave, de modo que el cifrado es determinístico: el DVH —que firma el texto plano— sigue siendo estable y las lecturas devuelven el texto claro. La columna guarda «AES1$» + Base64; los valores anteriores (sin prefijo) se leen tal cual y se cifran en su próximo guardado. La clave se genera la primera vez y se protege con DPAPI en %LOCALAPPDATA%\OpenRIN\enc.key.', 'Anti fuerza bruta: 5 intentos fallidos bloquean la cuenta 15 minutos.', 'Acceso a base: autenticación integrada de Windows; las consultas ADO.NET son siempre parametrizadas.', 'Permisos: cada módulo y acción se habilita consultando el árbol de permisos por código (PA001, PO001, SI001...).', 'Integridad: dígitos verificadores horizontales (por fila) y verticales (por tabla). SaveChanges trabaja en tres fases: persistir, firmar el DVH de cada fila y recalcular el DVV de cada tabla tocada.', 'Control de cambios: AuditoriaDeCambios serializa en JSON el estado anterior y el nuevo; AuditoriaLogic.Restaurar recompone un estado anterior y lo vuelve a firmar.'] },
+      { nota: 'Las contraseñas y las respuestas de seguridad no se cifran: se guardan con hash PBKDF2-SHA256 (irreversible). El cifrado AES-256 se reserva para los campos clínicos de texto libre; DNI, teléfono y email permanecen en claro porque el sistema los busca por coincidencia y controla su unicidad.' },
     ] },
     { titulo: 'Idiomas', bloques: [
       { p: 'Los idiomas y sus textos están en la base (tablas Idiomas y Textos); no se usan hojas de recursos. LocalizationService.ObtenerTexto(clave) devuelve el texto del idioma activo, o la clave si no existe. Se entregan es, en y zh-CN. EstablecerIdioma(codigo) cambia el idioma en caliente y notifica a los suscriptores.' },
@@ -454,7 +454,7 @@ export const PROGRAMACION = {
         { cod: 'cd Codigo\ndotnet build PlataformaACO.sln\ndotnet run --project Negocio.UI' },
       ] },
       { titulo: 'Pruebas automáticas', bloques: [
-        { p: 'El proyecto Pruebas recorre los casos de uso contra una base real y verifica 103 comprobaciones: idiomas dinámicos, seguridad, pacientes, historia clínica, RIN y criticidad, alertas, eventos, agenda, seguimiento, reportes, exportación, control de cambios, integridad (con recuperación pre-login) y respaldos. Termina con código 0 si todas pasan. Ejecutar SOLO contra bases de desarrollo/demo: la suite RESTAURA la base de negocio dentro de la prueba.' },
+        { p: 'El proyecto Pruebas recorre los casos de uso contra una base real y verifica 109 comprobaciones: idiomas dinámicos, seguridad, pacientes, historia clínica, RIN y criticidad, alertas, eventos, agenda, seguimiento, reportes, exportación, control de cambios, integridad (con recuperación pre-login) y respaldos. Termina con código 0 si todas pasan. Ejecutar SOLO contra bases de desarrollo/demo: la suite RESTAURA la base de negocio dentro de la prueba.' },
         { cod: 'copy Pruebas\\App.config.ejemplo Pruebas\\App.config\ndotnet run --project Pruebas' },
       ] },
       { titulo: 'Generar el instalador', bloques: [
