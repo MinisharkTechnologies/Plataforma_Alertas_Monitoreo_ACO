@@ -24,3 +24,9 @@ Desktop.ini
 SECRETS*
 appsettings.*.local.json
 Codigo/Negocio.UI/App.config
+
+## Artefactos locales y de pruebas (nunca subir)
+credenciales_prueba.txt
+Codigo/Pruebas/App.config
+Codigo/Herramientas/App.config
+Instalador/Salida/
