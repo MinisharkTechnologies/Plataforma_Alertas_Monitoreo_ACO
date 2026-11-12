@@ -31,8 +31,8 @@ namespace Negocio.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccionResolucion")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("DVH")
                         .HasMaxLength(128)
@@ -40,7 +40,8 @@ namespace Negocio.DAL.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<bool>("EscaladaAMedico")
                         .HasColumnType("bit");
@@ -244,7 +245,8 @@ namespace Negocio.DAL.Migrations
 
                     b.Property<string>("AccionTomada")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("DVH")
                         .HasMaxLength(128)
@@ -252,7 +254,8 @@ namespace Negocio.DAL.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
@@ -582,8 +585,8 @@ namespace Negocio.DAL.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("DetalleDecision")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<DateTime?>("FechaDecision")
                         .HasColumnType("datetime2");
@@ -601,8 +604,8 @@ namespace Negocio.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Observaciones")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("Resultado")
                         .IsRequired()
@@ -655,8 +658,8 @@ namespace Negocio.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Observaciones")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.HasKey("Id");
 

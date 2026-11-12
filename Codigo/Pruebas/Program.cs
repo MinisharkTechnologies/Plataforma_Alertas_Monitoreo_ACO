@@ -76,6 +76,16 @@ using (var c0 = new Microsoft.Data.SqlClient.SqlConnection(Cadena("ServicesDB", 
 { c0.Open(); using var cmd = c0.CreateCommand(); cmd.CommandText = "UPDATE Usuarios SET IntentosFallidos=0, BloqueadoHasta=NULL WHERE NombreUsuario='pruebas_auto'"; cmd.ExecuteNonQuery(); }
 Check("desbloqueo y login", Try("login", () => SeguridadService.Autenticar(uSys, clave)) != null);
 Check("cifrado AES ida y vuelta", CryptographyService.Desencriptar(CryptographyService.Encriptar("dato clínico")) == "dato clínico");
+string detIda = CryptographyService.EncriptarDeterminista("EventoAdverso:Descripcion", "clínico-determinístico");
+Check("AES determinístico: mismo contexto + plaintext da el mismo ciphertext",
+    detIda.StartsWith("AES1$") && detIda == CryptographyService.EncriptarDeterminista("EventoAdverso:Descripcion", "clínico-determinístico"));
+Check("AES determinístico: round-trip",
+    CryptographyService.DesencriptarDeterminista("EventoAdverso:Descripcion", detIda) == "clínico-determinístico");
+Check("AES determinístico: contexto distinto da ciphertext distinto",
+    CryptographyService.EncriptarDeterminista("EventoAdverso:Descripcion", "clínico-determinístico")
+    != CryptographyService.EncriptarDeterminista("Turno:Observaciones", "clínico-determinístico"));
+Check("AES determinístico: fallback legacy (sin prefijo se devuelve tal cual)",
+    CryptographyService.DesencriptarDeterminista("EventoAdverso:Descripcion", "valor legacy en claro") == "valor legacy en claro");
 var h = CryptographyService.Hashear("abc");
 Check("hash PBKDF2 verifica", CryptographyService.VerificarHash("abc", h) && !CryptographyService.VerificarHash("abd", h));
 BitacoraService.Info("prueba automática", U);
@@ -196,6 +206,18 @@ int firmadas = Try("recalcular todo", () => integ.RecalcularTodo());
 var a0 = integ.Auditar();
 Check("auditoría sin problemas", a0.Problemas.Count == 0, string.Join(" | ", a0.Problemas.Take(3)));
 Check("11 tablas auditadas", a0.TablasVerificadas.Count == 11, a0.TablasVerificadas.Count.ToString());
+
+using (var cX = new Microsoft.Data.SqlClient.SqlConnection(Cadena("NegocioDB", "OpenRIN_Negocio")))
+{
+    cX.Open(); using var cmd = cX.CreateCommand();
+    cmd.CommandText = "SELECT Descripcion FROM EventosAdversos WHERE Id = " + e1.Id;
+    string crudo = Convert.ToString(cmd.ExecuteScalar()) ?? "";
+    Check("campo clínico de texto libre almacenado cifrado determinístico (AES1$)",
+        crudo.StartsWith("AES1$"), crudo.Length > 0 ? crudo.Substring(0, Math.Min(12, crudo.Length)) : "(vacío)");
+    Check("al leer por la app, el campo llega en claro (round-trip AES)",
+        Try("leer evento cifrado", () => { using var cx = new NegocioDbContext(); return cx.EventosAdversos.AsNoTracking().First(x => x.Id == e1.Id).Descripcion; }) == "Epistaxis");
+}
+
 using (var c1 = new Microsoft.Data.SqlClient.SqlConnection(Cadena("NegocioDB", "OpenRIN_Negocio")))
 { c1.Open(); using var cmd = c1.CreateCommand(); cmd.CommandText = $"UPDATE Pacientes SET Telefono='ALTERADO' WHERE Id={p.Id}"; cmd.ExecuteNonQuery(); }
 using var ctx2 = new NegocioDbContext(); var a1 = new IntegridadLogic(ctx2).Auditar();
@@ -268,6 +290,14 @@ Check("un archivo que no es respaldo no se restaura (RespaldoException)", noSano
 Check("la verificación rechaza el archivo falso", !BackupService.VerificarIntegridadBackup(falso));
 
 Titulo("Respaldo automático diario");
+// Re-ejecutable: si ya se corrió hoy, los registros "Automatico" de hoy harían que la prueba
+// no genere nada legítimamente. Se limpian SOLO en la tabla de registro (dev/demo), no archivos.
+using (var cAuto = new Microsoft.Data.SqlClient.SqlConnection(Cadena("ServicesDB", "OpenRIN_Services")))
+{
+    cAuto.Open(); using var cmd = cAuto.CreateCommand();
+    cmd.CommandText = "DELETE FROM Respaldos WHERE Origen = 'Automatico' AND CAST(Fecha AS date) = CAST(GETDATE() AS date)";
+    try { cmd.ExecuteNonQuery(); } catch (Exception) { }
+}
 bool sanos = false;
 var generados1 = Try("diario con datos no sanos", () => BackupService.RespaldoDiarioSiCorresponde(() => sanos, "prueba", carpetaPrueba));
 Check("con datos no sanos no se respalda", generados1 != null && generados1.Count == 0);

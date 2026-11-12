@@ -865,3 +865,22 @@ GO
 COMMIT;
 GO
 
+
+-- Migración 20261112111055_CifradoDeterministico: ensanches para columnas con cifrado
+-- determinístico (el ciphertext es más largo que el plaintext: AES1$ + Base64).
+IF NOT EXISTS (
+    SELECT * FROM [__EFMigrationsHistory]
+    WHERE [MigrationId] = N'20261112111055_CifradoDeterministico'
+)
+BEGIN
+    ALTER TABLE [Turnos] ALTER COLUMN [Observaciones] nvarchar(4000) NULL;
+    ALTER TABLE [Seguimientos] ALTER COLUMN [Observaciones] nvarchar(4000) NULL;
+    ALTER TABLE [Seguimientos] ALTER COLUMN [DetalleDecision] nvarchar(4000) NULL;
+    ALTER TABLE [EventosAdversos] ALTER COLUMN [Descripcion] nvarchar(4000) NOT NULL;
+    ALTER TABLE [EventosAdversos] ALTER COLUMN [AccionTomada] nvarchar(4000) NOT NULL;
+    ALTER TABLE [Alertas] ALTER COLUMN [Descripcion] nvarchar(4000) NOT NULL;
+    ALTER TABLE [Alertas] ALTER COLUMN [AccionResolucion] nvarchar(4000) NULL;
+    INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+    VALUES (N'20261112111055_CifradoDeterministico', N'8.0.31');
+END;
+GO
