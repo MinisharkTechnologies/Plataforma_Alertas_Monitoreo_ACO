@@ -3,7 +3,7 @@ import fs from 'fs';
 
 const SRC = process.env.SRC_PDF || 'original.pdf';
 const OUTPDF = process.argv[2] || 'Carpeta de Proyecto - OpenRIN (diagramas corregidos).pdf';
-const D = process.env.DIAG_DIR || 'OpenRIN-corregido/Diagramas';
+const D = process.env.DIAG_DIR || 'Diagramas';
 const only = process.argv.slice(3).map(Number);
 
 const map = [
