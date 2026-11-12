@@ -1,7 +1,6 @@
 // Manuales de OpenRIN con el esquema de la entrega final (Manual de instalación, Manual de usuario, Manual de programación).
 // Estructura: documento = {titulo, subtitulo, secciones:[{titulo, bloques:[], sub:[{titulo, bloques:[], sub:[...]}]}]}
 // Bloques: {p} {ul} {ol} {nota} {importante} {tabla:{cab,filas}} {cod} {img,cap}
-import { DEMO_CLAVE } from './contenido.mjs';
 
 const AUTOR = 'Muñiz Cortés, Carlos Santiago';
 const LEGAJO = 'B00000955-VCO';
@@ -19,7 +18,7 @@ export const INSTALACION = {
         { ul: ['Interfaz: Windows Forms.', 'Backend: C# sobre .NET 8 (la aplicación incluye su propio runtime).', 'Base de datos: SQL Server 2019 o superior (Express, Standard o Enterprise). Se probó con SQL Server 2022 Express.', 'Arquitectura: en capas: Presentación, Lógica de negocio, Dominio, Acceso a datos y Servicios técnicos.'] },
       ] },
       { titulo: 'Componentes del sistema', bloques: [
-        { ul: ['Aplicación principal: Negocio.UI.exe.', 'Herramientas de línea de comandos: OpenRIN.Herramientas.exe (cargar datos de demostración, respaldo e integridad).', 'Bases de datos: OpenRIN_Negocio (datos clínicos, 13 tablas) y OpenRIN_Services (usuarios, permisos, idiomas, textos y bitácora).', 'Archivo de configuración: Negocio.UI.dll.config (y OpenRIN.Herramientas.dll.config).', 'Ayuda en línea: OpenRIN-Ayuda.chm.', 'Scripts de base de datos: carpeta 4 - Base de Datos.', 'Tarea programada «OpenRIN - Respaldo Nocturno» (respaldo diario a las 03:00).'] },
+        { ul: ['Aplicación principal: Negocio.UI.exe.', 'Herramientas de línea de comandos: OpenRIN.Herramientas.exe (cargar datos de demostración, respaldo e integridad).', 'Bases de datos: OpenRIN_Negocio (datos clínicos, 13 tablas) y OpenRIN_Services (usuarios, permisos, idiomas, textos y bitácora).', 'Archivo de configuración: Negocio.UI.dll.config (y OpenRIN.Herramientas.dll.config).', 'Ayuda en línea: OpenRIN-Ayuda.chm.', 'Scripts de base de datos: carpeta 4 - Base de Datos.', 'Tarea programada «OpenRIN - Respaldo Nocturno (app)» (respaldo diario a las 03:00).'] },
       ] },
     ] },
     { titulo: 'Requisitos del sistema', sub: [
@@ -97,7 +96,7 @@ export const INSTALACION = {
         { ol: ['Cree las bases de datos y cargue los scripts (sección 6).', 'Compile y publique la aplicación (vea el Manual de programación, sección 7).', 'Copie la carpeta publicada a C:\\Program Files\\OpenRIN.', 'Cree los archivos de configuración (sección 7).', 'Ejecute OpenRIN.Herramientas.exe sembrar para crear los usuarios y los datos de demostración.'] },
       ] },
       { titulo: 'Verificar la instalación', bloques: [
-        { ul: ['Debe existir C:\\Program Files\\OpenRIN\\Negocio.UI.exe.', 'Debe haber un acceso directo «OpenRIN» en el escritorio.', 'En SSMS deben verse las bases OpenRIN_Services y OpenRIN_Negocio.', 'En el Programador de tareas debe existir «OpenRIN - Respaldo Nocturno».'] },
+        { ul: ['Debe existir C:\\Program Files\\OpenRIN\\Negocio.UI.exe.', 'Debe haber un acceso directo «OpenRIN» en el escritorio.', 'En SSMS deben verse las bases OpenRIN_Services y OpenRIN_Negocio.', 'En el Programador de tareas debe existir «OpenRIN - Respaldo Nocturno (app)».'] },
       ] },
     ] },
     { titulo: 'Instalación de las bases de datos', bloques: [
@@ -152,7 +151,7 @@ export const INSTALACION = {
       { titulo: 'Primera ejecución', bloques: [
         { p: 'Antes de mostrar el inicio de sesión, el programa verifica la integridad de la base de datos. Luego aparece la pantalla de acceso. Ingrese con uno de los usuarios de demostración:' },
         { img: '01_login.png', cap: 'Pantalla de inicio de sesión.' },
-        { tabla: { cab: ['Usuario', 'Perfil', 'Contraseña inicial'], filas: [['sysadmin', 'Administrador del sistema', DEMO_CLAVE], ['medico', 'Médico', DEMO_CLAVE], ['recepcion', 'Administrativo', DEMO_CLAVE]] } },
+        { tabla: { cab: ['Usuario', 'Perfil', 'Contraseña inicial'], filas: [['sysadmin', 'Administrador del sistema', '(aleatoria por instalación)'], ['medico', 'Médico', '(aleatoria por instalación)'], ['recepcion', 'Administrativo', '(aleatoria por instalación)']] } }, { p: 'La clave de demostración la genera el instalador de forma aleatoria y se muestra una única vez por consola («clave de demostración generada»). Si ejecutó OpenRIN.Herramientas.exe sembrar sin argumentos, la misma salida la imprime una única vez. No existe ninguna clave por defecto documentada: cámbiela después de la primera prueba.' },
         { importante: 'Cambie estas contraseñas después de la primera prueba (¿Olvidó su contraseña?, o desde Sistema y Bitácora).' },
       ] },
     ] },
@@ -194,7 +193,7 @@ export const INSTALACION = {
     ] },
     { titulo: 'Mantenimiento', sub: [
       { titulo: 'Respaldo de las bases de datos', bloques: [
-        { p: 'La tarea «OpenRIN - Respaldo Nocturno» genera todos los días a las 03:00 un respaldo completo de las dos bases y verifica cada archivo. Los archivos quedan en C:\\OpenRIN\\Backups con el nombre OpenRIN_Negocio_AAAAMMDD_HHMMSS_FULL.bak.' },
+        { p: 'La tarea «OpenRIN - Respaldo Nocturno (app)» genera todos los días a las 03:00 un respaldo completo de las dos bases y verifica cada archivo. Los archivos quedan en C:\\OpenRIN\\Backups con el nombre OpenRIN_Negocio_AAAAMMDD_HHMMSS_FULL.bak.' },
         { nota: 'Copie periódicamente esa carpeta a otro disco o a la nube: un respaldo en el mismo equipo no protege ante la falla del disco.' },
         { p: 'Para hacer un respaldo en cualquier momento:' },
         { cod: 'OpenRIN.Herramientas.exe respaldo' },
@@ -397,7 +396,7 @@ export const PROGRAMACION = {
           ['Services', 'Transversal', 'Seguridad, criptografía, localización, bitácora, respaldos, transacciones y manejo de excepciones, con su fachada.'],
           ['Negocio.UI', 'Interfaz', 'Formularios y un UserControl por módulo.'],
           ['Herramientas', 'Utilitario', 'Comandos sembrar, respaldo e integridad.'],
-          ['Pruebas', 'Pruebas', 'Programa de consola con 62 comprobaciones contra una base real.'],
+          ['Pruebas', 'Pruebas', 'Programa de consola con 103 comprobaciones contra una base real.'],
         ] } },
         { p: 'Las dependencias van así: Negocio.UI → Negocio.BLL → Negocio.DAL → Negocio.DomainModel, y Services lo usan todas las capas a través de sus fachadas.' },
         { img: '../../Diagramas/Arquitectura/G06 - Logica de negocio (clases).png', cap: 'Diagrama de clases de la capa de lógica de negocio (draw.io).' },
@@ -455,7 +454,7 @@ export const PROGRAMACION = {
         { cod: 'cd Codigo\ndotnet build PlataformaACO.sln\ndotnet run --project Negocio.UI' },
       ] },
       { titulo: 'Pruebas automáticas', bloques: [
-        { p: 'El proyecto Pruebas recorre los casos de uso contra una base real y verifica 62 comprobaciones: idiomas, seguridad, pacientes, historia clínica, RIN y criticidad, alertas, eventos, agenda, seguimiento, reportes, exportación, control de cambios, integridad y respaldo. Termina con código 0 si todas pasan.' },
+        { p: 'El proyecto Pruebas recorre los casos de uso contra una base real y verifica 103 comprobaciones: idiomas dinámicos, seguridad, pacientes, historia clínica, RIN y criticidad, alertas, eventos, agenda, seguimiento, reportes, exportación, control de cambios, integridad (con recuperación pre-login) y respaldos. Termina con código 0 si todas pasan. Ejecutar SOLO contra bases de desarrollo/demo: la suite RESTAURA la base de negocio dentro de la prueba.' },
         { cod: 'copy Pruebas\\App.config.ejemplo Pruebas\\App.config\ndotnet run --project Pruebas' },
       ] },
       { titulo: 'Generar el instalador', bloques: [

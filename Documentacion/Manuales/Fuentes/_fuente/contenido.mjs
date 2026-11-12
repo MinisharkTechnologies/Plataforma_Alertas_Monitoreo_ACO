@@ -1,6 +1,7 @@
 // Contenido de la documentación de OpenRIN. Cada documento es una lista de secciones; cada sección una lista de bloques:
 //   {p:"texto"} {h:"subtítulo"} {ul:[...]} {ol:[...]} {img:"archivo.png", cap:"pie"} {nota:"texto"} {tabla:{cab:[...], filas:[[...]]}} {cod:"código"}
-export const DEMO_CLAVE = 'Demo2026!';
+// La clave de demostración es ALEATORIA por instalación (la genera el instalador / sembrar).
+// No publicar ninguna clave por defecto.
 
 // ------------------------------------------------------------------ AYUDA / GUÍA DEL USUARIO
 export const USUARIO = [
@@ -177,10 +178,11 @@ export const INSTALACION = [
     ] } },
     { h: 'Usuarios de demostración' },
     { tabla: { cab: ['Usuario', 'Perfil', 'Contraseña inicial'], filas: [
-      ['sysadmin', 'Administrador del sistema', DEMO_CLAVE],
-      ['medico', 'Médico', DEMO_CLAVE],
-      ['recepcion', 'Administrativo', DEMO_CLAVE],
+      ['sysadmin', 'Administrador del sistema', '(aleatoria por instalación)'],
+      ['medico', 'Médico', '(aleatoria por instalación)'],
+      ['recepcion', 'Administrativo', '(aleatoria por instalación)'],
     ] } },
+    { p: 'La clave de demostración es aleatoria y se muestra una única vez por consola al instalar (o al ejecutar «OpenRIN.Herramientas.exe sembrar»). No existe ninguna clave por defecto documentada.' },
     { nota: 'Cambie estas contraseñas después de la primera prueba (pantalla de acceso > «¿Olvidó su contraseña?», o Sistema y Bitácora). Los pacientes de demostración pueden darse de baja desde el módulo de pacientes antes de usar el sistema con datos reales.' },
   ] },
   { titulo: 'Opciones avanzadas', bloques: [
@@ -195,7 +197,7 @@ export const INSTALACION = [
     { p: 'Para extraer los archivos del instalador sin ejecutarlo: OpenRIN-Setup.exe /Q /C /T:C:\\carpeta.' },
   ] },
   { titulo: 'Verificación de la instalación', bloques: [
-    { ol: ['Abra OpenRIN: debe aparecer la pantalla «Iniciar Sesión».', 'Ingrese con sysadmin y la contraseña inicial.', 'En la cabecera debe leerse «Integridad OK».', 'Abra Panel de Monitoreo: deben verse los cinco pacientes de demostración.', 'Compruebe la tarea programada «OpenRIN - Respaldo Nocturno» en el Programador de tareas.'] },
+    { ol: ['Abra OpenRIN: debe aparecer la pantalla «Iniciar Sesión».', 'Ingrese con sysadmin y la contraseña inicial.', 'En la cabecera debe leerse «Integridad OK».', 'Abra Panel de Monitoreo: deben verse los cinco pacientes de demostración.', 'Compruebe la tarea programada «OpenRIN - Respaldo Nocturno (app)» en el Programador de tareas.'] },
     { p: 'El registro de la instalación queda en %TEMP%\\OpenRIN_instalacion.log.' },
   ] },
   { titulo: 'Solución de problemas', bloques: [
@@ -225,7 +227,7 @@ export const OPERACION = [
     { ul: ['Alta de usuarios del personal: Sistema y Bitácora > Usuarios > Nuevo usuario. Elija el perfil adecuado.', 'Los pacientes reciben su usuario del portal al registrarse en el módulo de pacientes.', 'Deshabilite las cuentas del personal que deja el consultorio; no se eliminan para conservar la trazabilidad.', 'Ajuste los permisos de cada perfil en Perfiles y permisos.', 'Una cuenta bloqueada por 5 intentos fallidos se libera sola a los 15 minutos.'] },
   ] },
   { titulo: 'Respaldos', bloques: [
-    { p: 'El respaldo completo de OpenRIN_Services y OpenRIN_Negocio se ejecuta todos los días a las 03:00 con la tarea «OpenRIN - Respaldo Nocturno» del Programador de tareas, aunque la aplicación esté cerrada. Cada archivo .bak se verifica con RESTORE VERIFYONLY y el resultado queda en la bitácora.' },
+    { p: 'El respaldo completo de OpenRIN_Services y OpenRIN_Negocio se ejecuta todos los días a las 03:00 con la tarea «OpenRIN - Respaldo Nocturno (app)» del Programador de tareas, aunque la aplicación esté cerrada. Cada archivo .bak se verifica con RESTORE VERIFYONLY y el resultado queda en la bitácora.' },
     { tabla: { cab: ['Dato', 'Valor'], filas: [
       ['Carpeta de respaldos', 'C:\\OpenRIN\\Backups (se cambia con la clave BackupFolder del archivo de configuración)'],
       ['Nombre de archivo', 'OpenRIN_Negocio_AAAAMMDD_HHMMSS_FULL.bak'],
@@ -270,7 +272,7 @@ export const MANTENIMIENTO = [
       ['Respaldos', 'C:\\OpenRIN\\Backups'],
       ['Clave de cifrado', '%LOCALAPPDATA%\\OpenRIN\\enc.key, protegida con DPAPI para el usuario de Windows'],
       ['Bases de datos', 'OpenRIN_Services (seguridad, idiomas, permisos, bitácora) y OpenRIN_Negocio (datos clínicos)'],
-      ['Tarea programada', '«OpenRIN - Respaldo Nocturno», diaria a las 03:00, cuenta SYSTEM'],
+      ['Tarea programada', '«OpenRIN - Respaldo Nocturno (app)», diaria a las 03:00, cuenta SYSTEM'],
     ] } },
   ] },
   { titulo: 'Configuración', bloques: [

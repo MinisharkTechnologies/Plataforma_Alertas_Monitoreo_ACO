@@ -11,7 +11,13 @@ const CAPTURAS = path.resolve(process.argv[2] || 'capturas');
 const SALIDA = path.resolve(process.argv[3] || 'salida');
 const HHC = process.argv[4] || 'C:/ortmp/hh/hhc.exe';
 const EDGE = process.argv[5] || 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
-const RAIZ = path.resolve(import.meta.dirname, '../..');
+// Sube desde esta carpeta hasta encontrar la raíz del repo (la que contiene Codigo/).
+let RAIZ = path.resolve(import.meta.dirname);
+while (!fs.existsSync(path.join(RAIZ, 'Codigo', 'Services'))) {
+  const padre = path.dirname(RAIZ);
+  if (padre === RAIZ) throw new Error('No encuentro la raíz del repositorio (carpeta Codigo/) desde ' + import.meta.dirname);
+  RAIZ = padre;
+}
 const CODIGO = path.join(RAIZ, 'Codigo');
 fs.mkdirSync(SALIDA, { recursive: true });
 const TEMP = path.join(process.env.TEMP || 'C:/Temp', 'manuales_openrin');

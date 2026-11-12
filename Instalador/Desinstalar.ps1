@@ -6,7 +6,7 @@ $esAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIden
 if (-not $esAdmin) { Start-Process powershell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$($MyInvocation.MyCommand.Path)`"" -Wait; exit }
 $destino = Split-Path -Parent $MyInvocation.MyCommand.Path
 Get-Process -Name "Negocio.UI" -ErrorAction SilentlyContinue | Stop-Process -Force
-Unregister-ScheduledTask -TaskName "OpenRIN - Respaldo Nocturno" -Confirm:$false -ErrorAction SilentlyContinue
+Unregister-ScheduledTask -TaskName "OpenRIN - Respaldo Nocturno (app)" -Confirm:$false -ErrorAction SilentlyContinue
 Remove-Item (Join-Path ([Environment]::GetFolderPath("CommonDesktopDirectory")) "OpenRIN.lnk") -Force -ErrorAction SilentlyContinue
 Remove-Item (Join-Path ([Environment]::GetFolderPath("CommonPrograms")) "OpenRIN") -Recurse -Force -ErrorAction SilentlyContinue
 Remove-Item "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OpenRIN" -Recurse -Force -ErrorAction SilentlyContinue

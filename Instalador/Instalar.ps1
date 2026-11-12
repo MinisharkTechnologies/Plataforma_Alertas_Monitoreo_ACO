@@ -204,8 +204,8 @@ Paso 7 "Programando el respaldo diario (03:00)"
 $accion = New-ScheduledTaskAction -Execute $herr -Argument "respaldo-auto" -WorkingDirectory $datos
 $disparador = New-ScheduledTaskTrigger -Daily -At 3:00
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
-Register-ScheduledTask -TaskName "OpenRIN - Respaldo Nocturno" -Action $accion -Trigger $disparador -Principal $principal -Force | Out-Null
-Write-Host "  Tarea 'OpenRIN - Respaldo Nocturno' registrada (carpeta de respaldos: $respaldos)"
+Register-ScheduledTask -TaskName "OpenRIN - Respaldo Nocturno (app)" -Action $accion -Trigger $disparador -Principal $principal -Force | Out-Null
+Write-Host "  Tarea 'OpenRIN - Respaldo Nocturno (app)' registrada (carpeta de respaldos: $respaldos)"
 
 # ---- 8. registro de desinstalación -------------------------------------------------------------
 Paso 8 "Registrando la desinstalación"

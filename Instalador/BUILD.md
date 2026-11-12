@@ -29,7 +29,7 @@ El instalador (`Instalar.ps1`), con elevación de administrador:
 2. Crea las bases `OpenRIN_Services` y `OpenRIN_Negocio` (si no existen) aplicando los scripts SQL (esquema + semillas de seguridad, permisos e idiomas).
 3. Instala la aplicación en `Archivos de programa\OpenRIN`, escribe la configuración con autenticación integrada de Windows (sin contraseñas, `TrustServerCertificate=True`, respaldos en `C:\OpenRIN\Backups`).
 4. Siembra los datos de demostración (`OpenRIN.Herramientas.exe sembrar`): crea `sysadmin`, `medico`, `recepcion`. **La clave de demostración se genera aleatoria y se muestra una única vez por consola** (o se usa `-ClaveDemo` para indicarla).
-5. Crea accesos directos (escritorio y menú Inicio) y la tarea programada diaria 03:00 «OpenRIN - Respaldo Nocturno» (`OpenRIN.Herramientas.exe respaldo-auto`, SYSTEM).
+5. Crea accesos directos (escritorio y menú Inicio) y la tarea programada diaria 03:00 «OpenRIN - Respaldo Nocturno (app)» (`OpenRIN.Herramientas.exe respaldo-auto`, SYSTEM).
 6. Registra la desinstalación en «Agregar o quitar programas» (ícono, versión, publisher, sin modificar/reparar).
 
 Para desinstalar: menú Inicio → «Desinstalar OpenRIN». Las bases y los respaldos se **conservan**; `-QuitarBases` hace una copia previa obligatoria (vía Herramientas o BACKUP COPY_ONLY) y solo después elimina las bases.
