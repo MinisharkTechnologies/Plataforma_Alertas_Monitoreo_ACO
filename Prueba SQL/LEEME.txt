@@ -1,0 +1,59 @@
+﻿PRUEBA SQL - OpenRIN
+====================
+
+Estas consultas sirven para probar, a mano, la protección de integridad (DVH/DVV) y los respaldos
+de OpenRIN, por ejemplo en una demostración frente al profesor.
+
+CÓMO EJECUTARLAS
+----------------
+Opción A - SQL Server Management Studio (SSMS):
+  1. Conéctese a  .\SQLEXPRESS  (autenticación de Windows).
+  2. Archivo > Nuevo > Consulta, pegue el contenido del archivo .txt y pulse F5.
+
+Opción B - línea de comandos (sqlcmd), parado en esta carpeta:
+  sqlcmd -S .\SQLEXPRESS -E -C -I -f 65001 -i "01 - Alterar un dato (prueba de DVH).txt"
+
+(-I es obligatorio: las tablas tienen índices filtrados.)
+Las bases son OpenRIN_Negocio (datos clínicos) y OpenRIN_Services (usuarios, bitácora y respaldos).
+
+
+PRUEBA 1 - UN DATO ALTERADO FUERA DEL SISTEMA (DVH)
+---------------------------------------------------
+  1. Con OpenRIN CERRADO, ejecute  "01 - Alterar un dato (prueba de DVH).txt".
+  2. Abra OpenRIN. Antes del inicio de sesión aparece la "Alerta de integridad de los datos"
+     con el registro modificado, y el acceso queda bloqueado.
+  3. En esa pantalla ingrese con un usuario que pueda administrar respaldos (por ejemplo sysadmin;
+     la clave inicial figura en el Manual de instalación) y elija una de las salidas:
+       - Restaurar el respaldo elegido (o restaurar desde otro archivo): vuelve a una copia sana.
+       - Recalcular los dígitos verificadores: acepta el estado actual de los datos (pide confirmación).
+  4. Cada paso queda en la bitácora (ver "07 - Ver la bitácora de integridad y respaldos.txt").
+
+  Si prefiere volver atrás sin usar la pantalla, ejecute "02 - Volver el dato a la normalidad.txt"
+  (con OpenRIN cerrado) y el sistema arranca normal.
+
+
+PRUEBA 2 - UNA TABLA CON SU DÍGITO ALTERADO (DVV)
+-------------------------------------------------
+  Igual que la prueba 1, pero con "03 - Alterar el digito de la tabla (prueba de DVV).txt" y, para
+  deshacer, "04 - Volver el digito a la normalidad.txt".
+
+
+PRUEBA 3 - RESPALDOS
+--------------------
+  - Cree un respaldo desde OpenRIN (Sistema > Respaldos) y mire el registro con
+    "06 - Ver los respaldos registrados.txt".
+  - "08 - Respaldo y verificacion a mano.txt" hace lo mismo con T-SQL puro.
+  - IMPORTANTE: haga al menos un respaldo ANTES de la prueba 1, para tener una copia sana
+    que restaurar.
+
+
+ESTADO DE LA INTEGRIDAD EN CUALQUIER MOMENTO
+--------------------------------------------
+  "05 - Ver el estado de la integridad.txt"  o, desde la consola:
+  OpenRIN.Herramientas.exe integridad          (responde "Integridad OK (11 tablas)" si todo está sano)
+
+
+NOTA
+----
+Estas consultas modifican datos a propósito. Úselas solo en la base de pruebas / demostración.
+Las de "Volver a la normalidad" dejan el dato exactamente como estaba.

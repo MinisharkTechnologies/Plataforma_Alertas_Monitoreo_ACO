@@ -1,0 +1,6 @@
+﻿-- Últimos eventos de integridad y de respaldos en la bitácora (tabla Logs de la base de servicios).
+
+SELECT TOP 40 Fecha, Nivel, Usuario, Mensaje
+FROM OpenRIN_Services.dbo.Logs
+WHERE Mensaje LIKE N'%Integridad%' OR Mensaje LIKE N'%espaldo%' OR Mensaje LIKE N'%verificadores%'
+ORDER BY Id DESC;

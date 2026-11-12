@@ -1,0 +1,21 @@
+﻿-- Respaldo y verificación con T-SQL puro (lo mismo que hace OpenRIN por dentro).
+-- Cambie la carpeta si hace falta: tiene que existir y poder escribirla el servicio de SQL Server
+-- (por ejemplo C:\OpenRIN\Backups, o la carpeta Backup de la instancia).
+
+BACKUP DATABASE OpenRIN_Negocio
+TO DISK = N'C:\OpenRIN\Backups\OpenRIN_Negocio_prueba.bak'
+WITH COPY_ONLY, CHECKSUM, INIT, STATS = 10;
+
+-- Verifica que el archivo sirva (sin restaurarlo):
+RESTORE VERIFYONLY
+FROM DISK = N'C:\OpenRIN\Backups\OpenRIN_Negocio_prueba.bak'
+WITH CHECKSUM;
+
+-- Contenido del archivo:
+RESTORE HEADERONLY FROM DISK = N'C:\OpenRIN\Backups\OpenRIN_Negocio_prueba.bak';
+
+-- Para RESTAURAR a mano (cierre OpenRIN primero; reemplaza la base actual):
+-- USE master;
+-- ALTER DATABASE OpenRIN_Negocio SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+-- RESTORE DATABASE OpenRIN_Negocio FROM DISK = N'C:\OpenRIN\Backups\OpenRIN_Negocio_prueba.bak' WITH REPLACE;
+-- ALTER DATABASE OpenRIN_Negocio SET MULTI_USER;

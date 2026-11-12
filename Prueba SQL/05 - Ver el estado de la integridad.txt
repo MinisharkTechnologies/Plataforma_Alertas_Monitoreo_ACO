@@ -1,0 +1,12 @@
+﻿-- Muestra los dígitos verificadores guardados y cuántas filas de cada tabla firmada no tienen DVH.
+-- (El control completo lo hace OpenRIN al iniciar o:  OpenRIN.Herramientas.exe integridad)
+
+SELECT NombreTabla, LEFT(DVV, 16) + N'...' AS DVV, FechaCalculo
+FROM OpenRIN_Negocio.dbo.DigitosVerificadores
+ORDER BY NombreTabla;
+
+SELECT N'Pacientes' AS Tabla, COUNT(*) AS Filas, SUM(CASE WHEN DVH IS NULL OR DVH = N'' THEN 1 ELSE 0 END) AS SinDVH FROM OpenRIN_Negocio.dbo.Pacientes
+UNION ALL SELECT N'MedicionesRIN', COUNT(*), SUM(CASE WHEN DVH IS NULL OR DVH = N'' THEN 1 ELSE 0 END) FROM OpenRIN_Negocio.dbo.MedicionesRIN
+UNION ALL SELECT N'Alertas',       COUNT(*), SUM(CASE WHEN DVH IS NULL OR DVH = N'' THEN 1 ELSE 0 END) FROM OpenRIN_Negocio.dbo.Alertas
+UNION ALL SELECT N'Turnos',        COUNT(*), SUM(CASE WHEN DVH IS NULL OR DVH = N'' THEN 1 ELSE 0 END) FROM OpenRIN_Negocio.dbo.Turnos
+UNION ALL SELECT N'Usuarios',      COUNT(*), SUM(CASE WHEN DVH IS NULL OR DVH = N'' THEN 1 ELSE 0 END) FROM OpenRIN_Negocio.dbo.Usuarios;

@@ -1,0 +1,6 @@
+﻿-- Catálogo de respaldos que lleva OpenRIN (tabla Respaldos de la base de servicios).
+-- Origen: Manual | Automatico | Previo (copia antes de restaurar) | Importado.  Sano = pasó RESTORE VERIFYONLY.
+
+SELECT TOP 30 Id, Fecha, BaseDatos, Origen, Sano, TamanoBytes / 1024 / 1024 AS MB, Usuario, Archivo, Observaciones
+FROM OpenRIN_Services.dbo.Respaldos
+ORDER BY Fecha DESC;
