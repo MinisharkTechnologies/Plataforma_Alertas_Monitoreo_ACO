@@ -10,6 +10,16 @@
     <EmbeddedResource Include="openrin.ico" />
   </ItemGroup>
 
+  <!-- Ayuda en línea (D02): el .chm debe quedar junto al ejecutable, porque PrincipalForm
+       lo busca en AppContext.BaseDirectory. Sin esto, el botón Ayuda y el F1 avisan que
+       no encuentran el archivo. El instalador lo copia aparte al publicar. -->
+  <ItemGroup>
+    <None Include="..\..\Documentacion\Manuales\OpenRIN-Ayuda.chm"
+          Link="OpenRIN-Ayuda.chm"
+          CopyToOutputDirectory="PreserveNewest"
+          CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="QuestPDF" Version="2026.9.0" />
   </ItemGroup>
