@@ -1142,3 +1142,4 @@ WHEN MATCHED THEN UPDATE SET Valor = origen.Valor
 WHEN NOT MATCHED THEN INSERT (CodigoIdioma, Clave, Valor)
     VALUES (origen.CodigoIdioma, origen.Clave, origen.Valor);
 GO
+

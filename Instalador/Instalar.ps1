@@ -41,7 +41,7 @@ if (-not $esAdmin) {
 }
 Start-Transcript -Path $log -Force | Out-Null
 
-function Paso($n, $texto) { Write-Host ""; Write-Host "[$n/8] $texto" -ForegroundColor Cyan }
+function Paso($n, $texto) { Write-Host ""; Write-Host "[$n/9] $texto" -ForegroundColor Cyan }
 function Fallar($mensaje) {
     Write-Host ""; Write-Host "ERROR: $mensaje" -ForegroundColor Red
     Write-Host "Detalle en: $log"
@@ -120,7 +120,7 @@ foreach ($bd in @("OpenRIN_Services", "OpenRIN_Negocio")) {
     $cmd = $cm.CreateCommand(); $cmd.CommandText = "IF DB_ID('$bd') IS NULL CREATE DATABASE [$bd]"; [void]$cmd.ExecuteNonQuery()
 }
 $cm.Close()
-foreach ($s in @("services_01_bitacora.sql", "services_02_seguridad.sql", "services_03_permisos.sql", "services_04_localizacion.sql", "services_05_localizacion_seed.sql", "services_06_respaldos.sql")) {
+foreach ($s in @("services_01_bitacora.sql", "services_02_seguridad.sql", "services_03_permisos.sql", "services_04_localizacion.sql", "services_05_localizacion_seed.sql", "services_06_respaldos.sql", "services_07_integridad.sql")) {
     Write-Host "  OpenRIN_Services <- $s"; Ejecutar-Script "OpenRIN_Services" (Join-Path $aqui $s)
 }
 Write-Host "  OpenRIN_Negocio  <- negocio_esquema.sql"; Ejecutar-Script "OpenRIN_Negocio" (Join-Path $aqui "negocio_esquema.sql")
@@ -186,6 +186,14 @@ Paso 5 "Cargando usuarios y datos de demostración"
 $herr = Join-Path $Destino "OpenRIN.Herramientas.exe"
 & $herr sembrar $ClaveDemo 2>&1 | Tee-Object -Variable salidaSembrar | Out-Host
 if ($LASTEXITCODE -ne 0) { Fallar "La carga de datos de demostración terminó con error ($LASTEXITCODE)." }
+
+# Firma los dígitos verificadores (DVH/DVV) de la base Services con las filas ya
+# sembradas (las de los scripts SQL se corren antes de esta firma; la app las verifica al arrancar).
+Paso 6 "Firmando integridad (DVH/DVV) de las bases"
+& $herr recalcular 2>&1 | Out-Host
+if ($LASTEXITCODE -ne 0) { Fallar "No se pudo firmar la integridad de las bases ($LASTEXITCODE)." }
+& $herr integridad 2>&1 | Out-Host
+if ($LASTEXITCODE -ne 0) { Fallar "La verificación de integridad informa problemas tras la firma ($LASTEXITCODE)." }
 # La respuesta a la pregunta de recuperación la genera «sembrar» (aleatoria) y se imprime una sola vez:
 # se captura para dejarla guardada junto a la clave en el archivo de credenciales del Escritorio.
 $respuestaRecuperacion = ""
@@ -217,7 +225,7 @@ try {
 }
 
 # ---- 6. accesos directos -----------------------------------------------------------------------
-Paso 6 "Creando accesos directos"
+Paso 7 "Creando accesos directos"
 $sh = New-Object -ComObject WScript.Shell
 foreach ($carpeta in @([Environment]::GetFolderPath("CommonDesktopDirectory"), (Join-Path ([Environment]::GetFolderPath("CommonPrograms")) "OpenRIN"))) {
     New-Item -ItemType Directory -Force -Path $carpeta | Out-Null
@@ -229,7 +237,7 @@ $u = $sh.CreateShortcut((Join-Path (Join-Path ([Environment]::GetFolderPath("Com
 $u.TargetPath = "powershell.exe"; $u.Arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$Destino\Desinstalar.ps1`""; $u.Save()
 
 # ---- 7. respaldo automático --------------------------------------------------------------------
-Paso 7 "Programando el respaldo diario (03:00)"
+Paso 8 "Programando el respaldo diario (03:00)"
 $accion = New-ScheduledTaskAction -Execute $herr -Argument "respaldo-auto" -WorkingDirectory $datos
 $disparador = New-ScheduledTaskTrigger -Daily -At 3:00
 $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
@@ -237,7 +245,7 @@ Register-ScheduledTask -TaskName "OpenRIN - Respaldo Nocturno (app)" -Action $ac
 Write-Host "  Tarea 'OpenRIN - Respaldo Nocturno (app)' registrada (carpeta de respaldos: $respaldos)"
 
 # ---- 8. registro de desinstalación -------------------------------------------------------------
-Paso 8 "Registrando la desinstalación"
+Paso 9 "Registrando la desinstalación"
 Copy-Item (Join-Path $aqui "Desinstalar.ps1") (Join-Path $Destino "Desinstalar.ps1") -Force
 $k = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OpenRIN"
 New-Item -Path $k -Force | Out-Null

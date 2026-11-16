@@ -34,6 +34,7 @@ Copy-Item (Join-Path $sql "permisos.sql")           (Join-Path $paq "services_03
 Copy-Item (Join-Path $sql "localizacion.sql")       (Join-Path $paq "services_04_localizacion.sql")
 Copy-Item (Join-Path $sql "localizacion_seed.sql")  (Join-Path $paq "services_05_localizacion_seed.sql")
 Copy-Item (Join-Path $sql "respaldos.sql")           (Join-Path $paq "services_06_respaldos.sql")
+Copy-Item (Join-Path $sql "integridad_services.sql")(Join-Path $paq "services_07_integridad.sql")
 Copy-Item (Join-Path $codigo "Negocio.DAL\Tools\script.sql") (Join-Path $paq "negocio_esquema.sql")
 # Los scripts de PowerShell se guardan con BOM UTF-8 para que Windows PowerShell 5.1 lea bien los acentos.
 foreach ($f in "Instalar.ps1", "Desinstalar.ps1") {

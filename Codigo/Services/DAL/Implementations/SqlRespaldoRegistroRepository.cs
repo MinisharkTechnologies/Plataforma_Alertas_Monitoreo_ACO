@@ -29,7 +29,9 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@Sano", r.Sano),
                 new SqlParameter("@Usuario", r.Usuario),
                 new SqlParameter("@Obs", r.Observaciones));
-            return Convert.ToInt32(id);
+            int idRespaldo = Convert.ToInt32(id);
+            IntegridadServices.FirmarFila("Respaldos", "Id", idRespaldo);
+            return idRespaldo;
         }
 
         /// <inheritdoc />
@@ -38,6 +40,7 @@ namespace Services.DAL.Implementations
             SqlHelper.EjecutarComando(
                 "UPDATE dbo.Respaldos SET Sano = @Sano, Observaciones = @Obs WHERE Id = @Id;", CommandType.Text,
                 new SqlParameter("@Sano", sano), new SqlParameter("@Obs", observaciones), new SqlParameter("@Id", id));
+            IntegridadServices.FirmarFila("Respaldos", "Id", id);
         }
 
         /// <inheritdoc />
@@ -52,7 +55,10 @@ namespace Services.DAL.Implementations
 
         /// <inheritdoc />
         public void Eliminar(int id)
-            => SqlHelper.EjecutarComando("DELETE FROM dbo.Respaldos WHERE Id = @Id;", CommandType.Text, new SqlParameter("@Id", id));
+        {
+            SqlHelper.EjecutarComando("DELETE FROM dbo.Respaldos WHERE Id = @Id;", CommandType.Text, new SqlParameter("@Id", id));
+            IntegridadServices.RecalcularTabla("Respaldos");
+        }
 
         private static List<RespaldoRegistro> Leer(string sql, params SqlParameter[] parametros)
         {

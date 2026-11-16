@@ -2,7 +2,8 @@
 //   OpenRIN.Herramientas.exe sembrar [contraseña-demo]   crea los usuarios y los datos de demostración (idempotente)
 //   OpenRIN.Herramientas.exe respaldo                    respaldo completo de ambas bases (COPY_ONLY + CHECKSUM + verificación)
 //   OpenRIN.Herramientas.exe respaldo-auto               respaldo diario: solo con datos sanos y si hoy no hay uno; conserva los 10 últimos
-//   OpenRIN.Herramientas.exe integridad                  auditoría de dígitos verificadores (DVH/DVV)
+//   OpenRIN.Herramientas.exe integridad                  auditoría de dígitos verificadores (DVH/DVV) de ambas bases
+//   OpenRIN.Herramientas.exe recalcular                  recalcula DVH/DVV de ambas bases (reparación auditada)
 using Negocio.BLL;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
@@ -33,8 +34,27 @@ if (comando == "integridad")
 {
     using var c = new NegocioDbContext();
     var r = new IntegridadLogic(c).Auditar();
-    Console.WriteLine(r.Problemas.Count == 0 ? "Integridad OK (" + r.TablasVerificadas.Count + " tablas)" : string.Join(Environment.NewLine, r.Problemas));
-    return r.Problemas.Count == 0 ? 0 : 2;
+    var rs = Services.BLL.IntegridadServicesLogic.Auditar();
+    bool negocioOk = r.Problemas.Count == 0;
+    bool servicesOk = rs.Problemas.Count == 0;
+    if (negocioOk && servicesOk)
+    {
+        Console.WriteLine("Integridad OK (Negocio: " + r.TablasVerificadas.Count + " tablas · Services: " + rs.FilasAuditadas + " filas en 7 tablas)");
+        return 0;
+    }
+    Console.WriteLine("Negocio: " + (negocioOk ? "OK" : string.Join(" | ", r.Problemas)));
+    Console.WriteLine("Services: " + (servicesOk ? "OK" : string.Join(" | ", rs.Problemas)));
+    return 2;
+}
+
+if (comando == "recalcular")
+{
+    using var c = new NegocioDbContext();
+    var r = new IntegridadLogic(c).RecalcularTodo();
+    var rs = Services.BLL.IntegridadServicesLogic.RecalcularTodo();
+    Console.WriteLine("DVH/DVV recalculados (reparación auditada): Negocio " + r + " filas · Services " + rs + " filas.");
+    Console.WriteLine("Verifique con: OpenRIN.Herramientas.exe integridad");
+    return 0;
 }
 
 string GenerarSecreto()

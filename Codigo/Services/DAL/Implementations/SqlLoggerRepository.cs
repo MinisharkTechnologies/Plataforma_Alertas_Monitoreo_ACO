@@ -17,12 +17,13 @@ namespace Services.DAL.Implementations
     {
         private const string InsertarSql = @"
             INSERT INTO dbo.Logs (Fecha, Nivel, Mensaje, Excepcion, Usuario, Capa)
+            OUTPUT INSERTED.Id
             VALUES (@Fecha, @Nivel, @Mensaje, @Excepcion, @Usuario, @Capa);";
 
         /// <inheritdoc />
         public void Registrar(LogEntry entrada)
         {
-            SqlHelper.EjecutarComando(
+            object? id = SqlHelper.EjecutarEscalar(
                 InsertarSql,
                 CommandType.Text,
                 new SqlParameter("@Fecha", entrada.Fecha),
@@ -31,6 +32,10 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@Excepcion", (object?)entrada.Excepcion ?? DBNull.Value),
                 new SqlParameter("@Usuario", (object?)entrada.Usuario ?? DBNull.Value),
                 new SqlParameter("@Capa", (object?)entrada.Capa ?? DBNull.Value));
+            if (id != null && id != DBNull.Value)
+            {
+                IntegridadServices.FirmarFila("Logs", "Id", Convert.ToInt32(id));
+            }
         }
 
         /// <summary>

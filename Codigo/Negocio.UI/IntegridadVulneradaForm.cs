@@ -275,8 +275,9 @@ namespace Negocio.UI
                 {
                     filas = new IntegridadLogic(contexto).RecalcularTodo();
                 }
-                BitacoraService.Warning($"Integridad — dígitos verificadores recalculados ({filas} filas): se aceptó el estado actual de los datos.", _sesion.NombreUsuario);
-                TerminarSiEstaSana(string.Format(T("integridad.rec.recalculada"), filas));
+                int filasServices = Services.BLL.IntegridadServicesLogic.RecalcularTodo();
+                BitacoraService.Warning($"Integridad — dígitos verificadores recalculados (Negocio: {filas} · Services: {filasServices} filas): se aceptó el estado actual de los datos.", _sesion.NombreUsuario);
+                TerminarSiEstaSana(string.Format(T("integridad.rec.recalculada"), $"Negocio: {filas} · Services: {filasServices}"));
             }
             catch (Exception ex)
             {

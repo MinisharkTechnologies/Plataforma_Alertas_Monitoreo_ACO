@@ -76,6 +76,7 @@ namespace Services.DAL.Implementations
                     new SqlParameter("@perfil", perfil),
                     new SqlParameter("@permiso", codigo));
             }
+            IntegridadServices.RecalcularTabla("PerfilesPermisos");
         }
     }
 }

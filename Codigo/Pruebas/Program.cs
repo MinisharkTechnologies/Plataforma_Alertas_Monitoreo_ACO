@@ -349,6 +349,7 @@ LocalizationService.GuardarTexto("es", "comun.guardar", "Guardar!!");
 Check("una leyenda corregida en la base pisa a la del .resx", LocalizationService.ObtenerTexto("comun.guardar") == "Guardar!!");
 LocalizationService.EliminarTexto("es", "comun.guardar");
 Check("al quitar la corrección la leyenda vuelve a modo degradado (clave)", LocalizationService.ObtenerTexto("comun.guardar") == "comun.guardar");
+LocalizationService.GuardarTexto("es", "comun.guardar", "Guardar");
 LocalizationService.RegistrarIdioma("pt", "Português (prueba)");
 LocalizationService.GuardarTexto("pt", "comun.guardar", "Salvar");
 LocalizationService.EstablecerIdioma("pt");

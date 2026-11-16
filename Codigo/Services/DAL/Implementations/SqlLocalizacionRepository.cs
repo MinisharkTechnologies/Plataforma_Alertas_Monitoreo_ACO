@@ -54,19 +54,25 @@ namespace Services.DAL.Implementations
 
         /// <summary>Registra un idioma nuevo (activo por defecto).</summary>
         public void RegistrarIdioma(string codigo, string nombre)
-            => SqlHelper.EjecutarComando(
+        {
+            SqlHelper.EjecutarComando(
                 "INSERT INTO dbo.Idiomas (Codigo, Nombre, Activo) VALUES (@codigo, @nombre, 1);",
                 CommandType.Text,
                 new SqlParameter("@codigo", codigo),
                 new SqlParameter("@nombre", nombre));
+            IntegridadServices.RecalcularTabla("Idiomas");
+        }
 
         /// <summary>Activa o desactiva un idioma.</summary>
         public void CambiarEstadoIdioma(string codigo, bool activo)
-            => SqlHelper.EjecutarComando(
+        {
+            SqlHelper.EjecutarComando(
                 "UPDATE dbo.Idiomas SET Activo = @activo WHERE Codigo = @codigo;",
                 CommandType.Text,
                 new SqlParameter("@activo", activo),
                 new SqlParameter("@codigo", codigo));
+            IntegridadServices.RecalcularTabla("Idiomas");
+        }
 
         /// <summary>Elimina un idioma junto con todos sus textos.</summary>
         public void EliminarIdioma(string codigo)
@@ -75,15 +81,18 @@ namespace Services.DAL.Implementations
                 "DELETE FROM dbo.Textos WHERE CodigoIdioma = @codigo;",
                 CommandType.Text,
                 new SqlParameter("@codigo", codigo));
+            IntegridadServices.RecalcularTabla("Textos");
             SqlHelper.EjecutarComando(
                 "DELETE FROM dbo.Idiomas WHERE Codigo = @codigo;",
                 CommandType.Text,
                 new SqlParameter("@codigo", codigo));
+            IntegridadServices.RecalcularTabla("Idiomas");
         }
 
         /// <summary>Inserta o actualiza el valor de una leyenda para un idioma (upsert).</summary>
         public void GuardarTexto(string codigoIdioma, string clave, string valor)
-            => SqlHelper.EjecutarComando(
+        {
+            SqlHelper.EjecutarComando(
                 "MERGE dbo.Textos AS destino " +
                 "USING (SELECT @codigo AS CodigoIdioma, @clave AS Clave) AS origen " +
                 "ON destino.CodigoIdioma = origen.CodigoIdioma AND destino.Clave = origen.Clave " +
@@ -93,13 +102,18 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@codigo", codigoIdioma),
                 new SqlParameter("@clave", clave),
                 new SqlParameter("@valor", valor));
+            IntegridadServices.RecalcularTabla("Textos");
+        }
 
         /// <summary>Elimina una leyenda de un idioma.</summary>
         public void EliminarTexto(string codigoIdioma, string clave)
-            => SqlHelper.EjecutarComando(
+        {
+            SqlHelper.EjecutarComando(
                 "DELETE FROM dbo.Textos WHERE CodigoIdioma = @codigo AND Clave = @clave;",
                 CommandType.Text,
                 new SqlParameter("@codigo", codigoIdioma),
                 new SqlParameter("@clave", clave));
+            IntegridadServices.RecalcularTabla("Textos");
+        }
     }
 }
