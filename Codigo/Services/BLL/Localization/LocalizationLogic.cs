@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Services.DAL.Implementations;
 using Services.DAL.Interfaces;
+using Services.DomainModel.Exceptions;
 using Services.DomainModel;
 
 namespace Services.BLL.Localization
@@ -76,7 +77,7 @@ namespace Services.BLL.Localization
             AsegurarCarga();
             if (string.IsNullOrWhiteSpace(codigoIdioma) || !_idiomas.Any(i => i.Codigo == codigoIdioma))
             {
-                throw new ArgumentException(
+                throw new DatoInvalidoException(
                     $"Idioma no soportado: '{codigoIdioma}'. Idiomas disponibles: {string.Join(", ", _idiomas.Select(i => i.Codigo))}.");
             }
 
@@ -109,16 +110,16 @@ namespace Services.BLL.Localization
         {
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                throw new ArgumentException("El código del idioma es obligatorio.");
+                throw new DatoInvalidoException("El código del idioma es obligatorio.");
             }
             if (string.IsNullOrWhiteSpace(nombre))
             {
-                throw new ArgumentException("El nombre del idioma es obligatorio.");
+                throw new DatoInvalidoException("El nombre del idioma es obligatorio.");
             }
             string limpio = codigo.Trim();
             if (Repositorio.ObtenerIdiomas().Any(i => string.Equals(i.Codigo, limpio, StringComparison.OrdinalIgnoreCase)))
             {
-                throw new ArgumentException($"Ya existe un idioma con el código '{limpio}'.");
+                throw new RegistroDuplicadoException($"Ya existe un idioma con el código '{limpio}'.");
             }
 
             Repositorio.RegistrarIdioma(limpio, nombre.Trim());
@@ -136,15 +137,15 @@ namespace Services.BLL.Localization
         {
             if (string.IsNullOrWhiteSpace(codigo))
             {
-                throw new ArgumentException("El código del idioma es obligatorio.");
+                throw new DatoInvalidoException("El código del idioma es obligatorio.");
             }
             if (string.Equals(codigo, IdiomaBase, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("El idioma base no puede eliminarse.");
+                throw new DatoInvalidoException("El idioma base no puede eliminarse.");
             }
             if (string.Equals(codigo, _idiomaActual, StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("No puede eliminarse el idioma que está activo en este momento.");
+                throw new DatoInvalidoException("No puede eliminarse el idioma que está activo en este momento.");
             }
 
             Repositorio.EliminarIdioma(codigo);
@@ -162,11 +163,11 @@ namespace Services.BLL.Localization
         {
             if (string.IsNullOrWhiteSpace(codigoIdioma))
             {
-                throw new ArgumentException("El código del idioma es obligatorio.");
+                throw new DatoInvalidoException("El código del idioma es obligatorio.");
             }
             if (string.IsNullOrWhiteSpace(clave))
             {
-                throw new ArgumentException("La clave de la leyenda es obligatoria.");
+                throw new DatoInvalidoException("La clave de la leyenda es obligatoria.");
             }
 
             Repositorio.GuardarTexto(codigoIdioma, clave.Trim(), valor ?? string.Empty);

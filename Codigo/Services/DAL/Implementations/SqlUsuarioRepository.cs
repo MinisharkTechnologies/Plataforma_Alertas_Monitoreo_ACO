@@ -11,7 +11,7 @@ namespace Services.DAL.Implementations
     /// <summary>
     /// Persistencia de usuarios y permisos en la base Services (ADO.NET, REQ-ARQ-006).
     /// </summary>
-    public class SqlUsuarioRepository : IUsuarioRepository
+    internal class SqlUsuarioRepository : IUsuarioRepository
     {
         private const string Columnas = @"
             Id, NombreUsuario, NombreCompleto, HashPassword, Perfil, Email,
@@ -69,7 +69,12 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@IntentosFallidos", usuario.IntentosFallidos),
                 new SqlParameter("@BloqueadoHasta", (object?)usuario.BloqueadoHasta ?? DBNull.Value));
 
-            return id == null || id == DBNull.Value ? 0 : Convert.ToInt32(id);
+            int idUsuario = id == null || id == DBNull.Value ? 0 : Convert.ToInt32(id);
+            if (idUsuario > 0)
+            {
+                IntegridadServices.FirmarFila("Usuarios", "Id", idUsuario);
+            }
+            return idUsuario;
         }
 
         /// <inheritdoc />
@@ -87,6 +92,7 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@IntentosFallidos", intentosFallidos),
                 new SqlParameter("@BloqueadoHasta", (object?)bloqueadoHasta ?? DBNull.Value),
                 new SqlParameter("@Id", idUsuario));
+            IntegridadServices.FirmarFila("Usuarios", "Id", idUsuario);
         }
 
         /// <inheritdoc />
@@ -99,6 +105,13 @@ namespace Services.DAL.Implementations
                 CommandType.Text,
                 new SqlParameter("@Activo", activo),
                 new SqlParameter("@NombreUsuario", nombreUsuario));
+            object? id = SqlHelper.EjecutarEscalar(
+                "SELECT Id FROM dbo.Usuarios WHERE NombreUsuario = @NombreUsuario;",
+                CommandType.Text, new SqlParameter("@NombreUsuario", nombreUsuario));
+            if (id != null && id != DBNull.Value)
+            {
+                IntegridadServices.FirmarFila("Usuarios", "Id", Convert.ToInt32(id));
+            }
         }
 
         /// <inheritdoc />
@@ -123,6 +136,7 @@ namespace Services.DAL.Implementations
                 CommandType.Text,
                 new SqlParameter("@HashPassword", hashPassword),
                 new SqlParameter("@Id", idUsuario));
+            IntegridadServices.FirmarFila("Usuarios", "Id", idUsuario);
         }
 
         /// <inheritdoc />

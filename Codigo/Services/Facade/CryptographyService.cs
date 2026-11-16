@@ -14,6 +14,17 @@ namespace Services.Facade
         /// <summary>Desencripta un texto cifrado previamente con <see cref="Encriptar"/>.</summary>
         public static string Desencriptar(string textoCifrado) => CryptographyLogic.Desencriptar(textoCifrado);
 
+        /// <summary>Encripta con AES-256 determinístico (mismo contexto + plaintext ⇒ mismo
+        /// ciphertext). Para campos con DVH: la firma es estable.
+        /// <param name="contexto">Identificador estable del campo (entidad:propiedad).</param></summary>
+        public static string EncriptarDeterminista(string contexto, string textoPlano)
+            => CryptographyLogic.EncriptarDeterminista(contexto, textoPlano);
+
+        /// <summary>Desencripta un texto cifrado con <see cref="EncriptarDeterminista"/>; sin el
+        /// marcador AES1$ devuelve el valor tal cual (legacy).</summary>
+        public static string DesencriptarDeterminista(string contexto, string textoCifrado)
+            => CryptographyLogic.DesencriptarDeterminista(contexto, textoCifrado);
+
         /// <summary>Hashea un texto (PBKDF2-SHA256 + sal). Irreversible: uso principal en contraseñas.</summary>
         public static string Hashear(string texto) => CryptographyLogic.Hashear(texto);
 

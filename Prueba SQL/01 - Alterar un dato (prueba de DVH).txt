@@ -1,0 +1,36 @@
+﻿SET QUOTED_IDENTIFIER ON;
+-- PRUEBA DVH: modifica un dato "por fuera" del sistema (sin recalcular su dígito verificador).
+-- Ejecutar con OpenRIN CERRADO. Para deshacer: archivo 02.
+
+-- Antes (anote el valor):
+SELECT Id, NombreCompleto FROM OpenRIN_Negocio.dbo.Pacientes
+WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.Pacientes);
+
+UPDATE OpenRIN_Negocio.dbo.Pacientes
+SET NombreCompleto = NombreCompleto + N' (ALTERADO)'
+WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.Pacientes);
+
+-- Después:
+SELECT Id, NombreCompleto FROM OpenRIN_Negocio.dbo.Pacientes
+WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.Pacientes);
+
+-- Resultado esperado al abrir OpenRIN: "Alerta de integridad de los datos" con la tabla Pacientes
+-- y el registro modificado (el DVH guardado no coincide con sus datos).
+
+
+-- ---------------------------------------------------------------------------
+-- OTRAS VARIANTES (quitar los -- para usarlas; cada una se deshace con la consulta inversa):
+
+-- Alterar otro dato del mismo paciente:
+-- UPDATE OpenRIN_Negocio.dbo.Pacientes SET Telefono = Telefono + N'0'
+-- WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.Pacientes);
+-- Para deshacer:
+-- UPDATE OpenRIN_Negocio.dbo.Pacientes SET Telefono = LEFT(Telefono, LEN(Telefono) - 1)
+-- WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.Pacientes);
+
+-- Alterar un dato de otra tabla (obras sociales):
+-- UPDATE OpenRIN_Negocio.dbo.ObrasSociales SET Nombre = Nombre + N' (ALTERADO)'
+-- WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.ObrasSociales);
+-- Para deshacer:
+-- UPDATE OpenRIN_Negocio.dbo.ObrasSociales SET Nombre = REPLACE(Nombre, N' (ALTERADO)', N'')
+-- WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.ObrasSociales);

@@ -1,0 +1,9 @@
+{
+  "name": "openrin-diagramas",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@hpcc-js/wasm": "2.36.0",
+    "mupdf": "1.28.1"
+  }
+}

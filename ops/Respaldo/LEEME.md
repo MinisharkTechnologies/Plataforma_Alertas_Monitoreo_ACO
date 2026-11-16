@@ -49,3 +49,8 @@ schtasks /Query /TN "OpenRIN - Respaldo Nocturno" /V /FO LIST   # ver Ultimo res
   puesta en producción.
 - Complemento en la aplicación: la bitácora interna registra los respaldos lanzados desde
   la propia plataforma (REQ-ARQ-005); este mecanismo cubre el caso "sin aplicación abierta".
+- **Nombre de tarea:** la tarea instalada por el instalador oficial de OpenRIN
+  (`Instalador\Instalar.ps1`) se registra como **"OpenRIN - Respaldo Nocturno (app)"**
+  (como SYSTEM, con `OpenRIN.Herramientas.exe respaldo-auto`). Esta del repositorio es
+  distinta y no colisionan: son mecanismos equivalentes con distinto privilegio. Si vas a
+  reinstalar la app en este equipo, elegí uno de los dos o renombrá uno de los dos.

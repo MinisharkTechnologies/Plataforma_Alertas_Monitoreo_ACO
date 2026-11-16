@@ -10,19 +10,20 @@ namespace Services.DAL.Implementations
 {
     /// <summary>
     /// Persiste entradas de bitácora en la tabla Logs de la base Services (ADO.NET, REQ-ARQ-003).
-    /// En caso de error técnico lanza <see cref="Services.DomainModel.Exceptions.DataAccessException"/>.
+    /// En caso de error técnico lanza <see cref="Services.DomainModel.Exceptions.AccesoADatosException"/>.
     /// Expone también la consulta de las últimas entradas (pantalla de administración).
     /// </summary>
-    public class SqlLoggerRepository : ILoggerRepository
+    internal class SqlLoggerRepository : ILoggerConsultaRepository
     {
         private const string InsertarSql = @"
             INSERT INTO dbo.Logs (Fecha, Nivel, Mensaje, Excepcion, Usuario, Capa)
+            OUTPUT INSERTED.Id
             VALUES (@Fecha, @Nivel, @Mensaje, @Excepcion, @Usuario, @Capa);";
 
         /// <inheritdoc />
         public void Registrar(LogEntry entrada)
         {
-            SqlHelper.EjecutarComando(
+            object? id = SqlHelper.EjecutarEscalar(
                 InsertarSql,
                 CommandType.Text,
                 new SqlParameter("@Fecha", entrada.Fecha),
@@ -31,6 +32,10 @@ namespace Services.DAL.Implementations
                 new SqlParameter("@Excepcion", (object?)entrada.Excepcion ?? DBNull.Value),
                 new SqlParameter("@Usuario", (object?)entrada.Usuario ?? DBNull.Value),
                 new SqlParameter("@Capa", (object?)entrada.Capa ?? DBNull.Value));
+            if (id != null && id != DBNull.Value)
+            {
+                IntegridadServices.FirmarFila("Logs", "Id", Convert.ToInt32(id));
+            }
         }
 
         /// <summary>

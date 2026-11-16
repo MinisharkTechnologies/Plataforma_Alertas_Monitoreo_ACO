@@ -53,7 +53,7 @@ namespace Negocio.DAL.Context
                 string? cadena = ConfigurationManager.ConnectionStrings["NegocioDB"]?.ConnectionString;
                 if (string.IsNullOrWhiteSpace(cadena))
                 {
-                    throw new InvalidOperationException(
+                    throw new Services.DomainModel.Exceptions.ConfiguracionInvalidaException(
                         "Falta la cadena de conexión 'NegocioDB' en la configuración de la aplicación.");
                 }
                 optionsBuilder.UseSqlServer(cadena);
@@ -312,7 +312,13 @@ namespace Negocio.DAL.Context
                 entidad.Property(e => e.Tipo).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(e => e.Gravedad).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(e => e.Descripcion).IsRequired();
+                entidad.Property(e => e.Descripcion).HasMaxLength(4000);
+                entidad.Property(e => e.Descripcion).HasConversion(
+                    Negocio.DAL.Conversores.CifradoDeterministico.Para("EventoAdverso:Descripcion"));
                 entidad.Property(e => e.AccionTomada).IsRequired();
+                entidad.Property(e => e.AccionTomada).HasMaxLength(4000);
+                entidad.Property(e => e.AccionTomada).HasConversion(
+                    Negocio.DAL.Conversores.CifradoDeterministico.Para("EventoAdverso:AccionTomada"));
                 entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(e => e.Paciente).WithMany().HasForeignKey(e => e.IdPaciente)
@@ -340,8 +346,13 @@ namespace Negocio.DAL.Context
                 entidad.Property(a => a.NivelCriticidad).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(a => a.Estado).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(a => a.Descripcion).IsRequired();
-                entidad.Property(a => a.AccionResolucion).HasMaxLength(1000);
-                entidad.Property<string>("DVH").HasMaxLength(128);
+            entidad.Property(a => a.Descripcion).HasMaxLength(4000);
+            entidad.Property(a => a.Descripcion).HasConversion(
+                Negocio.DAL.Conversores.CifradoDeterministico.Para("Alerta:Descripcion"));
+            entidad.Property(a => a.AccionResolucion).HasMaxLength(4000);
+            entidad.Property(a => a.AccionResolucion).HasConversion(
+                Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Alerta:AccionResolucion"));
+            entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(a => a.Paciente).WithMany().HasForeignKey(a => a.IdPaciente)
                     .OnDelete(DeleteBehavior.Restrict);
@@ -354,7 +365,9 @@ namespace Negocio.DAL.Context
             {
                 entidad.ToTable("Turnos");
                 entidad.Property(t => t.Estado).HasConversion<string>().HasMaxLength(30);
-                entidad.Property(t => t.Observaciones).HasMaxLength(1000);
+                entidad.Property(t => t.Observaciones).HasMaxLength(4000);
+                entidad.Property(t => t.Observaciones).HasConversion(
+                    Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Turno:Observaciones"));
                 entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(t => t.Paciente).WithMany().HasForeignKey(t => t.IdPaciente)
@@ -368,8 +381,12 @@ namespace Negocio.DAL.Context
                 entidad.Property(s => s.TipoContacto).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(s => s.Resultado).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(s => s.DecisionClinica).HasConversion<string>().HasMaxLength(30);
-                entidad.Property(s => s.Observaciones).HasMaxLength(1000);
-                entidad.Property(s => s.DetalleDecision).HasMaxLength(1000);
+                entidad.Property(s => s.Observaciones).HasMaxLength(4000);
+                entidad.Property(s => s.Observaciones).HasConversion(
+                    Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Seguimiento:Observaciones"));
+                entidad.Property(s => s.DetalleDecision).HasMaxLength(4000);
+                entidad.Property(s => s.DetalleDecision).HasConversion(
+                    Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Seguimiento:DetalleDecision"));
                 entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(s => s.Paciente).WithMany().HasForeignKey(s => s.IdPaciente)
@@ -404,6 +421,17 @@ namespace Negocio.DAL.Context
             });
 
             // ---------- Datos semilla ----------
+            // ---------- Referencias a Usuarios (integridad referencial) ----------
+            // Las columnas que identifican a la persona que operó (médico asignado, usuario del portal,
+            // quien registra o resuelve) son claves foráneas hacia Usuarios, con borrado restringido.
+            modelBuilder.Entity<Paciente>().HasOne<Usuario>().WithMany().HasForeignKey(p => p.IdUsuarioPortal).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MedicionRIN>().HasOne<Usuario>().WithMany().HasForeignKey(m => m.IdUsuarioRegistro).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Alerta>().HasOne<Usuario>().WithMany().HasForeignKey(a => a.IdUsuarioResolucion).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Turno>().HasOne<Usuario>().WithMany().HasForeignKey(t => t.IdUsuarioMedico).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Seguimiento>().HasOne<Usuario>().WithMany().HasForeignKey(x => x.IdUsuarioRegistro).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Seguimiento>().HasOne<Usuario>().WithMany().HasForeignKey(x => x.IdUsuarioDecision).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<EventoAdverso>().HasOne<Usuario>().WithMany().HasForeignKey(e => e.IdUsuarioRegistro).OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<ObraSocial>().HasData(
                 new ObraSocial { Id = 1, Nombre = "OSDE", Activo = true },
                 new ObraSocial { Id = 2, Nombre = "Swiss Medical", Activo = true },

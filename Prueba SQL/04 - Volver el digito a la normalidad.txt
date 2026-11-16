@@ -1,0 +1,9 @@
+﻿SET QUOTED_IDENTIFIER ON;
+-- Deshace el archivo 03: vuelve a invertir el dígito (invertido dos veces queda igual que al principio).
+-- Ejecutar UNA SOLA VEZ y con OpenRIN CERRADO.
+
+UPDATE OpenRIN_Negocio.dbo.DigitosVerificadores
+SET DVV = REVERSE(DVV)
+WHERE NombreTabla = N'Pacientes';
+
+SELECT NombreTabla, DVV FROM OpenRIN_Negocio.dbo.DigitosVerificadores WHERE NombreTabla = N'Pacientes';

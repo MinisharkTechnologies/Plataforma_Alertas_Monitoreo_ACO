@@ -1,0 +1,10 @@
+﻿SET QUOTED_IDENTIFIER ON;
+-- Deshace el archivo 01: deja el dato exactamente como estaba, así su dígito verificador vuelve a coincidir.
+-- Ejecutar con OpenRIN CERRADO.
+
+UPDATE OpenRIN_Negocio.dbo.Pacientes
+SET NombreCompleto = REPLACE(NombreCompleto, N' (ALTERADO)', N'')
+WHERE NombreCompleto LIKE N'% (ALTERADO)';
+
+SELECT Id, NombreCompleto FROM OpenRIN_Negocio.dbo.Pacientes
+WHERE Id = (SELECT MIN(Id) FROM OpenRIN_Negocio.dbo.Pacientes);

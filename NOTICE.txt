@@ -1,0 +1,35 @@
+OpenRIN — Plataforma Integral de Alertas y Monitoreo para Pacientes Anticoagulados
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés
+
+   Este programa es software libre: usted puede redistribuirlo y/o modificarlo
+   bajo los términos de la GNU General Public License publicada por la Free
+   Software Foundation, bien en su versión 3 de la licencia, o bien (a su
+   elección) con cualquier versión posterior.
+   Este programa se distribuye con la esperanza de que sea útil, pero SIN
+   NINGUNA GARANTÍA; sin siquiera la garantía implícita de COMERCIALIZACIÓN o
+   IDONEIDAD PARA UN PROPÓSITO PARTICULAR. Consulte la GNU General Public
+   License para más detalles, en el archivo LICENSE de este repositorio.
+
+========================================================================
+AVISOS DE TERCEROS (las dependencias conservan sus propias licencias):
+========================================================================
+
+- QuestPDF (Motor de renderizado PDF) — Community License (gratuita para
+  proyectos de código abierto y entidades pequeñas); permanece bajo la
+  licencia de sus autores. https://www.questpdf.com/licensing
+- SkiaSharp / libSkiaSharp / HarfBuzzSharp — MIT (Spencer Lee, Aprica,
+  QuestPDF). Renderizado 2D y tipografías.
+- Microsoft.Data.SqlClient — MIT (Microsoft). Cliente ADO.NET de SQL Server.
+- Microsoft.EntityFrameworkCore / Microsoft.EntityFrameworkCore.SqlServer /
+  Microsoft.EntityFrameworkCore.Design (8.0.31) — MIT (.NET Foundation).
+- System.Configuration.ConfigurationManager / System.Security.Cryptography.
+  ProtectedData (10.0.12) — MIT (.NET Foundation).
+- .NET 8 (Windows Desktop Runtime) — MIT (.NET Foundation).
+- isotipo "openrin" generado por el propio proyecto (Sin terceros).
+
+Las dependencias NuGet se fijan a las versiones indicadas en los archivos
+.csproj. Para una distribución binaria acompañada de correspondencia, las
+fuentes de las dependencias están disponibles públicamente en NuGet.org.
+
+Este archivo no sustituye ni modifica los términos de licencia de ningún
+tercero.

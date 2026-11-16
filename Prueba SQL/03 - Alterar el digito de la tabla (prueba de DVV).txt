@@ -1,0 +1,14 @@
+﻿SET QUOTED_IDENTIFIER ON;
+-- PRUEBA DVV: invierte el dígito verificador VERTICAL de la tabla Pacientes (los datos no se tocan).
+-- Ejecutar con OpenRIN CERRADO. Para deshacer: archivo 04.
+
+SELECT NombreTabla, DVV FROM OpenRIN_Negocio.dbo.DigitosVerificadores WHERE NombreTabla = N'Pacientes';
+
+UPDATE OpenRIN_Negocio.dbo.DigitosVerificadores
+SET DVV = REVERSE(DVV)
+WHERE NombreTabla = N'Pacientes';
+
+SELECT NombreTabla, DVV FROM OpenRIN_Negocio.dbo.DigitosVerificadores WHERE NombreTabla = N'Pacientes';
+
+-- Resultado esperado al abrir OpenRIN: "Alerta de integridad de los datos" indicando que el
+-- dígito verificador de la tabla Pacientes (DVV) no coincide.

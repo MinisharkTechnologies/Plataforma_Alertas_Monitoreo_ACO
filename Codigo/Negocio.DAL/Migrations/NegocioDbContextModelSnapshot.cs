@@ -31,8 +31,8 @@ namespace Negocio.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AccionResolucion")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("DVH")
                         .HasMaxLength(128)
@@ -40,7 +40,8 @@ namespace Negocio.DAL.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<bool>("EscaladaAMedico")
                         .HasColumnType("bit");
@@ -88,6 +89,8 @@ namespace Negocio.DAL.Migrations
                     b.HasIndex("IdMedicion");
 
                     b.HasIndex("IdPaciente");
+
+                    b.HasIndex("IdUsuarioResolucion");
 
                     b.ToTable("Alertas", (string)null);
                 });
@@ -242,7 +245,8 @@ namespace Negocio.DAL.Migrations
 
                     b.Property<string>("AccionTomada")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("DVH")
                         .HasMaxLength(128)
@@ -250,7 +254,8 @@ namespace Negocio.DAL.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
@@ -277,6 +282,8 @@ namespace Negocio.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdPaciente");
+
+                    b.HasIndex("IdUsuarioRegistro");
 
                     b.ToTable("EventosAdversos", (string)null);
                 });
@@ -382,6 +389,8 @@ namespace Negocio.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdPaciente");
+
+                    b.HasIndex("IdUsuarioRegistro");
 
                     b.ToTable("MedicionesRIN", (string)null);
                 });
@@ -511,6 +520,8 @@ namespace Negocio.DAL.Migrations
 
                     b.HasIndex("IdObraSocial");
 
+                    b.HasIndex("IdUsuarioPortal");
+
                     b.ToTable("Pacientes", (string)null);
                 });
 
@@ -574,8 +585,8 @@ namespace Negocio.DAL.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("DetalleDecision")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<DateTime?>("FechaDecision")
                         .HasColumnType("datetime2");
@@ -593,8 +604,8 @@ namespace Negocio.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Observaciones")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.Property<string>("Resultado")
                         .IsRequired()
@@ -609,6 +620,10 @@ namespace Negocio.DAL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdPaciente");
+
+                    b.HasIndex("IdUsuarioDecision");
+
+                    b.HasIndex("IdUsuarioRegistro");
 
                     b.ToTable("Seguimientos", (string)null);
                 });
@@ -643,12 +658,14 @@ namespace Negocio.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Observaciones")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("IdPaciente");
+
+                    b.HasIndex("IdUsuarioMedico");
 
                     b.ToTable("Turnos", (string)null);
                 });
@@ -726,6 +743,11 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioResolucion")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Medicion");
 
                     b.Navigation("Paciente");
@@ -738,6 +760,11 @@ namespace Negocio.DAL.Migrations
                         .HasForeignKey("IdPaciente")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioRegistro")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Paciente");
                 });
@@ -768,6 +795,11 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioRegistro")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Paciente");
                 });
 
@@ -776,6 +808,11 @@ namespace Negocio.DAL.Migrations
                     b.HasOne("Negocio.DomainModel.ObraSocial", "ObraSocial")
                         .WithMany()
                         .HasForeignKey("IdObraSocial")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioPortal")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("ObraSocial");
@@ -789,6 +826,16 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioDecision")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioRegistro")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Paciente");
                 });
 
@@ -797,6 +844,12 @@ namespace Negocio.DAL.Migrations
                     b.HasOne("Negocio.DomainModel.Paciente", "Paciente")
                         .WithMany()
                         .HasForeignKey("IdPaciente")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("IdUsuarioMedico")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
