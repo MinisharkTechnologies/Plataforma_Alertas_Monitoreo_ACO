@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
 namespace Services.DAL.Tools
@@ -74,11 +75,15 @@ namespace Services.DAL.Tools
         /// <summary>Recalcula los DVH de todas las filas y el DVV de todas las tablas (reparación auditada).</summary>
         public static int RecalcularTodo()
         {
+            // Paralelización a nivel de tabla: cada tabla abre su propia conexión y se firma
+            // de forma independiente (7 tablas en 7 conexiones ~= 7× throughput en la lectura).
+            // Conexiones independientes → sin enlistamiento transaccional entre ellas.
             int firmadas = 0;
-            foreach (TablaConfig tabla in Tablas)
+            Parallel.ForEach(Tablas, new ParallelOptions { MaxDegreeOfParallelism = 4 }, tabla =>
             {
-                firmadas += RecalcularTabla(tabla);
-            }
+                int f = RecalcularTabla(tabla);
+                System.Threading.Interlocked.Add(ref firmadas, f);
+            });
             return firmadas;
         }
 
@@ -87,20 +92,23 @@ namespace Services.DAL.Tools
         {
             var problemas = new List<string>();
             int filas = 0;
-            foreach (TablaConfig tabla in Tablas)
+            // 7 tablas en paralelo sobre 4 hilos máx.; cada tabla es solo-lectura durante la auditoría
+            var lck = new object();
+            Parallel.ForEach(Tablas, new ParallelOptions { MaxDegreeOfParallelism = 4 }, tabla =>
             {
-                // Cuento filas leídas por tabla para el reporte (a modo de diagnóstico).
-                var r = AuditarTablaConteo(tabla, problemas);
-                filas += r;
-            }
+                List<string> probs = AuditarTabla(tabla);
+                int n = Contar(tabla);
+                lock (lck)
+                {
+                    filas += n;
+                    problemas.AddRange(probs);
+                }
+            });
             return (problemas, filas);
         }
 
-        private static int AuditarTablaConteo(TablaConfig tabla, List<string> problemasAcumulador)
+        private static int Contar(TablaConfig tabla)
         {
-            List<string> probs = AuditarTabla(tabla);
-            problemasAcumulador.AddRange(probs);
-            // Cuento simple para el informe: lectura rápida de filas (ya se hace dentro de AuditarTabla).
             using SqlDataReader lector = SqlHelper.EjecutarLector(
                 $"SELECT COUNT(*) FROM [{tabla.Nombre}];", CommandType.Text);
             return lector.Read() ? Convert.ToInt32(lector.GetValue(0)) : 0;
