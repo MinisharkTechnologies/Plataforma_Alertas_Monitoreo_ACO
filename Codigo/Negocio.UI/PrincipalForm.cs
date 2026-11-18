@@ -57,6 +57,9 @@ namespace Negocio.UI
             {
                 Icon = icono;
             }
+            // El logo se carga en ejecucion: dentro de InitializeComponent el disenador
+            // de Visual Studio no puede procesar una llamada a un metodo.
+            _picLogo.Image = Recursos.CargarIcono(64)?.ToBitmap();
             ConstruirMenu();
             AplicarTextos();
             VerificarIntegridad();

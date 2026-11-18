@@ -63,7 +63,6 @@ namespace Negocio.UI
             // _picLogo
             // 
             this._picLogo.BackColor = System.Drawing.Color.Transparent;
-            this._picLogo.Image = Recursos.CargarIcono(64)?.ToBitmap();
             this._picLogo.Location = new System.Drawing.Point(22, 13);
             this._picLogo.Name = "_picLogo";
             this._picLogo.Size = new System.Drawing.Size(46, 46);
