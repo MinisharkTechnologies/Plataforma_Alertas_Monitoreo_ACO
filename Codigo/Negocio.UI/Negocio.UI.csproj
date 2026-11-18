@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
@@ -24,6 +24,14 @@
     <PackageReference Include="QuestPDF" Version="2026.9.0" />
   </ItemGroup>
 
+  <!-- Formularios y controles con diseñador: Visual Studio los reconoce como tales y anida
+       el archivo .Designer.cs debajo del .cs en el Explorador de soluciones, habilitando
+       la vista de diseño (arrastrar y soltar controles desde el Cuadro de herramientas). -->
+  <ItemGroup>
+    <Compile Update="LoginForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="LoginForm.Designer.cs"><DependentUpon>LoginForm.cs</DependentUpon></Compile>
+  </ItemGroup>
+
   <PropertyGroup>
     <ApplicationIcon>openrin.ico</ApplicationIcon>
     <OutputType>WinExe</OutputType>
@@ -32,5 +40,53 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <!-- Formularios y controles con diseniador: Visual Studio los reconoce como tales y anida
+       el archivo .Designer.cs debajo del .cs en el Explorador de soluciones, habilitando
+       la vista de disenio (arrastrar y soltar controles desde el Cuadro de herramientas). -->
+  <ItemGroup>
+    <Compile Update="AgendaControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="AgendaControl.Designer.cs"><DependentUpon>AgendaControl.cs</DependentUpon></Compile>
+    <Compile Update="AgendarTurnoForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="AgendarTurnoForm.Designer.cs"><DependentUpon>AgendarTurnoForm.cs</DependentUpon></Compile>
+    <Compile Update="CredencialesPortalForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="CredencialesPortalForm.Designer.cs"><DependentUpon>CredencialesPortalForm.cs</DependentUpon></Compile>
+    <Compile Update="EventoAdversoForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="EventoAdversoForm.Designer.cs"><DependentUpon>EventoAdversoForm.cs</DependentUpon></Compile>
+    <Compile Update="EventosAdversosControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="EventosAdversosControl.Designer.cs"><DependentUpon>EventosAdversosControl.cs</DependentUpon></Compile>
+    <Compile Update="HistoriaClinicaForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="HistoriaClinicaForm.Designer.cs"><DependentUpon>HistoriaClinicaForm.cs</DependentUpon></Compile>
+    <Compile Update="IdiomaNuevoForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="IdiomaNuevoForm.Designer.cs"><DependentUpon>IdiomaNuevoForm.cs</DependentUpon></Compile>
+    <Compile Update="IntegridadVulneradaForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="IntegridadVulneradaForm.Designer.cs"><DependentUpon>IntegridadVulneradaForm.cs</DependentUpon></Compile>
+    <Compile Update="LoginForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="LoginForm.Designer.cs"><DependentUpon>LoginForm.cs</DependentUpon></Compile>
+    <Compile Update="PacienteEditorForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="PacienteEditorForm.Designer.cs"><DependentUpon>PacienteEditorForm.cs</DependentUpon></Compile>
+    <Compile Update="PacientesControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="PacientesControl.Designer.cs"><DependentUpon>PacientesControl.cs</DependentUpon></Compile>
+    <Compile Update="PanelTriajeControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="PanelTriajeControl.Designer.cs"><DependentUpon>PanelTriajeControl.cs</DependentUpon></Compile>
+    <Compile Update="PortalControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="PortalControl.Designer.cs"><DependentUpon>PortalControl.cs</DependentUpon></Compile>
+    <Compile Update="PrincipalForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="PrincipalForm.Designer.cs"><DependentUpon>PrincipalForm.cs</DependentUpon></Compile>
+    <Compile Update="RecepcionRINControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="RecepcionRINControl.Designer.cs"><DependentUpon>RecepcionRINControl.cs</DependentUpon></Compile>
+    <Compile Update="RecuperacionForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="RecuperacionForm.Designer.cs"><DependentUpon>RecuperacionForm.cs</DependentUpon></Compile>
+    <Compile Update="ReportesControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="ReportesControl.Designer.cs"><DependentUpon>ReportesControl.cs</DependentUpon></Compile>
+    <Compile Update="SeguimientoControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="SeguimientoControl.Designer.cs"><DependentUpon>SeguimientoControl.cs</DependentUpon></Compile>
+    <Compile Update="SistemaControl.cs"><SubType>UserControl</SubType></Compile>
+    <Compile Update="SistemaControl.Designer.cs"><DependentUpon>SistemaControl.cs</DependentUpon></Compile>
+    <Compile Update="TextoDialogoForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="TextoDialogoForm.Designer.cs"><DependentUpon>TextoDialogoForm.cs</DependentUpon></Compile>
+    <Compile Update="UsuarioNuevoForm.cs"><SubType>Form</SubType></Compile>
+    <Compile Update="UsuarioNuevoForm.Designer.cs"><DependentUpon>UsuarioNuevoForm.cs</DependentUpon></Compile>
+  </ItemGroup>
 
 </Project>

@@ -12,22 +12,25 @@ namespace Negocio.UI
     /// visuales (colores por criticidad, alerta activa y tendencia peligrosa).
     /// Se refresca automáticamente cada 30 segundos y de forma manual con "Actualizar".
     /// </summary>
-    public class PanelTriajeControl : UserControl
+    public partial class PanelTriajeControl : UserControl
     {
-        private readonly Button _btnActualizar = new();
-        private readonly Label _lblRefresco = new();
-        private readonly DataGridView _grilla = new();
-        private readonly FlowLayoutPanel _panelLeyenda = new();
-        private readonly System.Windows.Forms.Timer _temporizador = new();
+        // Los controles que se ven en pantalla se declaran en PanelTriajeControl.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
 
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
         public PanelTriajeControl()
         {
-            ConstruirInterfaz();
+            InitializeComponent();
+
+            // En tiempo de diseño (diseñador de Visual Studio) no se toca la base de datos:
+            // alcanza con que los controles se hayan creado para que el control se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             AplicarTextos();
             CargarDatos();
-
-            _temporizador.Interval = 30_000;
-            _temporizador.Tick += (s, e) => CargarDatos();
             _temporizador.Start();
         }
 
@@ -50,91 +53,11 @@ namespace Negocio.UI
             CargarDatos();
         }
 
-        private void ConstruirInterfaz()
-        {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
+        // Manejadores de eventos de la interfaz (se conectan desde PanelTriajeControl.Designer.cs).
 
-            // ---- Barra superior: botón actualizar + sello de refresco ----
-            var panelBarra = new Panel { Dock = DockStyle.Top, Height = 46, BackColor = BackColor };
+        private void BtnActualizar_Click(object? sender, EventArgs e) => CargarDatos();
 
-            _btnActualizar.Location = new Point(0, 4);
-            _btnActualizar.Size = new Size(130, 34);
-            _btnActualizar.FlatStyle = FlatStyle.Flat;
-            _btnActualizar.FlatAppearance.BorderSize = 0;
-            _btnActualizar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnActualizar.ForeColor = Color.White;
-            _btnActualizar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            _btnActualizar.Cursor = Cursors.Hand;
-            _btnActualizar.Click += (s, e) => CargarDatos();
-
-            _lblRefresco.AutoSize = true;
-            _lblRefresco.Location = new Point(146, 12);
-            _lblRefresco.Font = new Font("Segoe UI", 9F);
-            _lblRefresco.ForeColor = Color.FromArgb(90, 110, 135);
-
-            panelBarra.Controls.Add(_btnActualizar);
-            panelBarra.Controls.Add(_lblRefresco);
-
-            // ---- Leyenda inferior ----
-            _panelLeyenda.Dock = DockStyle.Bottom;
-            _panelLeyenda.Height = 44;
-            _panelLeyenda.FlowDirection = FlowDirection.LeftToRight;
-            _panelLeyenda.WrapContents = false;
-            _panelLeyenda.BackColor = BackColor;
-            _panelLeyenda.Padding = new Padding(0, 8, 0, 0);
-
-            // ---- Grilla principal ----
-            _grilla.Dock = DockStyle.Fill;
-            _grilla.ReadOnly = true;
-            _grilla.AllowUserToAddRows = false;
-            _grilla.AllowUserToDeleteRows = false;
-            _grilla.AllowUserToResizeRows = false;
-            _grilla.RowHeadersVisible = false;
-            _grilla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            _grilla.MultiSelect = false;
-            _grilla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            _grilla.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None;
-            _grilla.BackgroundColor = Color.White;
-            _grilla.BorderStyle = BorderStyle.None;
-            _grilla.GridColor = Color.FromArgb(225, 235, 245);
-            _grilla.EnableHeadersVisualStyles = false;
-            _grilla.ColumnHeadersHeight = 38;
-            _grilla.RowTemplate.Height = 34;
-            _grilla.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            _grilla.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            _grilla.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            _grilla.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            _grilla.DefaultCellStyle.Font = new Font("Segoe UI", 11F);
-            _grilla.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            _grilla.DefaultCellStyle.SelectionForeColor = Color.Black;
-            _grilla.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            _grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-
-            _grilla.Columns.Add("paciente", "");
-            _grilla.Columns.Add("documento", "");
-            _grilla.Columns.Add("ultimoRin", "");
-            _grilla.Columns.Add("fecha", "");
-            _grilla.Columns.Add("dias", "");
-            _grilla.Columns.Add("criticidad", "");
-            _grilla.Columns.Add("alerta", "");
-            _grilla.Columns["paciente"].FillWeight = 34;
-            _grilla.Columns["documento"].FillWeight = 16;
-            _grilla.Columns["ultimoRin"].FillWeight = 12;
-            _grilla.Columns["fecha"].FillWeight = 14;
-            _grilla.Columns["dias"].FillWeight = 14;
-            _grilla.Columns["criticidad"].FillWeight = 18;
-            _grilla.Columns["alerta"].FillWeight = 8;
-            _grilla.Columns["ultimoRin"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            _grilla.Columns["dias"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            _grilla.Columns["criticidad"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            _grilla.Columns["alerta"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-            Controls.Add(_grilla);
-            Controls.Add(panelBarra);
-            Controls.Add(_panelLeyenda);
-        }
+        private void Temporizador_Tick(object? sender, EventArgs e) => CargarDatos();
 
         private void AplicarTextos()
         {

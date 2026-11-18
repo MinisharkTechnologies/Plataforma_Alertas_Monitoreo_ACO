@@ -13,24 +13,30 @@ namespace Negocio.UI
     /// consulta de sus eventos registrados (o de los últimos eventos de todos los pacientes)
     /// y alta de nuevos incidentes con tipo, gravedad, descripción y acción tomada.
     /// </summary>
-    public class EventosAdversosControl : UserControl
+    public partial class EventosAdversosControl : UserControl
     {
-        private readonly string _nombreUsuario;
+        private readonly string _nombreUsuario = string.Empty;
 
-        private readonly Label _lblDni = new();
-        private readonly TextBox _txtDni = new();
-        private readonly Button _btnBuscar = new();
-        private readonly Label _lblPaciente = new();
-        private readonly Button _btnRegistrar = new();
-        private readonly DataGridView _grilla = new();
-        private readonly Label _lblSinEventos = new();
-
+        // Los controles de la interfaz se declaran en EventosAdversosControl.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
         private Paciente? _pacienteActual;
 
-        public EventosAdversosControl(string nombreUsuario)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public EventosAdversosControl()
+        {
+            InitializeComponent();
+        }
+
+        public EventosAdversosControl(string nombreUsuario) : this()
         {
             _nombreUsuario = nombreUsuario;
-            ConstruirInterfaz();
+
+            // En tiempo de diseño no se toca la base de datos.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             AplicarTextos();
             Recargar();
         }
@@ -57,119 +63,21 @@ namespace Negocio.UI
             Recargar();
         }
 
-        private void ConstruirInterfaz()
+        /// <summary>Busca al paciente al presionar Enter en el campo de DNI.</summary>
+        private void TxtDni_KeyDown(object? sender, KeyEventArgs e)
         {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
-
-            // ---- Barra superior ----
-            var panelBarra = new Panel { Dock = DockStyle.Top, Height = 64, BackColor = BackColor };
-
-            _lblDni.Location = new Point(0, 4);
-            _lblDni.Size = new Size(320, 18);
-            _lblDni.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblDni.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _txtDni.Name = "txtDniEvento";
-            _txtDni.Location = new Point(0, 24);
-            _txtDni.Size = new Size(180, 28);
-            _txtDni.Font = new Font("Segoe UI", 11F);
-            _txtDni.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; BuscarPaciente(); } };
-
-            _btnBuscar.Location = new Point(190, 23);
-            _btnBuscar.Size = new Size(110, 30);
-            _btnBuscar.FlatStyle = FlatStyle.Flat;
-            _btnBuscar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnBuscar.ForeColor = Color.White;
-            _btnBuscar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnBuscar.FlatAppearance.BorderSize = 0;
-            _btnBuscar.Cursor = Cursors.Hand;
-            _btnBuscar.Click += (s, e) => BuscarPaciente();
-
-            _lblPaciente.Location = new Point(314, 28);
-            _lblPaciente.Size = new Size(205, 24);
-            _lblPaciente.AutoEllipsis = true;
-            _lblPaciente.Font = new Font("Segoe UI", 10.5F, FontStyle.Bold);
-            _lblPaciente.ForeColor = Color.FromArgb(30, 66, 120);
-
-            _btnRegistrar.Location = new Point(530, 15);
-            _btnRegistrar.Size = new Size(230, 34);
-            _btnRegistrar.FlatStyle = FlatStyle.Flat;
-            _btnRegistrar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnRegistrar.ForeColor = Color.White;
-            _btnRegistrar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnRegistrar.FlatAppearance.BorderSize = 0;
-            _btnRegistrar.Cursor = Cursors.Hand;
-            _btnRegistrar.Click += (s, e) => RegistrarEvento();
-
-            panelBarra.Controls.Add(_lblDni);
-            panelBarra.Controls.Add(_txtDni);
-            panelBarra.Controls.Add(_btnBuscar);
-            panelBarra.Controls.Add(_lblPaciente);
-            panelBarra.Controls.Add(_btnRegistrar);
-            _btnRegistrar.BringToFront();
-
-            // ---- Grilla de eventos ----
-            _grilla.Dock = DockStyle.Fill;
-            EstiloGrilla(_grilla);
-            _grilla.Columns.Add("fecha", "");
-            _grilla.Columns.Add("paciente", "");
-            _grilla.Columns.Add("tipo", "");
-            _grilla.Columns.Add("gravedad", "");
-            _grilla.Columns.Add("descripcion", "");
-            _grilla.Columns.Add("accion", "");
-            _grilla.Columns["fecha"].FillWeight = 12;
-            _grilla.Columns["paciente"].FillWeight = 20;
-            _grilla.Columns["tipo"].FillWeight = 13;
-            _grilla.Columns["gravedad"].FillWeight = 11;
-            _grilla.Columns["descripcion"].FillWeight = 22;
-            _grilla.Columns["accion"].FillWeight = 22;
-            foreach (string columna in new[] { "fecha", "tipo", "gravedad" })
+            if (e.KeyCode == Keys.Enter)
             {
-                _grilla.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                e.SuppressKeyPress = true;
+                BuscarPaciente();
             }
-            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
-            _grilla.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            _grilla.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-
-            _lblSinEventos.Dock = DockStyle.Bottom;
-            _lblSinEventos.Height = 24;
-            _lblSinEventos.Font = new Font("Segoe UI", 9.5F);
-            _lblSinEventos.ForeColor = Color.FromArgb(150, 100, 40);
-
-            Controls.Add(_grilla);
-            Controls.Add(_lblSinEventos);
-            Controls.Add(panelBarra);
         }
 
-        private static void EstiloGrilla(DataGridView grilla)
-        {
-            grilla.ReadOnly = true;
-            grilla.AllowUserToAddRows = false;
-            grilla.AllowUserToDeleteRows = false;
-            grilla.AllowUserToResizeRows = false;
-            grilla.RowHeadersVisible = false;
-            grilla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grilla.MultiSelect = false;
-            grilla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            grilla.BackgroundColor = Color.White;
-            grilla.BorderStyle = BorderStyle.None;
-            grilla.GridColor = Color.FromArgb(225, 235, 245);
-            grilla.EnableHeadersVisualStyles = false;
-            grilla.ColumnHeadersHeight = 34;
-            grilla.RowTemplate.Height = 32;
-            grilla.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            grilla.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grilla.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grilla.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            grilla.DefaultCellStyle.Font = new Font("Segoe UI", 10F);
-            grilla.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            grilla.DefaultCellStyle.SelectionForeColor = Color.Black;
-            grilla.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            grilla.RowTemplate.Height = 32;
-            grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-        }
+        /// <summary>Busca el paciente por documento.</summary>
+        private void BtnBuscar_Click(object? sender, EventArgs e) => BuscarPaciente();
+
+        /// <summary>Abre el formulario de registro de un evento adverso.</summary>
+        private void BtnRegistrar_Click(object? sender, EventArgs e) => RegistrarEvento();
 
         private void AplicarTextos()
         {

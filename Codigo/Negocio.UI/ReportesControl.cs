@@ -16,45 +16,32 @@ namespace Negocio.UI
     /// los grupos con bajo desempeño), historial clínico unificado por paciente y exportación
     /// auditada del historial a PDF/Excel.
     /// </summary>
-    public class ReportesControl : UserControl
+    public partial class ReportesControl : UserControl
     {
-        private readonly string _nombreUsuario;
+        private readonly string _nombreUsuario = string.Empty;
 
-        private readonly Button _btnVistaMensual = new();
-        private readonly Button _btnVistaDiagnostico = new();
-        private readonly Button _btnVistaHistorial = new();
-        private readonly Label _lblPeriodo = new();
-        private readonly DateTimePicker _dtpMes = new();
-
-        private readonly Panel _panelMensual = new();
-        private readonly Button _btnGenerarMensual = new();
-        private readonly Label _lblTituloIndicador = new();
-        private readonly Label _lblIndicador = new();
-        private readonly Label _lblClasificacionGlobal = new();
-        private readonly Label _lblResumen = new();
-        private readonly DataGridView _grillaPacientes = new();
-
-        private readonly Panel _panelDiagnostico = new();
-        private readonly Button _btnGenerarDiagnostico = new();
-        private readonly DataGridView _grillaDiagnosticos = new();
-
-        private readonly Panel _panelHistorial = new();
-        private readonly Label _lblDni = new();
-        private readonly TextBox _txtDni = new();
-        private readonly Button _btnBuscar = new();
-        private readonly Label _lblPacienteHistorial = new();
-        private readonly Label _lblFormato = new();
-        private readonly ComboBox _cmbFormato = new();
-        private readonly Button _btnExportar = new();
-        private readonly DataGridView _grillaHistorial = new();
+        // Los controles de la interfaz se declaran en ReportesControl.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
 
         private int _vistaActual;
         private int _idPacienteHistorial;
 
-        public ReportesControl(string nombreUsuario)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public ReportesControl()
+        {
+            InitializeComponent();
+        }
+
+        public ReportesControl(string nombreUsuario) : this()
         {
             _nombreUsuario = nombreUsuario;
-            ConstruirInterfaz();
+
+            // En tiempo de diseño no se toca la base de datos.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             AplicarTextos();
             MostrarVista(0);
         }
@@ -67,264 +54,36 @@ namespace Negocio.UI
         /// <summary>Restablece la vista por defecto (al entrar al módulo).</summary>
         public void Recargar() => MostrarVista(_vistaActual);
 
-        private void ConstruirInterfaz()
+        /// <summary>Muestra la vista de reporte mensual.</summary>
+        private void BtnVistaMensual_Click(object? sender, EventArgs e) => MostrarVista(0);
+
+        /// <summary>Muestra la vista de reporte por diagnóstico.</summary>
+        private void BtnVistaDiagnostico_Click(object? sender, EventArgs e) => MostrarVista(1);
+
+        /// <summary>Muestra la vista de historial del paciente.</summary>
+        private void BtnVistaHistorial_Click(object? sender, EventArgs e) => MostrarVista(2);
+
+        /// <summary>Genera el reporte mensual del período seleccionado.</summary>
+        private void BtnGenerarMensual_Click(object? sender, EventArgs e) => CargarMensual();
+
+        /// <summary>Genera el reporte por diagnóstico del período seleccionado.</summary>
+        private void BtnGenerarDiagnostico_Click(object? sender, EventArgs e) => CargarDiagnosticos();
+
+        /// <summary>Busca el historial al presionar Enter en el campo de DNI.</summary>
+        private void TxtDni_KeyDown(object? sender, KeyEventArgs e)
         {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
-
-            // ---- Barra superior: vistas + período ----
-            var panelBarra = new Panel { Dock = DockStyle.Top, Height = 58, BackColor = BackColor };
-
-            ConfigurarBotonVista(_btnVistaMensual, 0);
-            ConfigurarBotonVista(_btnVistaDiagnostico, 176);
-            ConfigurarBotonVista(_btnVistaHistorial, 352);
-
-            _lblPeriodo.Location = new Point(760, 20);
-            _lblPeriodo.Size = new Size(72, 20);
-            _lblPeriodo.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblPeriodo.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _dtpMes.Location = new Point(836, 16);
-            _dtpMes.Size = new Size(170, 28);
-            _dtpMes.Format = DateTimePickerFormat.Custom;
-            _dtpMes.CustomFormat = "MMMM yyyy";
-            _dtpMes.ShowUpDown = true;
-            _dtpMes.Font = new Font("Segoe UI", 10F);
-
-            panelBarra.Controls.Add(_btnVistaMensual);
-            panelBarra.Controls.Add(_btnVistaDiagnostico);
-            panelBarra.Controls.Add(_btnVistaHistorial);
-            panelBarra.Controls.Add(_lblPeriodo);
-            panelBarra.Controls.Add(_dtpMes);
-
-            // ---- Vista 1: reporte mensual ----
-            _panelMensual.Dock = DockStyle.Fill;
-            _panelMensual.BackColor = Color.White;
-
-            _btnGenerarMensual.Location = new Point(14, 12);
-            _btnGenerarMensual.Size = new Size(210, 32);
-            _btnGenerarMensual.FlatStyle = FlatStyle.Flat;
-            _btnGenerarMensual.BackColor = Color.FromArgb(45, 108, 223);
-            _btnGenerarMensual.ForeColor = Color.White;
-            _btnGenerarMensual.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnGenerarMensual.FlatAppearance.BorderSize = 0;
-            _btnGenerarMensual.Cursor = Cursors.Hand;
-            _btnGenerarMensual.Click += (s, e) => CargarMensual();
-
-            _lblTituloIndicador.Location = new Point(14, 54);
-            _lblTituloIndicador.Size = new Size(420, 20);
-            _lblTituloIndicador.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblTituloIndicador.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _lblIndicador.Location = new Point(12, 72);
-            _lblIndicador.Size = new Size(330, 56);
-            _lblIndicador.Font = new Font("Segoe UI", 30F, FontStyle.Bold);
-            _lblIndicador.ForeColor = Color.FromArgb(120, 130, 145);
-
-            _lblClasificacionGlobal.Location = new Point(16, 128);
-            _lblClasificacionGlobal.Size = new Size(320, 26);
-            _lblClasificacionGlobal.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            _lblClasificacionGlobal.ForeColor = Color.FromArgb(120, 130, 145);
-
-            _lblResumen.Location = new Point(370, 76);
-            _lblResumen.Size = new Size(760, 60);
-            _lblResumen.Font = new Font("Segoe UI", 10.5F);
-            _lblResumen.ForeColor = Color.FromArgb(40, 60, 90);
-
-            var hostPacientes = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 166, 14, 14) };
-            _grillaPacientes.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaPacientes);
-            _grillaPacientes.Columns.Add("paciente", "");
-            _grillaPacientes.Columns.Add("mediciones", "");
-            _grillaPacientes.Columns.Add("porcentaje", "");
-            _grillaPacientes.Columns.Add("clasificacion", "");
-            _grillaPacientes.Columns["paciente"].FillWeight = 40;
-            _grillaPacientes.Columns["mediciones"].FillWeight = 14;
-            _grillaPacientes.Columns["porcentaje"].FillWeight = 16;
-            _grillaPacientes.Columns["clasificacion"].FillWeight = 18;
-            foreach (string columna in new[] { "mediciones", "porcentaje", "clasificacion" })
+            if (e.KeyCode == Keys.Enter)
             {
-                _grillaPacientes.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                e.SuppressKeyPress = true;
+                BuscarHistorial();
             }
-
-            _panelMensual.Controls.Add(hostPacientes);
-            hostPacientes.Controls.Add(_grillaPacientes);
-            _panelMensual.Controls.Add(_btnGenerarMensual);
-            _panelMensual.Controls.Add(_lblTituloIndicador);
-            _panelMensual.Controls.Add(_lblIndicador);
-            _panelMensual.Controls.Add(_lblClasificacionGlobal);
-            _panelMensual.Controls.Add(_lblResumen);
-            _btnGenerarMensual.BringToFront();
-            _lblTituloIndicador.BringToFront();
-            _lblIndicador.BringToFront();
-            _lblClasificacionGlobal.BringToFront();
-            _lblResumen.BringToFront();
-
-            // ---- Vista 2: por diagnóstico ----
-            _panelDiagnostico.Dock = DockStyle.Fill;
-            _panelDiagnostico.BackColor = Color.White;
-
-            _btnGenerarDiagnostico.Location = new Point(14, 12);
-            _btnGenerarDiagnostico.Size = new Size(210, 32);
-            _btnGenerarDiagnostico.FlatStyle = FlatStyle.Flat;
-            _btnGenerarDiagnostico.BackColor = Color.FromArgb(45, 108, 223);
-            _btnGenerarDiagnostico.ForeColor = Color.White;
-            _btnGenerarDiagnostico.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnGenerarDiagnostico.FlatAppearance.BorderSize = 0;
-            _btnGenerarDiagnostico.Cursor = Cursors.Hand;
-            _btnGenerarDiagnostico.Click += (s, e) => CargarDiagnosticos();
-
-            var hostDiagnosticos = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 56, 14, 14) };
-            _grillaDiagnosticos.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaDiagnosticos);
-            _grillaDiagnosticos.Columns.Add("diagnostico", "");
-            _grillaDiagnosticos.Columns.Add("pacientes", "");
-            _grillaDiagnosticos.Columns.Add("indicador", "");
-            _grillaDiagnosticos.Columns.Add("optimos", "");
-            _grillaDiagnosticos.Columns.Add("suboptimos", "");
-            _grillaDiagnosticos.Columns.Add("deficientes", "");
-            _grillaDiagnosticos.Columns.Add("bajoDesempeno", "");
-            _grillaDiagnosticos.Columns["diagnostico"].FillWeight = 30;
-            _grillaDiagnosticos.Columns["pacientes"].FillWeight = 10;
-            _grillaDiagnosticos.Columns["indicador"].FillWeight = 14;
-            _grillaDiagnosticos.Columns["optimos"].FillWeight = 10;
-            _grillaDiagnosticos.Columns["suboptimos"].FillWeight = 10;
-            _grillaDiagnosticos.Columns["deficientes"].FillWeight = 10;
-            _grillaDiagnosticos.Columns["bajoDesempeno"].FillWeight = 16;
-            foreach (string columna in new[] { "pacientes", "indicador", "optimos", "suboptimos", "deficientes", "bajoDesempeno" })
-            {
-                _grillaDiagnosticos.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
-
-            _panelDiagnostico.Controls.Add(hostDiagnosticos);
-            hostDiagnosticos.Controls.Add(_grillaDiagnosticos);
-            _panelDiagnostico.Controls.Add(_btnGenerarDiagnostico);
-            _btnGenerarDiagnostico.BringToFront();
-
-            // ---- Vista 3: historial del paciente ----
-            _panelHistorial.Dock = DockStyle.Fill;
-            _panelHistorial.BackColor = Color.White;
-
-            _lblDni.Location = new Point(14, 10);
-            _lblDni.Size = new Size(300, 18);
-            _lblDni.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblDni.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _txtDni.Name = "txtDniHist";
-            _txtDni.Location = new Point(14, 28);
-            _txtDni.Size = new Size(200, 28);
-            _txtDni.Font = new Font("Segoe UI", 11F);
-            _txtDni.KeyDown += (s, e) => { if (e.KeyCode == Keys.Enter) { e.SuppressKeyPress = true; BuscarHistorial(); } };
-
-            _btnBuscar.Location = new Point(226, 27);
-            _btnBuscar.Size = new Size(110, 30);
-            _btnBuscar.FlatStyle = FlatStyle.Flat;
-            _btnBuscar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnBuscar.ForeColor = Color.White;
-            _btnBuscar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnBuscar.FlatAppearance.BorderSize = 0;
-            _btnBuscar.Cursor = Cursors.Hand;
-            _btnBuscar.Click += (s, e) => BuscarHistorial();
-
-            _lblPacienteHistorial.Location = new Point(350, 30);
-            _lblPacienteHistorial.Size = new Size(560, 24);
-            _lblPacienteHistorial.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            _lblPacienteHistorial.ForeColor = Color.FromArgb(30, 66, 120);
-
-            _lblFormato.Location = new Point(14, 70);
-            _lblFormato.Size = new Size(80, 18);
-            _lblFormato.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblFormato.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _cmbFormato.Location = new Point(96, 66);
-            _cmbFormato.Size = new Size(120, 26);
-            _cmbFormato.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbFormato.Font = new Font("Segoe UI", 9.5F);
-
-            _btnExportar.Location = new Point(230, 64);
-            _btnExportar.Size = new Size(190, 30);
-            _btnExportar.FlatStyle = FlatStyle.Flat;
-            _btnExportar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnExportar.ForeColor = Color.White;
-            _btnExportar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnExportar.FlatAppearance.BorderSize = 0;
-            _btnExportar.Cursor = Cursors.Hand;
-            _btnExportar.Click += (s, e) => ExportarHistorial();
-
-            var hostHistorial = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 104, 14, 14) };
-            _grillaHistorial.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaHistorial);
-            _grillaHistorial.Columns.Add("fecha", "");
-            _grillaHistorial.Columns.Add("tipo", "");
-            _grillaHistorial.Columns.Add("descripcion", "");
-            _grillaHistorial.Columns["fecha"].FillWeight = 16;
-            _grillaHistorial.Columns["tipo"].FillWeight = 16;
-            _grillaHistorial.Columns["descripcion"].FillWeight = 68;
-            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
-            _grillaHistorial.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            _grillaHistorial.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-
-            _panelHistorial.Controls.Add(hostHistorial);
-            hostHistorial.Controls.Add(_grillaHistorial);
-            _panelHistorial.Controls.Add(_lblDni);
-            _panelHistorial.Controls.Add(_txtDni);
-            _panelHistorial.Controls.Add(_btnBuscar);
-            _panelHistorial.Controls.Add(_lblPacienteHistorial);
-            _panelHistorial.Controls.Add(_lblFormato);
-            _panelHistorial.Controls.Add(_cmbFormato);
-            _panelHistorial.Controls.Add(_btnExportar);
-            _txtDni.BringToFront();
-            _lblDni.BringToFront();
-            _lblPacienteHistorial.BringToFront();
-            _lblFormato.BringToFront();
-            _btnBuscar.BringToFront();
-            _cmbFormato.BringToFront();
-            _btnExportar.BringToFront();
-
-            Controls.Add(_panelMensual);
-            Controls.Add(_panelDiagnostico);
-            Controls.Add(_panelHistorial);
-            Controls.Add(panelBarra);
         }
 
-        private static void EstiloGrilla(DataGridView grilla)
-        {
-            grilla.ReadOnly = true;
-            grilla.AllowUserToAddRows = false;
-            grilla.AllowUserToDeleteRows = false;
-            grilla.AllowUserToResizeRows = false;
-            grilla.RowHeadersVisible = false;
-            grilla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grilla.MultiSelect = false;
-            grilla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            grilla.BackgroundColor = Color.White;
-            grilla.BorderStyle = BorderStyle.None;
-            grilla.GridColor = Color.FromArgb(225, 235, 245);
-            grilla.EnableHeadersVisualStyles = false;
-            grilla.ColumnHeadersHeight = 34;
-            grilla.RowTemplate.Height = 32;
-            grilla.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            grilla.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grilla.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grilla.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            grilla.DefaultCellStyle.Font = new Font("Segoe UI", 10F);
-            grilla.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            grilla.DefaultCellStyle.SelectionForeColor = Color.Black;
-            grilla.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-        }
+        /// <summary>Busca el paciente por documento y muestra su historial unificado.</summary>
+        private void BtnBuscar_Click(object? sender, EventArgs e) => BuscarHistorial();
 
-        private void ConfigurarBotonVista(Button boton, int x)
-        {
-            boton.Location = new Point(x, 15);
-            boton.Size = new Size(168, 32);
-            boton.FlatStyle = FlatStyle.Flat;
-            boton.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            boton.Cursor = Cursors.Hand;
-            boton.FlatAppearance.BorderColor = Color.FromArgb(202, 220, 240);
-            boton.Click += (s, e) => MostrarVista(boton == _btnVistaMensual ? 0 : boton == _btnVistaDiagnostico ? 1 : 2);
-        }
+        /// <summary>Exporta el historial del paciente en el formato elegido.</summary>
+        private void BtnExportar_Click(object? sender, EventArgs e) => ExportarHistorial();
 
         private void MostrarVista(int vista)
         {

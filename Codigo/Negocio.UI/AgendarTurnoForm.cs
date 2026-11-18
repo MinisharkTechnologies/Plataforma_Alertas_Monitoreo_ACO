@@ -12,7 +12,7 @@ namespace Negocio.UI
     /// Diálogo para agendar un turno presencial (REQ-FUNC-009): selección de paciente activo,
     /// médico habilitado, fecha y hora, con las validaciones de agenda de la BLL.
     /// </summary>
-    public class AgendarTurnoForm : Form
+    public partial class AgendarTurnoForm : Form
     {
         private sealed class OpcionPaciente
         {
@@ -28,110 +28,45 @@ namespace Negocio.UI
             public override string ToString() => Texto;
         }
 
-        private readonly string _usuarioResponsable;
-        private readonly ComboBox _cmbPaciente = new();
-        private readonly ComboBox _cmbMedico = new();
-        private readonly DateTimePicker _dtpFecha = new();
-        private readonly DateTimePicker _dtpHora = new();
-        private readonly TextBox _txtObservaciones = new();
-        private readonly Label _lblAviso = new();
+        private readonly string _usuarioResponsable = string.Empty;
 
-        public AgendarTurnoForm(string usuarioResponsable)
+        // Los controles de la interfaz se declaran en AgendarTurnoForm.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
+
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public AgendarTurnoForm()
         {
+            InitializeComponent();
+        }
+
+        public AgendarTurnoForm(string usuarioResponsable) : this()
+        {
+            // En tiempo de diseño (diseñador de Visual Studio) no se toca la base de datos:
+            // alcanza con que los controles se hayan creado para que el formulario se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             _usuarioResponsable = usuarioResponsable;
-
-            Text = $"OpenRIN — {Localizacion("agenda.agendar")}";
-            ClientSize = new Size(480, 340);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            ShowInTaskbar = false;
-            BackColor = Color.White;
-
-            ConstruirInterfaz();
+            AplicarTextos();
+            _dtpFecha.Value = DateTime.Today.AddDays(1);
             CargarCombos();
         }
 
         private static string Localizacion(string clave) => LocalizationService.ObtenerTexto(clave);
 
-        private static Label Etiqueta(string clave, int x, int y, int ancho = 210)
-            => new()
-            {
-                Text = Localizacion(clave),
-                Location = new Point(x, y),
-                Size = new Size(ancho, 18),
-                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold)
-            };
-
-        private void ConstruirInterfaz()
+        /// <summary>Aplica los textos localizados a las etiquetas y botones del diálogo.</summary>
+        private void AplicarTextos()
         {
-            Controls.Add(Etiqueta("panel.columna.paciente", 18, 14));
-            _cmbPaciente.Location = new Point(18, 34);
-            _cmbPaciente.Size = new Size(444, 28);
-            _cmbPaciente.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbPaciente.Font = new Font("Segoe UI", 10F);
-
-            Controls.Add(Etiqueta("agenda.columna.medico", 18, 70));
-            _cmbMedico.Location = new Point(18, 90);
-            _cmbMedico.Size = new Size(280, 28);
-            _cmbMedico.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbMedico.Font = new Font("Segoe UI", 10F);
-
-            Controls.Add(Etiqueta("rin.columna.fecha", 310, 70));
-            _dtpFecha.Location = new Point(310, 90);
-            _dtpFecha.Size = new Size(120, 28);
-            _dtpFecha.Format = DateTimePickerFormat.Short;
-            _dtpFecha.Font = new Font("Segoe UI", 10F);
-            _dtpFecha.Value = DateTime.Today.AddDays(1);
-
-            Controls.Add(Etiqueta("agenda.hora", 18, 128, 120));
-            _dtpHora.Location = new Point(18, 148);
-            _dtpHora.Size = new Size(110, 28);
-            _dtpHora.Format = DateTimePickerFormat.Custom;
-            _dtpHora.CustomFormat = "HH:mm";
-            _dtpHora.ShowUpDown = true;
-            _dtpHora.Font = new Font("Segoe UI", 10F);
-
-            Controls.Add(Etiqueta("agenda.columna.observaciones", 144, 128, 318));
-            _txtObservaciones.Location = new Point(144, 148);
-            _txtObservaciones.Size = new Size(318, 28);
-            _txtObservaciones.Font = new Font("Segoe UI", 10F);
-
-            _lblAviso.Location = new Point(18, 186);
-            _lblAviso.Size = new Size(444, 40);
-            _lblAviso.Font = new Font("Segoe UI", 9F);
-            _lblAviso.ForeColor = Color.FromArgb(180, 40, 40);
-
-            var btnGuardar = new Button
-            {
-                Text = Localizacion("comun.guardar"),
-                Location = new Point(276, 236),
-                Size = new Size(90, 36),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(45, 108, 223),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold)
-            };
-            btnGuardar.FlatAppearance.BorderSize = 0;
-            btnGuardar.Click += BtnGuardar_Click;
-
-            var btnCancelar = new Button
-            {
-                Text = Localizacion("comun.cancelar"),
-                Location = new Point(374, 236),
-                Size = new Size(90, 36),
-                FlatStyle = FlatStyle.Flat
-            };
-            btnCancelar.Click += (s, e) => { DialogResult = DialogResult.Cancel; };
-
-            AcceptButton = btnGuardar;
-            CancelButton = btnCancelar;
-
-            Controls.AddRange(new Control[]
-            {
-                _cmbPaciente, _cmbMedico, _dtpFecha, _dtpHora, _txtObservaciones, _lblAviso, btnGuardar, btnCancelar
-            });
+            Text = $"OpenRIN — {Localizacion("agenda.agendar")}";
+            _lblPaciente.Text = Localizacion("panel.columna.paciente");
+            _lblMedico.Text = Localizacion("agenda.columna.medico");
+            _lblFecha.Text = Localizacion("rin.columna.fecha");
+            _lblHora.Text = Localizacion("agenda.hora");
+            _lblObservaciones.Text = Localizacion("agenda.columna.observaciones");
+            _btnGuardar.Text = Localizacion("comun.guardar");
+            _btnCancelar.Text = Localizacion("comun.cancelar");
         }
 
         private void CargarCombos()
@@ -167,6 +102,12 @@ namespace Negocio.UI
             {
                 _lblAviso.Text = Localizacion("agenda.sinMedicos");
             }
+        }
+
+        /// <summary>Cierra el diálogo sin guardar (botón Cancelar).</summary>
+        private void BtnCancelar_Click(object? sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
         }
 
         private void BtnGuardar_Click(object? sender, EventArgs e)

@@ -11,7 +11,7 @@ namespace Negocio.UI
     /// Alta (REQ-FUNC-001) y modificación de pacientes. En el alta se generan las credenciales
     /// únicas del portal y se muestran una única vez para entregarlas al paciente.
     /// </summary>
-    public class PacienteEditorForm : Form
+    public partial class PacienteEditorForm : Form
     {
         private sealed class OpcionObra
         {
@@ -21,32 +21,31 @@ namespace Negocio.UI
         }
 
         private readonly Paciente? _pacienteExistente;
-        private readonly string _usuarioResponsable;
+        private readonly string _usuarioResponsable = string.Empty;
         private readonly bool _esAlta;
 
-        private readonly TextBox _txtNombre = new();
-        private readonly TextBox _txtDni = new();
-        private readonly TextBox _txtTelefono = new();
-        private readonly TextBox _txtEmail = new();
-        private readonly ComboBox _cmbObraSocial = new();
-        private readonly TextBox _txtAfiliado = new();
+        // Los controles de la interfaz se declaran en PacienteEditorForm.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
 
-        public PacienteEditorForm(Paciente? paciente, string usuarioResponsable)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public PacienteEditorForm()
         {
+            InitializeComponent();
+        }
+
+        public PacienteEditorForm(Paciente? paciente, string usuarioResponsable) : this()
+        {
+            // En tiempo de diseño (diseñador de Visual Studio) no se toca la base de datos:
+            // alcanza con que los controles se hayan creado para que el formulario se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             _pacienteExistente = paciente;
             _usuarioResponsable = usuarioResponsable;
             _esAlta = paciente == null;
-
-            Text = $"OpenRIN — {LocalizationService.ObtenerTexto(_esAlta ? "pacientes.alta" : "comun.modificar")}";
-            ClientSize = new Size(480, 380);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            ShowInTaskbar = false;
-            BackColor = Color.White;
-
-            ConstruirInterfaz();
+            AplicarTextos();
             CargarObras();
             if (paciente != null)
             {
@@ -56,77 +55,18 @@ namespace Negocio.UI
 
         private static string Texto(string clave) => LocalizationService.ObtenerTexto(clave);
 
-        private static Label Etiqueta(string clave, int x, int y)
-            => new()
-            {
-                Text = Texto(clave),
-                Location = new Point(x, y),
-                Size = new Size(210, 18),
-                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold)
-            };
-
-        private void ConstruirInterfaz()
+        /// <summary>Aplica los textos localizados (título según alta o modificación, etiquetas y botones).</summary>
+        private void AplicarTextos()
         {
-            Controls.Add(Etiqueta("pacientes.nombre", 18, 14));
-            _txtNombre.Location = new Point(18, 34);
-            _txtNombre.Size = new Size(444, 28);
-            _txtNombre.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("pacientes.documento", 18, 70));
-            _txtDni.Location = new Point(18, 90);
-            _txtDni.Size = new Size(200, 28);
-            _txtDni.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("pacientes.telefono", 234, 70));
-            _txtTelefono.Location = new Point(234, 90);
-            _txtTelefono.Size = new Size(228, 28);
-            _txtTelefono.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("pacientes.email", 18, 126));
-            _txtEmail.Location = new Point(18, 146);
-            _txtEmail.Size = new Size(444, 28);
-            _txtEmail.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("pacientes.obraSocial", 18, 182));
-            _cmbObraSocial.Location = new Point(18, 202);
-            _cmbObraSocial.Size = new Size(280, 28);
-            _cmbObraSocial.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbObraSocial.Font = new Font("Segoe UI", 10F);
-
-            Controls.Add(Etiqueta("pacientes.numeroAfiliado", 310, 182));
-            _txtAfiliado.Location = new Point(310, 202);
-            _txtAfiliado.Size = new Size(152, 28);
-            _txtAfiliado.Font = new Font("Segoe UI", 10.5F);
-
-            var btnGuardar = new Button
-            {
-                Text = Texto("comun.guardar"),
-                Location = new Point(276, 266),
-                Size = new Size(90, 36),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(45, 108, 223),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold)
-            };
-            btnGuardar.FlatAppearance.BorderSize = 0;
-            btnGuardar.Click += BtnGuardar_Click;
-
-            var btnCancelar = new Button
-            {
-                Text = Texto("comun.cancelar"),
-                Location = new Point(374, 266),
-                Size = new Size(90, 36),
-                FlatStyle = FlatStyle.Flat
-            };
-            btnCancelar.Click += (s, e) => { DialogResult = DialogResult.Cancel; };
-
-            AcceptButton = btnGuardar;
-            CancelButton = btnCancelar;
-
-            Controls.AddRange(new Control[]
-            {
-                _txtNombre, _txtDni, _txtTelefono, _txtEmail, _cmbObraSocial, _txtAfiliado, btnGuardar, btnCancelar
-            });
+            Text = $"OpenRIN — {Texto(_esAlta ? "pacientes.alta" : "comun.modificar")}";
+            _lblNombre.Text = Texto("pacientes.nombre");
+            _lblDocumento.Text = Texto("pacientes.documento");
+            _lblTelefono.Text = Texto("pacientes.telefono");
+            _lblEmail.Text = Texto("pacientes.email");
+            _lblObraSocial.Text = Texto("pacientes.obraSocial");
+            _lblAfiliado.Text = Texto("pacientes.numeroAfiliado");
+            _btnGuardar.Text = Texto("comun.guardar");
+            _btnCancelar.Text = Texto("comun.cancelar");
         }
 
         private void CargarObras()
@@ -161,6 +101,12 @@ namespace Negocio.UI
                     break;
                 }
             }
+        }
+
+        /// <summary>Cierra el diálogo sin guardar (botón Cancelar).</summary>
+        private void BtnCancelar_Click(object? sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
         }
 
         private void BtnGuardar_Click(object? sender, EventArgs e)

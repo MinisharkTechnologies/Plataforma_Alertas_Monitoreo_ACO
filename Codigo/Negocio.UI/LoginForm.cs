@@ -11,22 +11,12 @@ namespace Negocio.UI
     /// (REQ-ARQ-006), muestra el logo institucional y permite cambiar el idioma en vivo
     /// (REQ-ARQ-001) y recuperar la contraseña con pregunta de seguridad.
     /// </summary>
-    public class LoginForm : Form
+    public partial class LoginForm : Form
     {
         private List<Idioma> _idiomasDisponibles = new();
 
-        private readonly Label _lblTitulo = new();
-        private readonly Label _lblSubtitulo = new();
-        private readonly Panel _panelTarjeta = new();
-        private readonly Label _lblUsuario = new();
-        private readonly TextBox _txtUsuario = new();
-        private readonly Label _lblContrasena = new();
-        private readonly TextBox _txtContrasena = new();
-        private readonly Button _btnIngresar = new();
-        private readonly LinkLabel _lnkRecuperar = new();
-        private readonly Label _lblIdioma = new();
-        private readonly ComboBox _cmbIdioma = new();
-        private readonly Label _lblVersion = new();
+        // Los controles que se ven en pantalla se declaran en LoginForm.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
         private readonly Icon? _logoLogin = Recursos.CargarIcono(96);
         private bool _actualizandoIdioma;
 
@@ -36,95 +26,24 @@ namespace Negocio.UI
         public LoginForm()
         {
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
+            InitializeComponent();
+
+            // En tiempo de diseño (diseñador de Visual Studio) no se toca la base de datos:
+            // alcanza con que los controles se hayan creado para que el formulario se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             System.Drawing.Icon? icono = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             if (icono != null)
             {
                 Icon = icono;
             }
-            ConstruirInterfaz();
             AplicarTextos();
         }
 
         private static string Texto(string clave) => LocalizationService.ObtenerTexto(clave);
-
-        private void ConstruirInterfaz()
-        {
-            ClientSize = new Size(460, 520);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            MaximizeBox = false;
-            StartPosition = FormStartPosition.CenterScreen;
-
-            _lblTitulo.Location = new Point(36, 26);
-            _lblTitulo.Size = new Size(268, 40);
-            _lblTitulo.Font = new Font("Segoe UI", 22F, FontStyle.Bold);
-            _lblTitulo.ForeColor = Color.FromArgb(27, 79, 138);
-
-            _lblSubtitulo.Location = new Point(38, 68);
-            _lblSubtitulo.Size = new Size(388, 20);
-            _lblSubtitulo.Font = new Font("Segoe UI", 9.5F);
-            _lblSubtitulo.ForeColor = Color.FromArgb(74, 107, 138);
-
-            _panelTarjeta.Location = new Point(36, 104);
-            _panelTarjeta.Size = new Size(388, 348);
-            _panelTarjeta.BackColor = Color.White;
-
-            _lblUsuario.Location = new Point(24, 26);
-            _lblUsuario.Size = new Size(340, 18);
-            _lblUsuario.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-
-            _txtUsuario.Location = new Point(24, 48);
-            _txtUsuario.Size = new Size(340, 28);
-            _txtUsuario.Font = new Font("Segoe UI", 11F);
-
-            _lblContrasena.Location = new Point(24, 92);
-            _lblContrasena.Size = new Size(340, 18);
-            _lblContrasena.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-
-            _txtContrasena.Location = new Point(24, 114);
-            _txtContrasena.Size = new Size(340, 28);
-            _txtContrasena.Font = new Font("Segoe UI", 11F);
-            _txtContrasena.UseSystemPasswordChar = true;
-
-            _btnIngresar.Location = new Point(24, 168);
-            _btnIngresar.Size = new Size(340, 42);
-            _btnIngresar.FlatStyle = FlatStyle.Flat;
-            _btnIngresar.FlatAppearance.BorderSize = 0;
-            _btnIngresar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnIngresar.ForeColor = Color.White;
-            _btnIngresar.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            _btnIngresar.Cursor = Cursors.Hand;
-            _btnIngresar.Click += BtnIngresar_Click;
-
-            _lnkRecuperar.Location = new Point(24, 224);
-            _lnkRecuperar.Size = new Size(340, 20);
-            _lnkRecuperar.Font = new Font("Segoe UI", 9F);
-            _lnkRecuperar.LinkColor = Color.FromArgb(45, 108, 223);
-            _lnkRecuperar.Click += LnkRecuperar_Click;
-
-            _lblIdioma.Location = new Point(24, 264);
-            _lblIdioma.Size = new Size(340, 18);
-            _lblIdioma.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-
-            _cmbIdioma.Location = new Point(24, 286);
-            _cmbIdioma.Size = new Size(220, 26);
-            _cmbIdioma.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbIdioma.Font = new Font("Segoe UI", 9.5F);
-            _cmbIdioma.SelectedIndexChanged += CmbIdioma_SelectedIndexChanged;
-
-            _panelTarjeta.Controls.AddRange(new Control[]
-            {
-                _lblUsuario, _txtUsuario, _lblContrasena, _txtContrasena,
-                _btnIngresar, _lnkRecuperar, _lblIdioma, _cmbIdioma
-            });
-
-            _lblVersion.Location = new Point(38, 468);
-            _lblVersion.Size = new Size(388, 18);
-            _lblVersion.Font = new Font("Segoe UI", 8F);
-            _lblVersion.ForeColor = Color.FromArgb(110, 130, 150);
-
-            Controls.Add(_panelTarjeta);
-            AcceptButton = _btnIngresar;
-        }
 
         protected override void OnPaint(PaintEventArgs e)
         {

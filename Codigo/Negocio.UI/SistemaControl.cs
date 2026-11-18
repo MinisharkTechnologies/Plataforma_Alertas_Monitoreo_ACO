@@ -13,61 +13,16 @@ namespace Negocio.UI
     /// (listado, alta vía la API de seguridad, habilitación/deshabilitación) y consulta de la
     /// bitácora centralizada con filtro por nivel mínimo.
     /// </summary>
-    public class SistemaControl : UserControl
+    public partial class SistemaControl : UserControl
     {
-        private readonly Button _btnVistaUsuarios = new();
-        private readonly Button _btnVistaBitacora = new();
-        private readonly Button _btnVistaCambios = new();
-        private readonly Button _btnVistaIdiomas = new();
-        private readonly Button _btnVistaPerfiles = new();
-        private readonly Button _btnVistaRespaldos = new();
-        private readonly RespaldosPanel _panelRespaldos = new();
 
-        private readonly Panel _panelUsuarios = new();
-        private readonly Button _btnNuevoUsuario = new();
-        private readonly Button _btnHabilitar = new();
-        private readonly Button _btnDeshabilitar = new();
-        private readonly DataGridView _grillaUsuarios = new();
 
-        private readonly Panel _panelBitacora = new();
-        private readonly Label _lblNivel = new();
-        private readonly ComboBox _cmbNivel = new();
-        private readonly Button _btnActualizar = new();
-        private readonly DataGridView _grillaBitacora = new();
 
-        private readonly Panel _panelCambios = new();
-        private readonly Label _lblEntidadCambios = new();
-        private readonly ComboBox _cmbEntidadCambios = new();
-        private readonly Label _lblIdCambios = new();
-        private readonly TextBox _txtIdCambios = new();
-        private readonly Button _btnBuscarCambios = new();
-        private readonly DataGridView _grillaCambios = new();
-        private readonly Label _lblCambioAnterior = new();
-        private readonly Label _lblCambioNuevo = new();
-        private readonly TextBox _txtCambioAnterior = new();
-        private readonly TextBox _txtCambioNuevo = new();
-        private readonly Button _btnRestaurarCambio = new();
         private List<CambioAuditado> _cambios = new();
 
-        private readonly Panel _panelIdiomas = new();
-        private readonly DataGridView _grillaIdiomas = new();
-        private readonly Button _btnNuevoIdioma = new();
-        private readonly Button _btnEliminarIdioma = new();
-        private readonly ComboBox _cmbIdiomaEditor = new();
-        private readonly DataGridView _grillaTextos = new();
-        private readonly TextBox _txtNuevaClave = new();
-        private readonly TextBox _txtNuevoValor = new();
-        private readonly Button _btnAgregarLeyenda = new();
-        private readonly Button _btnGuardarTextos = new();
         private List<Idioma> _idiomasEditor = new();
         private List<TextoLocalizacion> _textosEditor = new();
 
-        private readonly Panel _panelPerfiles = new();
-        private readonly ComboBox _cmbPerfiles = new();
-        private readonly TreeView _treePermisos = new();
-        private readonly Button _btnGuardarPermisos = new();
-        private readonly Button _btnMarcarTodo = new();
-        private readonly Button _btnDesmarcarTodo = new();
         private bool _actualizandoArbol;
 
         private static readonly string[] EntidadesAuditables =
@@ -79,12 +34,57 @@ namespace Negocio.UI
         private int _vistaActual;
         private List<UsuarioListado> _usuarios = new();
 
+        /// <summary>Constructor para el disenador de Visual Studio (no se usa en ejecucion).</summary>
         public SistemaControl()
         {
-            ConstruirInterfaz();
+            InitializeComponent();
+        }
+
+        /// <summary>Constructor de ejecucion: arma la interfaz y carga los datos reales.</summary>
+        public SistemaControl(bool enEjecucion) : this()
+        {
+            if (!enEjecucion || Disenio.Activo)
+            {
+                return;
+            }
+
+            ConectarEventos();
             AplicarTextos();
             MostrarVista(0);
             CargarUsuarios();
+        }
+
+        /// <summary>Conecta los eventos de la interfaz (no van en el Designer para que VS no los reescriba).</summary>
+        private void ConectarEventos()
+        {
+            _btnVistaUsuarios.Click += (s, e) => MostrarVista(0);
+            _btnVistaBitacora.Click += (s, e) => MostrarVista(1);
+            _btnVistaCambios.Click += (s, e) => MostrarVista(2);
+            _btnVistaIdiomas.Click += (s, e) => MostrarVista(3);
+            _btnVistaPerfiles.Click += (s, e) => MostrarVista(4);
+            _btnVistaRespaldos.Click += (s, e) => MostrarVista(5);
+
+            _btnNuevoUsuario.Click += (s, e) => AbrirAltaUsuario();
+            _btnHabilitar.Click += (s, e) => CambiarEstadoSeleccionado(true);
+            _btnDeshabilitar.Click += (s, e) => CambiarEstadoSeleccionado(false);
+
+            _btnActualizar.Click += (s, e) => CargarBitacora();
+
+            _btnBuscarCambios.Click += (s, e) => CargarCambios();
+            _grillaCambios.SelectionChanged += (s, e) => MostrarDetalleCambio();
+            _btnRestaurarCambio.Click += (s, e) => RestaurarCambioSeleccionado();
+
+            _btnNuevoIdioma.Click += (s, e) => AbrirAltaIdioma();
+            _btnEliminarIdioma.Click += (s, e) => EliminarIdiomaSeleccionado();
+            _cmbIdiomaEditor.SelectedIndexChanged += (s, e) => CargarTextosDelIdioma();
+            _btnAgregarLeyenda.Click += (s, e) => AgregarLeyendaInline();
+            _btnGuardarTextos.Click += (s, e) => GuardarCambiosTextos();
+
+            _cmbPerfiles.SelectedIndexChanged += (s, e) => CargarArbolDelPerfil();
+            _btnMarcarTodo.Click += (s, e) => MarcarTodo(true);
+            _btnDesmarcarTodo.Click += (s, e) => MarcarTodo(false);
+            _btnGuardarPermisos.Click += (s, e) => GuardarPermisosDelPerfil();
+            _treePermisos.AfterCheck += TreePermisos_AfterCheck;
         }
 
         private static string Localizacion(string clave) => LocalizationService.ObtenerTexto(clave);
@@ -120,417 +120,6 @@ namespace Negocio.UI
         {
             AplicarTextos();
             Recargar();
-        }
-
-        private void ConstruirInterfaz()
-        {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
-
-            // ---- Barra superior: vistas ----
-            var panelBarra = new Panel { Dock = DockStyle.Top, Height = 58, BackColor = BackColor };
-            ConfigurarBotonVista(_btnVistaUsuarios, 0, 0);
-            ConfigurarBotonVista(_btnVistaBitacora, 176, 1);
-            ConfigurarBotonVista(_btnVistaCambios, 352, 2);
-            ConfigurarBotonVista(_btnVistaIdiomas, 528, 3);
-            ConfigurarBotonVista(_btnVistaPerfiles, 704, 4);
-            ConfigurarBotonVista(_btnVistaRespaldos, 880, 5);
-            panelBarra.Controls.Add(_btnVistaUsuarios);
-            panelBarra.Controls.Add(_btnVistaBitacora);
-            panelBarra.Controls.Add(_btnVistaCambios);
-            panelBarra.Controls.Add(_btnVistaIdiomas);
-            panelBarra.Controls.Add(_btnVistaPerfiles);
-            panelBarra.Controls.Add(_btnVistaRespaldos);
-
-            // ---- Vista 1: usuarios ----
-            _panelUsuarios.Dock = DockStyle.Fill;
-            _panelUsuarios.BackColor = Color.White;
-
-            _btnNuevoUsuario.Location = new Point(14, 12);
-            _btnNuevoUsuario.Size = new Size(180, 32);
-            EstiloPrimario(_btnNuevoUsuario);
-            _btnNuevoUsuario.Click += (s, e) => AbrirAltaUsuario();
-
-            _btnHabilitar.Location = new Point(204, 12);
-            _btnHabilitar.Size = new Size(140, 32);
-            EstiloSecundario(_btnHabilitar);
-            _btnHabilitar.Click += (s, e) => CambiarEstadoSeleccionado(true);
-
-            _btnDeshabilitar.Location = new Point(354, 12);
-            _btnDeshabilitar.Size = new Size(150, 32);
-            EstiloSecundario(_btnDeshabilitar);
-            _btnDeshabilitar.Click += (s, e) => CambiarEstadoSeleccionado(false);
-
-            var hostUsuarios = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 56, 14, 14) };
-            _grillaUsuarios.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaUsuarios);
-            _grillaUsuarios.Columns.Add("usuario", "");
-            _grillaUsuarios.Columns.Add("nombre", "");
-            _grillaUsuarios.Columns.Add("perfil", "");
-            _grillaUsuarios.Columns.Add("email", "");
-            _grillaUsuarios.Columns.Add("activo", "");
-            _grillaUsuarios.Columns.Add("intentos", "");
-            _grillaUsuarios.Columns.Add("bloqueado", "");
-            _grillaUsuarios.Columns["usuario"].FillWeight = 16;
-            _grillaUsuarios.Columns["nombre"].FillWeight = 24;
-            _grillaUsuarios.Columns["perfil"].FillWeight = 14;
-            _grillaUsuarios.Columns["email"].FillWeight = 18;
-            _grillaUsuarios.Columns["activo"].FillWeight = 8;
-            _grillaUsuarios.Columns["intentos"].FillWeight = 8;
-            _grillaUsuarios.Columns["bloqueado"].FillWeight = 12;
-            foreach (string columna in new[] { "perfil", "activo", "intentos", "bloqueado" })
-            {
-                _grillaUsuarios.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
-
-            _panelUsuarios.Controls.Add(hostUsuarios);
-            hostUsuarios.Controls.Add(_grillaUsuarios);
-            _panelUsuarios.Controls.Add(_btnNuevoUsuario);
-            _panelUsuarios.Controls.Add(_btnHabilitar);
-            _panelUsuarios.Controls.Add(_btnDeshabilitar);
-            _btnNuevoUsuario.BringToFront();
-            _btnHabilitar.BringToFront();
-            _btnDeshabilitar.BringToFront();
-
-            // ---- Vista 2: bitácora ----
-            _panelBitacora.Dock = DockStyle.Fill;
-            _panelBitacora.BackColor = Color.White;
-
-            _lblNivel.Location = new Point(14, 20);
-            _lblNivel.Size = new Size(110, 20);
-            _lblNivel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblNivel.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _cmbNivel.Location = new Point(128, 16);
-            _cmbNivel.Size = new Size(160, 28);
-            _cmbNivel.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbNivel.Font = new Font("Segoe UI", 9.5F);
-
-            _btnActualizar.Location = new Point(300, 15);
-            _btnActualizar.Size = new Size(140, 30);
-            EstiloSecundario(_btnActualizar);
-            _btnActualizar.Click += (s, e) => CargarBitacora();
-
-            var hostBitacora = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 56, 14, 14) };
-            _grillaBitacora.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaBitacora);
-            _grillaBitacora.Columns.Add("fecha", "");
-            _grillaBitacora.Columns.Add("nivel", "");
-            _grillaBitacora.Columns.Add("capa", "");
-            _grillaBitacora.Columns.Add("usuario", "");
-            _grillaBitacora.Columns.Add("mensaje", "");
-            _grillaBitacora.Columns["fecha"].FillWeight = 14;
-            _grillaBitacora.Columns["nivel"].FillWeight = 9;
-            _grillaBitacora.Columns["capa"].FillWeight = 12;
-            _grillaBitacora.Columns["usuario"].FillWeight = 14;
-            _grillaBitacora.Columns["mensaje"].FillWeight = 51;
-            foreach (string columna in new[] { "nivel", "capa" })
-            {
-                _grillaBitacora.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
-            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
-            _grillaBitacora.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            _grillaBitacora.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-
-            _panelBitacora.Controls.Add(hostBitacora);
-            hostBitacora.Controls.Add(_grillaBitacora);
-            _panelBitacora.Controls.Add(_lblNivel);
-            _panelBitacora.Controls.Add(_cmbNivel);
-            _panelBitacora.Controls.Add(_btnActualizar);
-            _lblNivel.BringToFront();
-            _cmbNivel.BringToFront();
-            _btnActualizar.BringToFront();
-
-            // ---- Vista 3: control de cambios (T06b) ----
-            _panelCambios.Dock = DockStyle.Fill;
-            _panelCambios.BackColor = Color.White;
-
-            _lblEntidadCambios.Location = new Point(14, 20);
-            _lblEntidadCambios.Size = new Size(70, 20);
-            _lblEntidadCambios.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblEntidadCambios.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _cmbEntidadCambios.Location = new Point(88, 16);
-            _cmbEntidadCambios.Size = new Size(200, 28);
-            _cmbEntidadCambios.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbEntidadCambios.Font = new Font("Segoe UI", 9.5F);
-
-            _lblIdCambios.Location = new Point(304, 20);
-            _lblIdCambios.Size = new Size(130, 20);
-            _lblIdCambios.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblIdCambios.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _txtIdCambios.Location = new Point(438, 16);
-            _txtIdCambios.Size = new Size(90, 28);
-            _txtIdCambios.Font = new Font("Segoe UI", 9.5F);
-
-            _btnBuscarCambios.Location = new Point(544, 15);
-            _btnBuscarCambios.Size = new Size(160, 30);
-            EstiloSecundario(_btnBuscarCambios);
-            _btnBuscarCambios.Click += (s, e) => CargarCambios();
-
-            var hostCambios = new Panel { Dock = DockStyle.Top, Height = 260, Padding = new Padding(14, 56, 14, 6) };
-            _grillaCambios.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaCambios);
-            _grillaCambios.Columns.Add("fecha", "");
-            _grillaCambios.Columns.Add("usuario", "");
-            _grillaCambios.Columns.Add("tipo", "");
-            _grillaCambios.Columns.Add("entidad", "");
-            _grillaCambios.Columns.Add("registro", "");
-            _grillaCambios.Columns["fecha"].FillWeight = 18;
-            _grillaCambios.Columns["usuario"].FillWeight = 16;
-            _grillaCambios.Columns["tipo"].FillWeight = 14;
-            _grillaCambios.Columns["entidad"].FillWeight = 30;
-            _grillaCambios.Columns["registro"].FillWeight = 12;
-            foreach (string columna in new[] { "tipo", "registro" })
-            {
-                _grillaCambios.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            }
-            _grillaCambios.SelectionChanged += (s, e) => MostrarDetalleCambio();
-
-            var panelRestaurar = new Panel { Dock = DockStyle.Bottom, Height = 54, Padding = new Padding(0, 10, 0, 12) };
-            _btnRestaurarCambio.Dock = DockStyle.Right;
-            _btnRestaurarCambio.Width = 250;
-            EstiloPrimario(_btnRestaurarCambio);
-            _btnRestaurarCambio.Click += (s, e) => RestaurarCambioSeleccionado();
-            panelRestaurar.Controls.Add(_btnRestaurarCambio);
-
-            var hostDetalleCambios = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 6, 14, 14) };
-            var tablaDetalle = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 2 };
-            tablaDetalle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tablaDetalle.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
-            tablaDetalle.RowStyles.Add(new RowStyle(SizeType.Absolute, 26F));
-            tablaDetalle.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            _lblCambioAnterior.Dock = DockStyle.Fill;
-            _lblCambioAnterior.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblCambioAnterior.ForeColor = Color.FromArgb(60, 85, 115);
-            _lblCambioNuevo.Dock = DockStyle.Fill;
-            _lblCambioNuevo.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            _lblCambioNuevo.ForeColor = Color.FromArgb(60, 85, 115);
-
-            _txtCambioAnterior.Multiline = true;
-            _txtCambioAnterior.ReadOnly = true;
-            _txtCambioAnterior.ScrollBars = ScrollBars.Both;
-            _txtCambioAnterior.WordWrap = false;
-            _txtCambioAnterior.Dock = DockStyle.Fill;
-            _txtCambioAnterior.Font = new Font("Consolas", 8.5F);
-            _txtCambioAnterior.BackColor = Color.FromArgb(250, 252, 255);
-            _txtCambioNuevo.Multiline = true;
-            _txtCambioNuevo.ReadOnly = true;
-            _txtCambioNuevo.ScrollBars = ScrollBars.Both;
-            _txtCambioNuevo.WordWrap = false;
-            _txtCambioNuevo.Dock = DockStyle.Fill;
-            _txtCambioNuevo.Font = new Font("Consolas", 8.5F);
-            _txtCambioNuevo.BackColor = Color.FromArgb(250, 252, 255);
-
-            tablaDetalle.Controls.Add(_lblCambioAnterior, 0, 0);
-            tablaDetalle.Controls.Add(_lblCambioNuevo, 1, 0);
-            tablaDetalle.Controls.Add(_txtCambioAnterior, 0, 1);
-            tablaDetalle.Controls.Add(_txtCambioNuevo, 1, 1);
-            hostDetalleCambios.Controls.Add(tablaDetalle);
-
-            _panelCambios.Controls.Add(hostDetalleCambios);
-            _panelCambios.Controls.Add(panelRestaurar);
-            _panelCambios.Controls.Add(hostCambios);
-            hostCambios.Controls.Add(_grillaCambios);
-            _panelCambios.Controls.Add(_lblEntidadCambios);
-            _panelCambios.Controls.Add(_cmbEntidadCambios);
-            _panelCambios.Controls.Add(_lblIdCambios);
-            _panelCambios.Controls.Add(_txtIdCambios);
-            _panelCambios.Controls.Add(_btnBuscarCambios);
-            _lblEntidadCambios.BringToFront();
-            _cmbEntidadCambios.BringToFront();
-            _lblIdCambios.BringToFront();
-            _txtIdCambios.BringToFront();
-            _btnBuscarCambios.BringToFront();
-
-            // ---- Vista 4: idiomas (T05) ----
-            _panelIdiomas.Dock = DockStyle.Fill;
-            _panelIdiomas.BackColor = Color.White;
-
-            var panelIdiomasIzq = new Panel { Dock = DockStyle.Left, Width = 330 };
-            _btnNuevoIdioma.Location = new Point(14, 14);
-            _btnNuevoIdioma.Size = new Size(150, 32);
-            EstiloPrimario(_btnNuevoIdioma);
-            _btnNuevoIdioma.Click += (s, e) => AbrirAltaIdioma();
-
-            _btnEliminarIdioma.Location = new Point(172, 14);
-            _btnEliminarIdioma.Size = new Size(144, 32);
-            EstiloSecundario(_btnEliminarIdioma);
-            _btnEliminarIdioma.Click += (s, e) => EliminarIdiomaSeleccionado();
-
-            var hostIdiomas = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 58, 8, 14) };
-            _grillaIdiomas.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaIdiomas);
-            _grillaIdiomas.Columns.Add("codigo", "");
-            _grillaIdiomas.Columns.Add("nombre", "");
-            _grillaIdiomas.Columns["codigo"].FillWeight = 30;
-            _grillaIdiomas.Columns["nombre"].FillWeight = 70;
-            hostIdiomas.Controls.Add(_grillaIdiomas);
-            panelIdiomasIzq.Controls.Add(hostIdiomas);
-            panelIdiomasIzq.Controls.Add(_btnNuevoIdioma);
-            panelIdiomasIzq.Controls.Add(_btnEliminarIdioma);
-            _btnNuevoIdioma.BringToFront();
-            _btnEliminarIdioma.BringToFront();
-
-            var panelIdiomasDer = new Panel { Dock = DockStyle.Fill };
-            _cmbIdiomaEditor.Location = new Point(14, 18);
-            _cmbIdiomaEditor.Size = new Size(320, 28);
-            _cmbIdiomaEditor.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbIdiomaEditor.Font = new Font("Segoe UI", 9.5F);
-            _cmbIdiomaEditor.SelectedIndexChanged += (s, e) => CargarTextosDelIdioma();
-
-            var hostTextos = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 58, 14, 116) };
-            _grillaTextos.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaTextos);
-            _grillaTextos.ReadOnly = false;
-            _grillaTextos.Columns.Add("clave", "");
-            _grillaTextos.Columns.Add("valor", "");
-            _grillaTextos.Columns["clave"].ReadOnly = true;
-            _grillaTextos.Columns["clave"].FillWeight = 38;
-            _grillaTextos.Columns["valor"].FillWeight = 62;
-            hostTextos.Controls.Add(_grillaTextos);
-
-            var panelTextosAbajo = new Panel { Dock = DockStyle.Bottom, Height = 108 };
-            _txtNuevaClave.Location = new Point(14, 12);
-            _txtNuevaClave.Size = new Size(220, 28);
-            _txtNuevaClave.Font = new Font("Segoe UI", 9.5F);
-            _txtNuevoValor.Location = new Point(244, 12);
-            _txtNuevoValor.Size = new Size(320, 28);
-            _txtNuevoValor.Font = new Font("Segoe UI", 9.5F);
-            _btnAgregarLeyenda.Location = new Point(576, 11);
-            _btnAgregarLeyenda.Size = new Size(170, 30);
-            EstiloSecundario(_btnAgregarLeyenda);
-            _btnAgregarLeyenda.Click += (s, e) => AgregarLeyendaInline();
-            _btnGuardarTextos.Location = new Point(14, 56);
-            _btnGuardarTextos.Size = new Size(220, 34);
-            EstiloPrimario(_btnGuardarTextos);
-            _btnGuardarTextos.Click += (s, e) => GuardarCambiosTextos();
-            panelTextosAbajo.Controls.Add(_txtNuevaClave);
-            panelTextosAbajo.Controls.Add(_txtNuevoValor);
-            panelTextosAbajo.Controls.Add(_btnAgregarLeyenda);
-            panelTextosAbajo.Controls.Add(_btnGuardarTextos);
-
-            panelIdiomasDer.Controls.Add(hostTextos);
-            panelIdiomasDer.Controls.Add(panelTextosAbajo);
-            panelIdiomasDer.Controls.Add(_cmbIdiomaEditor);
-            _cmbIdiomaEditor.BringToFront();
-
-            _panelIdiomas.Controls.Add(panelIdiomasDer);
-            _panelIdiomas.Controls.Add(panelIdiomasIzq);
-
-            // ---- Vista 5: perfiles y permisos (T04) ----
-            _panelPerfiles.Dock = DockStyle.Fill;
-            _panelPerfiles.BackColor = Color.White;
-
-            _cmbPerfiles.Location = new Point(14, 18);
-            _cmbPerfiles.Size = new Size(280, 28);
-            _cmbPerfiles.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbPerfiles.Font = new Font("Segoe UI", 9.5F);
-            _cmbPerfiles.SelectedIndexChanged += (s, e) => CargarArbolDelPerfil();
-
-            _btnMarcarTodo.Location = new Point(310, 17);
-            _btnMarcarTodo.Size = new Size(150, 30);
-            EstiloSecundario(_btnMarcarTodo);
-            _btnMarcarTodo.Click += (s, e) => MarcarTodo(true);
-
-            _btnDesmarcarTodo.Location = new Point(468, 17);
-            _btnDesmarcarTodo.Size = new Size(150, 30);
-            EstiloSecundario(_btnDesmarcarTodo);
-            _btnDesmarcarTodo.Click += (s, e) => MarcarTodo(false);
-
-            _btnGuardarPermisos.Location = new Point(626, 17);
-            _btnGuardarPermisos.Size = new Size(200, 30);
-            EstiloPrimario(_btnGuardarPermisos);
-            _btnGuardarPermisos.Click += (s, e) => GuardarPermisosDelPerfil();
-
-            var hostArbol = new Panel { Dock = DockStyle.Fill, Padding = new Padding(14, 58, 14, 14) };
-            _treePermisos.Dock = DockStyle.Fill;
-            _treePermisos.CheckBoxes = true;
-            _treePermisos.Font = new Font("Segoe UI", 10F);
-            _treePermisos.HideSelection = false;
-            _treePermisos.BackColor = Color.White;
-            _treePermisos.BorderStyle = BorderStyle.None;
-            _treePermisos.AfterCheck += TreePermisos_AfterCheck;
-            hostArbol.Controls.Add(_treePermisos);
-
-            _panelPerfiles.Controls.Add(hostArbol);
-            _panelPerfiles.Controls.Add(_cmbPerfiles);
-            _panelPerfiles.Controls.Add(_btnMarcarTodo);
-            _panelPerfiles.Controls.Add(_btnDesmarcarTodo);
-            _panelPerfiles.Controls.Add(_btnGuardarPermisos);
-            _cmbPerfiles.BringToFront();
-            _btnMarcarTodo.BringToFront();
-            _btnDesmarcarTodo.BringToFront();
-            _btnGuardarPermisos.BringToFront();
-
-            Controls.Add(_panelUsuarios);
-            Controls.Add(_panelBitacora);
-            Controls.Add(_panelCambios);
-            Controls.Add(_panelIdiomas);
-            Controls.Add(_panelPerfiles);
-            Controls.Add(_panelRespaldos);
-            Controls.Add(panelBarra);
-        }
-
-        private static void EstiloPrimario(Button boton)
-        {
-            boton.FlatStyle = FlatStyle.Flat;
-            boton.BackColor = Color.FromArgb(45, 108, 223);
-            boton.ForeColor = Color.White;
-            boton.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            boton.FlatAppearance.BorderSize = 0;
-            boton.Cursor = Cursors.Hand;
-        }
-
-        private static void EstiloSecundario(Button boton)
-        {
-            boton.FlatStyle = FlatStyle.Flat;
-            boton.BackColor = Color.White;
-            boton.ForeColor = Color.FromArgb(28, 60, 105);
-            boton.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            boton.FlatAppearance.BorderColor = Color.FromArgb(202, 220, 240);
-            boton.Cursor = Cursors.Hand;
-        }
-
-        private static void EstiloGrilla(DataGridView grilla)
-        {
-            grilla.ReadOnly = true;
-            grilla.AllowUserToAddRows = false;
-            grilla.AllowUserToDeleteRows = false;
-            grilla.AllowUserToResizeRows = false;
-            grilla.RowHeadersVisible = false;
-            grilla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grilla.MultiSelect = false;
-            grilla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            grilla.BackgroundColor = Color.White;
-            grilla.BorderStyle = BorderStyle.None;
-            grilla.GridColor = Color.FromArgb(225, 235, 245);
-            grilla.EnableHeadersVisualStyles = false;
-            grilla.ColumnHeadersHeight = 34;
-            grilla.RowTemplate.Height = 30;
-            grilla.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            grilla.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grilla.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grilla.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            grilla.DefaultCellStyle.Font = new Font("Segoe UI", 9.5F);
-            grilla.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            grilla.DefaultCellStyle.SelectionForeColor = Color.Black;
-            grilla.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-        }
-
-        private void ConfigurarBotonVista(Button boton, int x, int vista)
-        {
-            boton.Location = new Point(x, 15);
-            boton.Size = new Size(168, 32);
-            boton.FlatStyle = FlatStyle.Flat;
-            boton.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            boton.Cursor = Cursors.Hand;
-            boton.FlatAppearance.BorderColor = Color.FromArgb(202, 220, 240);
-            boton.Click += (s, e) => MostrarVista(vista);
         }
 
         private void MostrarVista(int vista)

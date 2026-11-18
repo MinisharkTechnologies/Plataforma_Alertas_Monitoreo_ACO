@@ -13,33 +13,32 @@ namespace Negocio.UI
     /// del valor (canal digital o telefónico) y resultado inmediato del triaje: clasificación
     /// de criticidad, reclasificación por tendencia peligrosa y alerta urgente generada.
     /// </summary>
-    public class RecepcionRINControl : UserControl
+    public partial class RecepcionRINControl : UserControl
     {
-        private readonly string _nombreUsuario;
+        private readonly string _nombreUsuario = string.Empty;
 
-        private readonly TextBox _txtDni = new();
-        private readonly Button _btnBuscar = new();
-        private readonly Label _lblIdentificacion = new();
-        private readonly Label _lblAviso = new();
-        private readonly Label _lblFicha = new();
-        private readonly Label _lblValor = new();
-        private readonly NumericUpDown _numValor = new();
-        private readonly Label _lblFecha = new();
-        private readonly DateTimePicker _dtpFecha = new();
-        private readonly Label _lblCanal = new();
-        private readonly ComboBox _cmbCanal = new();
-        private readonly Button _btnReportar = new();
-        private readonly Label _lblResultado = new();
-        private readonly Label _lblHistorial = new();
-        private readonly DataGridView _grillaHistorial = new();
-
+        // Los controles que se ven en pantalla se declaran en RecepcionRINControl.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
         private Paciente? _pacienteActual;
         private HistoriaClinica? _historiaActual;
 
-        public RecepcionRINControl(string nombreUsuario)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public RecepcionRINControl()
         {
+            InitializeComponent();
+        }
+
+        public RecepcionRINControl(string nombreUsuario) : this()
+        {
+            // En tiempo de diseño (diseñador de Visual Studio) no se tocan servicios ni la base de datos:
+            // alcanza con que los controles se hayan creado para que el control se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             _nombreUsuario = nombreUsuario;
-            ConstruirInterfaz();
+
             AplicarTextos();
             _lblResultado.Text = Localizacion("rin.resultadoSinDatos");
         }
@@ -56,182 +55,20 @@ namespace Negocio.UI
             }
         }
 
-        private void ConstruirInterfaz()
+        // Manejadores de eventos de la interfaz (se conectan desde RecepcionRINControl.Designer.cs).
+
+        private void TxtDni_KeyDown(object? sender, KeyEventArgs e)
         {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
-
-            var colorEtiqueta = Color.FromArgb(60, 85, 115);
-
-            // ---- Barra de identificación ----
-            var panelBusqueda = new Panel { Dock = DockStyle.Top, Height = 64, BackColor = BackColor };
-
-            _lblIdentificacion.Location = new Point(0, 4);
-            _lblIdentificacion.Size = new Size(320, 18);
-            _lblIdentificacion.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblIdentificacion.ForeColor = colorEtiqueta;
-
-            _txtDni.Name = "txtDni";
-            _txtDni.Location = new Point(0, 26);
-            _txtDni.Size = new Size(200, 28);
-            _txtDni.Font = new Font("Segoe UI", 11F);
-            _txtDni.KeyDown += (s, e) =>
+            if (e.KeyCode == Keys.Enter)
             {
-                if (e.KeyCode == Keys.Enter)
-                {
-                    e.SuppressKeyPress = true;
-                    BuscarPaciente();
-                }
-            };
-
-            _btnBuscar.Name = "btnBuscar";
-            _btnBuscar.Location = new Point(212, 25);
-            _btnBuscar.Size = new Size(110, 30);
-            _btnBuscar.FlatStyle = FlatStyle.Flat;
-            _btnBuscar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnBuscar.ForeColor = Color.White;
-            _btnBuscar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnBuscar.FlatAppearance.BorderSize = 0;
-            _btnBuscar.Cursor = Cursors.Hand;
-            _btnBuscar.Click += (s, e) => BuscarPaciente();
-
-            _lblAviso.Location = new Point(336, 32);
-            _lblAviso.Size = new Size(700, 22);
-            _lblAviso.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblAviso.ForeColor = Color.FromArgb(180, 40, 40);
-
-            panelBusqueda.Controls.Add(_lblIdentificacion);
-            panelBusqueda.Controls.Add(_txtDni);
-            panelBusqueda.Controls.Add(_btnBuscar);
-            panelBusqueda.Controls.Add(_lblAviso);
-
-            // ---- Ficha del paciente ----
-            var panelFicha = new Panel
-            {
-                Dock = DockStyle.Left,
-                Width = 380,
-                BackColor = Color.White,
-                Padding = new Padding(14, 10, 14, 10)
-            };
-            _lblFicha.Dock = DockStyle.Fill;
-            _lblFicha.Font = new Font("Segoe UI", 10.5F);
-            _lblFicha.ForeColor = Color.FromArgb(40, 60, 90);
-            panelFicha.Controls.Add(_lblFicha);
-
-            // ---- Formulario de reporte + resultado + historial ----
-            var panelDerecho = new Panel { Dock = DockStyle.Fill, BackColor = BackColor };
-
-            _lblValor.Location = new Point(10, 0);
-            _lblValor.Size = new Size(160, 18);
-            _lblValor.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblValor.ForeColor = colorEtiqueta;
-
-            _numValor.Name = "numValor";
-            _numValor.Location = new Point(10, 20);
-            _numValor.Size = new Size(140, 28);
-            _numValor.DecimalPlaces = 2;
-            _numValor.Minimum = 0.1M;
-            _numValor.Maximum = 20.0M;
-            _numValor.Increment = 0.1M;
-            _numValor.Value = 2.5M;
-            _numValor.Font = new Font("Segoe UI", 11F);
-
-            _lblFecha.Location = new Point(170, 0);
-            _lblFecha.Size = new Size(160, 18);
-            _lblFecha.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblFecha.ForeColor = colorEtiqueta;
-
-            _dtpFecha.Name = "dtpFecha";
-            _dtpFecha.Location = new Point(170, 20);
-            _dtpFecha.Size = new Size(150, 28);
-            _dtpFecha.Format = DateTimePickerFormat.Short;
-            _dtpFecha.Font = new Font("Segoe UI", 10F);
-
-            _lblCanal.Location = new Point(340, 0);
-            _lblCanal.Size = new Size(200, 18);
-            _lblCanal.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblCanal.ForeColor = colorEtiqueta;
-
-            _cmbCanal.Name = "cmbCanal";
-            _cmbCanal.Location = new Point(340, 20);
-            _cmbCanal.Size = new Size(220, 28);
-            _cmbCanal.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbCanal.Font = new Font("Segoe UI", 10F);
-
-            _btnReportar.Name = "btnReportar";
-            _btnReportar.Location = new Point(580, 18);
-            _btnReportar.Size = new Size(160, 34);
-            _btnReportar.FlatStyle = FlatStyle.Flat;
-            _btnReportar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnReportar.ForeColor = Color.White;
-            _btnReportar.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            _btnReportar.FlatAppearance.BorderSize = 0;
-            _btnReportar.Cursor = Cursors.Hand;
-            _btnReportar.Click += (s, e) => ReportarValor();
-
-            _lblResultado.Location = new Point(10, 66);
-            _lblResultado.Size = new Size(730, 96);
-            _lblResultado.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            _lblResultado.ForeColor = Color.FromArgb(120, 135, 150);
-
-            _lblHistorial.Location = new Point(10, 170);
-            _lblHistorial.Size = new Size(300, 18);
-            _lblHistorial.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblHistorial.ForeColor = colorEtiqueta;
-
-            _grillaHistorial.Dock = DockStyle.Bottom;
-            _grillaHistorial.Height = 210;
-            _grillaHistorial.ReadOnly = true;
-            _grillaHistorial.AllowUserToAddRows = false;
-            _grillaHistorial.AllowUserToDeleteRows = false;
-            _grillaHistorial.AllowUserToResizeRows = false;
-            _grillaHistorial.RowHeadersVisible = false;
-            _grillaHistorial.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            _grillaHistorial.MultiSelect = false;
-            _grillaHistorial.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            _grillaHistorial.BackgroundColor = Color.White;
-            _grillaHistorial.BorderStyle = BorderStyle.None;
-            _grillaHistorial.GridColor = Color.FromArgb(225, 235, 245);
-            _grillaHistorial.EnableHeadersVisualStyles = false;
-            _grillaHistorial.ColumnHeadersHeight = 34;
-            _grillaHistorial.RowTemplate.Height = 32;
-            _grillaHistorial.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            _grillaHistorial.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            _grillaHistorial.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _grillaHistorial.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            _grillaHistorial.DefaultCellStyle.Font = new Font("Segoe UI", 10.5F);
-            _grillaHistorial.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            _grillaHistorial.DefaultCellStyle.SelectionForeColor = Color.Black;
-            _grillaHistorial.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            _grillaHistorial.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-
-            _grillaHistorial.Columns.Add("fecha", "");
-            _grillaHistorial.Columns.Add("valor", "");
-            _grillaHistorial.Columns.Add("canal", "");
-            _grillaHistorial.Columns.Add("criticidad", "");
-            _grillaHistorial.Columns["fecha"].FillWeight = 22;
-            _grillaHistorial.Columns["valor"].FillWeight = 16;
-            _grillaHistorial.Columns["canal"].FillWeight = 32;
-            _grillaHistorial.Columns["criticidad"].FillWeight = 30;
-            _grillaHistorial.Columns["valor"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            _grillaHistorial.Columns["criticidad"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-            panelDerecho.Controls.Add(_lblValor);
-            panelDerecho.Controls.Add(_numValor);
-            panelDerecho.Controls.Add(_lblFecha);
-            panelDerecho.Controls.Add(_dtpFecha);
-            panelDerecho.Controls.Add(_lblCanal);
-            panelDerecho.Controls.Add(_cmbCanal);
-            panelDerecho.Controls.Add(_btnReportar);
-            panelDerecho.Controls.Add(_lblResultado);
-            panelDerecho.Controls.Add(_lblHistorial);
-            panelDerecho.Controls.Add(_grillaHistorial);
-
-            Controls.Add(panelDerecho);
-            Controls.Add(panelFicha);
-            Controls.Add(panelBusqueda);
+                e.SuppressKeyPress = true;
+                BuscarPaciente();
+            }
         }
+
+        private void BtnBuscar_Click(object? sender, EventArgs e) => BuscarPaciente();
+
+        private void BtnReportar_Click(object? sender, EventArgs e) => ReportarValor();
 
         private void AplicarTextos()
         {

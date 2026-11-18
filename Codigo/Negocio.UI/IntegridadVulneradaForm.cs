@@ -15,60 +15,36 @@ namespace Negocio.UI
     /// respaldo sano de la lista (o otro archivo .bak) y lo restaura, o recalcula los dígitos con confirmación.
     /// Todo queda en la bitácora (capa «Integridad»). Devuelve <see cref="DialogResult.Retry"/> si la base quedó sana.
     /// </summary>
-    public sealed class IntegridadVulneradaForm : Form
+    public sealed partial class IntegridadVulneradaForm : Form
     {
         /// <summary>Código del permiso que habilita la recuperación.</summary>
         public const string PermisoRespaldos = "SI004";
         private const string BaseNegocio = "OpenRIN_Negocio";
 
-        private readonly ListView _lstAlterados = new();
-        private readonly TextBox _txtUsuario = new();
-        private readonly TextBox _txtClave = new();
-        private readonly Button _btnEntrar = new();
-        private readonly Label _lblEstadoSesion = new();
-        private readonly Panel _panelRecuperacion = new();
-        private readonly ListView _lstRespaldos = new();
-        private readonly Button _btnRestaurarSel = new();
-        private readonly Button _btnRestaurarArchivo = new();
-        private readonly Button _btnRecalcular = new();
-        private readonly Button _btnSalir = new();
+        // Los controles se declaran en IntegridadVulneradaForm.Designer.cs (patrón de Visual Studio).
         private UsuarioAutenticado? _sesion;
 
         private static string T(string clave) => LocalizationService.ObtenerTexto(clave);
 
         /// <summary>Crea la pantalla a partir del resultado de la auditoría (nulo si no pudo ejecutarse).</summary>
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public IntegridadVulneradaForm()
+        {
+            InitializeComponent();
+        }
+
         public IntegridadVulneradaForm(ResultadoAuditoria? auditoria, IReadOnlyList<string> problemas)
         {
-            Text = T("integridad.vulnerada.titulo");
-            StartPosition = FormStartPosition.CenterScreen;
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            ControlBox = false;
-            ClientSize = new Size(760, 690);
-            BackColor = Color.White;
+            InitializeComponent();
+
+            // En tiempo de diseño no se tocan la base de datos ni la bitácora.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath);
 
-            Controls.Add(new Label
-            {
-                Text = "⚠", Font = new Font("Segoe UI", 36F, FontStyle.Bold), ForeColor = Color.FromArgb(200, 40, 40),
-                Location = new Point(20, 10), Size = new Size(70, 64), TextAlign = ContentAlignment.MiddleCenter
-            });
-            Controls.Add(new Label
-            {
-                Text = T("integridad.vulnerada.titulo"), Font = new Font("Segoe UI", 15F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(150, 25, 25), Location = new Point(96, 14), Size = new Size(640, 30)
-            });
-            Controls.Add(new Label
-            {
-                Text = T("integridad.vulnerada.mensaje"), Font = new Font("Segoe UI", 9.5F),
-                ForeColor = Color.FromArgb(55, 55, 55), Location = new Point(98, 46), Size = new Size(640, 48)
-            });
-
-            Controls.Add(Etiqueta(T("integridad.vulnerada.registros"), 24, 100, 700));
-            ConfigurarLista(_lstAlterados, new Point(24, 122), new Size(712, 150),
-                (T("integridad.col.tabla"), 150), (T("integridad.col.id"), 60), (T("integridad.col.motivo"), 480));
-            _lstAlterados.BackColor = Color.FromArgb(252, 245, 245);
             if (auditoria != null && auditoria.Alterados.Count > 0)
             {
                 foreach (RegistroAlterado r in auditoria.Alterados)
@@ -83,61 +59,29 @@ namespace Negocio.UI
                     _lstAlterados.Items.Add(new ListViewItem(new[] { "—", "—", p }));
                 }
             }
-            Controls.Add(_lstAlterados);
-
-            // ---- recuperación ----
-            Controls.Add(new Label
-            {
-                Text = T("integridad.rec.titulo"), Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(27, 79, 138), Location = new Point(24, 286), Size = new Size(700, 26)
-            });
-            Controls.Add(Etiqueta(T("integridad.rec.explicacion"), 24, 314, 712));
-
-            Controls.Add(Etiqueta(T("integridad.rec.usuario"), 24, 342, 120));
-            _txtUsuario.SetBounds(24, 362, 190, 26);
-            Controls.Add(_txtUsuario);
-            Controls.Add(Etiqueta(T("integridad.rec.clave"), 230, 342, 120));
-            _txtClave.SetBounds(230, 362, 190, 26);
-            _txtClave.UseSystemPasswordChar = true;
-            Controls.Add(_txtClave);
-            EstilizarBoton(_btnEntrar, T("integridad.rec.entrar"), Color.FromArgb(45, 108, 223));
-            _btnEntrar.SetBounds(436, 358, 150, 34);
-            _btnEntrar.Click += (s, e) => IniciarSesion();
-            Controls.Add(_btnEntrar);
-            AcceptButton = _btnEntrar;
-
-            _lblEstadoSesion.SetBounds(24, 396, 712, 20);
-            _lblEstadoSesion.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            Controls.Add(_lblEstadoSesion);
-
-            _panelRecuperacion.SetBounds(24, 420, 712, 210);
-            _panelRecuperacion.Enabled = false;
-            _panelRecuperacion.Controls.Add(Etiqueta(T("integridad.rec.listaRespaldos"), 0, 0, 700));
-            ConfigurarLista(_lstRespaldos, new Point(0, 22), new Size(712, 110),
-                (T("integridad.rec.col.fecha"), 130), (T("integridad.rec.col.origen"), 80), (T("integridad.rec.col.estado"), 110),
-                (T("integridad.rec.col.tamano"), 70), (T("integridad.rec.col.archivo"), 300));
-            _panelRecuperacion.Controls.Add(_lstRespaldos);
-
-            EstilizarBoton(_btnRestaurarSel, T("integridad.rec.restaurarSel"), Color.FromArgb(46, 125, 50));
-            _btnRestaurarSel.SetBounds(0, 144, 220, 36);
-            _btnRestaurarSel.Click += (s, e) => RestaurarSeleccionado();
-            EstilizarBoton(_btnRestaurarArchivo, T("integridad.rec.restaurarArchivo"), Color.FromArgb(45, 108, 223));
-            _btnRestaurarArchivo.SetBounds(232, 144, 240, 36);
-            _btnRestaurarArchivo.Click += (s, e) => RestaurarDesdeArchivo();
-            EstilizarBoton(_btnRecalcular, T("integridad.rec.recalcular"), Color.FromArgb(180, 120, 0));
-            _btnRecalcular.SetBounds(484, 144, 228, 36);
-            _btnRecalcular.Click += (s, e) => Recalcular();
-            _panelRecuperacion.Controls.AddRange(new Control[] { _btnRestaurarSel, _btnRestaurarArchivo, _btnRecalcular });
-            Controls.Add(_panelRecuperacion);
-
-            EstilizarBoton(_btnSalir, T("integridad.vulnerada.salir"), Color.FromArgb(200, 40, 40));
-            _btnSalir.SetBounds(606, 642, 130, 36);
-            _btnSalir.Click += (s, e) => { DialogResult = DialogResult.Cancel; Close(); };
-            Controls.Add(_btnSalir);
 
             BitacoraService.Registrar(LogLevel.Fatal,
                 $"Integridad — Alteración detectada: {(auditoria?.Alterados.Count ?? problemas.Count)} registro(s)/tabla(s) con dígitos verificadores inválidos. Ingreso bloqueado.",
                 capa: "Integridad");
+        }
+
+        /// <summary>Abre la recuperación con las credenciales ingresadas.</summary>
+        private void BtnEntrar_Click(object? sender, EventArgs e) => IniciarSesion();
+
+        /// <summary>Restaura el respaldo seleccionado de la lista.</summary>
+        private void BtnRestaurarSel_Click(object? sender, EventArgs e) => RestaurarSeleccionado();
+
+        /// <summary>Restaura un respaldo elegido con el explorador de archivos.</summary>
+        private void BtnRestaurarArchivo_Click(object? sender, EventArgs e) => RestaurarDesdeArchivo();
+
+        /// <summary>Recalcula los dígitos verificadores (acepta el estado actual).</summary>
+        private void BtnRecalcular_Click(object? sender, EventArgs e) => Recalcular();
+
+        /// <summary>Cierra la pantalla sin recuperar la base.</summary>
+        private void BtnSalir_Click(object? sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
         private void IniciarSesion()
@@ -310,39 +254,6 @@ namespace Negocio.UI
             }
             Aviso(T("integridad.rec.sigueVulnerada"), MessageBoxIcon.Warning);
             CargarRespaldos();
-        }
-
-        private static Label Etiqueta(string texto, int x, int y, int ancho) => new()
-        {
-            Text = texto, Location = new Point(x, y), Size = new Size(ancho, 20),
-            Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = Color.FromArgb(70, 70, 70)
-        };
-
-        private static void ConfigurarLista(ListView lista, Point ubicacion, Size tamano, params (string Titulo, int Ancho)[] columnas)
-        {
-            lista.Location = ubicacion;
-            lista.Size = tamano;
-            lista.View = View.Details;
-            lista.FullRowSelect = true;
-            lista.GridLines = true;
-            lista.MultiSelect = false;
-            lista.HideSelection = false;
-            lista.Font = new Font("Segoe UI", 9F);
-            foreach ((string titulo, int ancho) in columnas)
-            {
-                lista.Columns.Add(titulo, ancho);
-            }
-        }
-
-        private static void EstilizarBoton(Button boton, string texto, Color fondo)
-        {
-            boton.Text = texto;
-            boton.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            boton.BackColor = fondo;
-            boton.ForeColor = Color.White;
-            boton.FlatStyle = FlatStyle.Flat;
-            boton.FlatAppearance.BorderSize = 0;
-            boton.Cursor = Cursors.Hand;
         }
 
         private bool Confirmar(string texto)

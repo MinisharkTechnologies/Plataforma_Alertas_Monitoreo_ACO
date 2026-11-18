@@ -13,33 +13,32 @@ namespace Negocio.UI
     /// sugerencias de reasignación inteligente (estables con turno → críticos sin turno),
     /// con aceptación (libera + asigna + notifica) o rechazo (escalable al médico).
     /// </summary>
-    public class AgendaControl : UserControl
+    public partial class AgendaControl : UserControl
     {
-        private readonly string _nombreUsuario;
+        private readonly string _nombreUsuario = string.Empty;
         private readonly bool _puedeGestionar;
 
-        private readonly Label _lblDesde = new();
-        private readonly DateTimePicker _dtpDesde = new();
-        private readonly Label _lblHasta = new();
-        private readonly DateTimePicker _dtpHasta = new();
-        private readonly Button _btnActualizar = new();
-        private readonly Button _btnAgendar = new();
-        private readonly DataGridView _grillaTurnos = new();
-        private readonly Label _lblSinTurnos = new();
-        private readonly Panel _panelSugerencias = new();
-        private readonly Label _lblSugerenciasTitulo = new();
-        private readonly DataGridView _grillaSugerencias = new();
-        private readonly Button _btnAceptarSugerencia = new();
-        private readonly Button _btnRechazarSugerencia = new();
-        private readonly Label _lblInfoSugerencias = new();
+        // Los controles de la interfaz se declaran en AgendaControl.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
         private List<SugerenciaReasignacion> _sugerencias = new();
 
-        public AgendaControl(int idUsuario, string nombreUsuario)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public AgendaControl()
+        {
+            InitializeComponent();
+        }
+
+        public AgendaControl(int idUsuario, string nombreUsuario) : this()
         {
             _nombreUsuario = nombreUsuario;
-            _puedeGestionar = SeguridadService.TienePermiso(idUsuario, "GESTION_AGENDA");
 
-            ConstruirInterfaz();
+            // En tiempo de diseño no se consultan permisos ni se toca la base de datos.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
+            _puedeGestionar = SeguridadService.TienePermiso(idUsuario, "GESTION_AGENDA");
             AplicarTextos();
             CargarTodo();
         }
@@ -56,172 +55,15 @@ namespace Negocio.UI
             CargarTodo();
         }
 
-        private void ConstruirInterfaz()
-        {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
+        /// <summary>Vuelve a cargar la agenda y las sugerencias.</summary>
+        private void BtnActualizar_Click(object? sender, EventArgs e) => CargarTodo();
 
-            var colorEtiqueta = Color.FromArgb(60, 85, 115);
+        /// <summary>Abre el formulario de alta de turno.</summary>
+        private void BtnAgendar_Click(object? sender, EventArgs e) => AbrirAgendador();
 
-            // ---- Barra superior ----
-            var panelBarra = new Panel { Dock = DockStyle.Top, Height = 58, BackColor = BackColor };
+        private void BtnAceptarSugerencia_Click(object? sender, EventArgs e) => AceptarSugerenciaSeleccionada();
 
-            _lblDesde.Location = new Point(0, 20);
-            _lblDesde.Size = new Size(50, 20);
-            _lblDesde.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblDesde.ForeColor = colorEtiqueta;
-
-            _dtpDesde.Location = new Point(54, 16);
-            _dtpDesde.Size = new Size(120, 28);
-            _dtpDesde.Format = DateTimePickerFormat.Short;
-            _dtpDesde.Font = new Font("Segoe UI", 10F);
-            _dtpDesde.Value = DateTime.Today;
-
-            _lblHasta.Location = new Point(188, 20);
-            _lblHasta.Size = new Size(50, 20);
-            _lblHasta.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _lblHasta.ForeColor = colorEtiqueta;
-
-            _dtpHasta.Location = new Point(238, 16);
-            _dtpHasta.Size = new Size(120, 28);
-            _dtpHasta.Format = DateTimePickerFormat.Short;
-            _dtpHasta.Font = new Font("Segoe UI", 10F);
-            _dtpHasta.Value = DateTime.Today.AddDays(30);
-
-            _btnActualizar.Location = new Point(374, 15);
-            _btnActualizar.Size = new Size(160, 30);
-            _btnActualizar.FlatStyle = FlatStyle.Flat;
-            _btnActualizar.BackColor = Color.White;
-            _btnActualizar.ForeColor = Color.FromArgb(28, 60, 105);
-            _btnActualizar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnActualizar.FlatAppearance.BorderColor = Color.FromArgb(202, 220, 240);
-            _btnActualizar.Cursor = Cursors.Hand;
-            _btnActualizar.Click += (s, e) => CargarTodo();
-
-            _btnAgendar.Location = new Point(546, 15);
-            _btnAgendar.Size = new Size(170, 32);
-            _btnAgendar.FlatStyle = FlatStyle.Flat;
-            _btnAgendar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnAgendar.ForeColor = Color.White;
-            _btnAgendar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnAgendar.FlatAppearance.BorderSize = 0;
-            _btnAgendar.Cursor = Cursors.Hand;
-            _btnAgendar.Click += (s, e) => AbrirAgendador();
-
-            panelBarra.Controls.Add(_lblDesde);
-            panelBarra.Controls.Add(_dtpDesde);
-            panelBarra.Controls.Add(_lblHasta);
-            panelBarra.Controls.Add(_dtpHasta);
-            panelBarra.Controls.Add(_btnActualizar);
-            panelBarra.Controls.Add(_btnAgendar);
-
-            // ---- Grilla de turnos ----
-            _grillaTurnos.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaTurnos);
-            _grillaTurnos.Columns.Add("fechaHora", "");
-            _grillaTurnos.Columns.Add("paciente", "");
-            _grillaTurnos.Columns.Add("medico", "");
-            _grillaTurnos.Columns.Add("estado", "");
-            _grillaTurnos.Columns.Add("observaciones", "");
-            _grillaTurnos.Columns["fechaHora"].FillWeight = 18;
-            _grillaTurnos.Columns["paciente"].FillWeight = 24;
-            _grillaTurnos.Columns["medico"].FillWeight = 22;
-            _grillaTurnos.Columns["estado"].FillWeight = 14;
-            _grillaTurnos.Columns["observaciones"].FillWeight = 22;
-            _grillaTurnos.Columns["estado"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-            _lblSinTurnos.Dock = DockStyle.Bottom;
-            _lblSinTurnos.Height = 24;
-            _lblSinTurnos.Font = new Font("Segoe UI", 9.5F);
-            _lblSinTurnos.ForeColor = Color.FromArgb(150, 100, 40);
-
-            // ---- Panel de sugerencias ----
-            _panelSugerencias.Dock = DockStyle.Right;
-            _panelSugerencias.Width = 480;
-            _panelSugerencias.BackColor = Color.White;
-            _panelSugerencias.Padding = new Padding(12, 10, 12, 10);
-
-            _lblSugerenciasTitulo.Dock = DockStyle.Top;
-            _lblSugerenciasTitulo.Height = 32;
-            _lblSugerenciasTitulo.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
-            _lblSugerenciasTitulo.ForeColor = Color.FromArgb(41, 98, 176);
-
-            var panelBotones = new Panel { Dock = DockStyle.Bottom, Height = 96, BackColor = Color.White };
-            _btnAceptarSugerencia.Location = new Point(0, 6);
-            _btnAceptarSugerencia.Size = new Size(220, 36);
-            _btnAceptarSugerencia.FlatStyle = FlatStyle.Flat;
-            _btnAceptarSugerencia.BackColor = Color.FromArgb(45, 108, 223);
-            _btnAceptarSugerencia.ForeColor = Color.White;
-            _btnAceptarSugerencia.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnAceptarSugerencia.FlatAppearance.BorderSize = 0;
-            _btnAceptarSugerencia.Cursor = Cursors.Hand;
-            _btnAceptarSugerencia.Click += (s, e) => AceptarSugerenciaSeleccionada();
-
-            _btnRechazarSugerencia.Location = new Point(232, 6);
-            _btnRechazarSugerencia.Size = new Size(220, 36);
-            _btnRechazarSugerencia.FlatStyle = FlatStyle.Flat;
-            _btnRechazarSugerencia.BackColor = Color.White;
-            _btnRechazarSugerencia.ForeColor = Color.FromArgb(28, 60, 105);
-            _btnRechazarSugerencia.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnRechazarSugerencia.FlatAppearance.BorderColor = Color.FromArgb(202, 220, 240);
-            _btnRechazarSugerencia.Cursor = Cursors.Hand;
-            _btnRechazarSugerencia.Click += (s, e) => RechazarSugerenciaSeleccionada();
-
-            _lblInfoSugerencias.Location = new Point(0, 52);
-            _lblInfoSugerencias.Size = new Size(452, 36);
-            _lblInfoSugerencias.Font = new Font("Segoe UI", 9F);
-            _lblInfoSugerencias.ForeColor = Color.FromArgb(150, 100, 40);
-
-            panelBotones.Controls.Add(_btnAceptarSugerencia);
-            panelBotones.Controls.Add(_btnRechazarSugerencia);
-            panelBotones.Controls.Add(_lblInfoSugerencias);
-
-            _grillaSugerencias.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaSugerencias);
-            _grillaSugerencias.Columns.Add("turno", "");
-            _grillaSugerencias.Columns.Add("de", "");
-            _grillaSugerencias.Columns.Add("a", "");
-            _grillaSugerencias.Columns["turno"].FillWeight = 26;
-            _grillaSugerencias.Columns["de"].FillWeight = 37;
-            _grillaSugerencias.Columns["a"].FillWeight = 37;
-
-            _panelSugerencias.Controls.Add(_grillaSugerencias);
-            _panelSugerencias.Controls.Add(panelBotones);
-            _panelSugerencias.Controls.Add(_lblSugerenciasTitulo);
-
-            Controls.Add(_grillaTurnos);
-            Controls.Add(_lblSinTurnos);
-            Controls.Add(_panelSugerencias);
-            Controls.Add(panelBarra);
-        }
-
-        private static void EstiloGrilla(DataGridView grilla)
-        {
-            grilla.ReadOnly = true;
-            grilla.AllowUserToAddRows = false;
-            grilla.AllowUserToDeleteRows = false;
-            grilla.AllowUserToResizeRows = false;
-            grilla.RowHeadersVisible = false;
-            grilla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grilla.MultiSelect = false;
-            grilla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            grilla.BackgroundColor = Color.White;
-            grilla.BorderStyle = BorderStyle.None;
-            grilla.GridColor = Color.FromArgb(225, 235, 245);
-            grilla.EnableHeadersVisualStyles = false;
-            grilla.ColumnHeadersHeight = 34;
-            grilla.RowTemplate.Height = 32;
-            grilla.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            grilla.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grilla.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grilla.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            grilla.DefaultCellStyle.Font = new Font("Segoe UI", 10F);
-            grilla.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            grilla.DefaultCellStyle.SelectionForeColor = Color.Black;
-            grilla.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-        }
+        private void BtnRechazarSugerencia_Click(object? sender, EventArgs e) => RechazarSugerenciaSeleccionada();
 
         private void AplicarTextos()
         {

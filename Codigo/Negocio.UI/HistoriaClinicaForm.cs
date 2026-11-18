@@ -11,7 +11,7 @@ namespace Negocio.UI
     /// Historia clínica hematológica de un paciente (REQ-FUNC-002): creación/actualización por
     /// perfiles con permiso HISTORIA_CLINICA, o vista de solo lectura para el resto.
     /// </summary>
-    public class HistoriaClinicaForm : Form
+    public partial class HistoriaClinicaForm : Form
     {
         private sealed class OpcionDiagnostico
         {
@@ -20,156 +20,71 @@ namespace Negocio.UI
             public override string ToString() => Nombre;
         }
 
-        private readonly Paciente _paciente;
-        private readonly string _usuarioResponsable;
+        private readonly Paciente _paciente = null!;
+        private readonly string _usuarioResponsable = string.Empty;
         private readonly bool _puedeEditar;
 
-        private readonly ComboBox _cmbDiagnostico = new();
-        private readonly NumericUpDown _numInferior = new();
-        private readonly NumericUpDown _numSuperior = new();
-        private readonly TextBox _txtMedicamento = new();
-        private readonly TextBox _txtDosis = new();
-        private readonly NumericUpDown _numPeriodicidad = new();
-        private readonly CheckBox _chkProximoControl = new();
-        private readonly DateTimePicker _dtpProximoControl = new();
-        private readonly Label _lblAviso = new();
+        // Los controles de la interfaz se declaran en HistoriaClinicaForm.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
 
-        public HistoriaClinicaForm(Paciente paciente, string usuarioResponsable, bool puedeEditar)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public HistoriaClinicaForm()
         {
+            InitializeComponent();
+        }
+
+        public HistoriaClinicaForm(Paciente paciente, string usuarioResponsable, bool puedeEditar) : this()
+        {
+            // En tiempo de diseño (diseñador de Visual Studio) no se toca la base de datos:
+            // alcanza con que los controles se hayan creado para que el formulario se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             _paciente = paciente;
             _usuarioResponsable = usuarioResponsable;
             _puedeEditar = puedeEditar;
-
-            Text = $"OpenRIN — {Localizacion("hc.titulo")} — {paciente.NombreCompleto}";
-            ClientSize = new Size(520, 430);
-            FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = false;
-            MinimizeBox = false;
-            StartPosition = FormStartPosition.CenterParent;
-            ShowInTaskbar = false;
-            BackColor = Color.White;
-
-            ConstruirInterfaz();
+            _dtpProximoControl.Value = DateTime.Today;
+            AplicarTextos();
+            AplicarPermisosEdicion();
             Cargar();
         }
 
         private static string Localizacion(string clave) => LocalizationService.ObtenerTexto(clave);
 
-        private static Label Etiqueta(string clave, int x, int y, int ancho = 210)
-            => new()
-            {
-                Text = Localizacion(clave),
-                Location = new Point(x, y),
-                Size = new Size(ancho, 18),
-                Font = new Font("Segoe UI", 9.5F, FontStyle.Bold)
-            };
-
-        private void ConstruirInterfaz()
+        /// <summary>Aplica los textos localizados a las etiquetas y botones del diálogo.</summary>
+        private void AplicarTextos()
         {
-            _lblAviso.Location = new Point(18, 12);
-            _lblAviso.Size = new Size(484, 36);
-            _lblAviso.Font = new Font("Segoe UI", 9F);
-            _lblAviso.ForeColor = Color.FromArgb(140, 80, 20);
+            Text = $"OpenRIN — {Localizacion("hc.titulo")} — {_paciente.NombreCompleto}";
+            _lblDiagnostico.Text = Localizacion("hc.diagnostico");
+            _lblLimiteInferior.Text = Localizacion("hc.limiteInferior");
+            _lblLimiteSuperior.Text = Localizacion("hc.limiteSuperior");
+            _lblMedicamento.Text = Localizacion("hc.medicamento");
+            _lblDosis.Text = Localizacion("hc.dosis");
+            _lblPeriodicidad.Text = Localizacion("hc.periodicidad");
+            _btnGuardar.Text = Localizacion("comun.guardar");
+            _btnCerrar.Text = Localizacion("comun.cerrar");
+        }
 
-            Controls.Add(Etiqueta("hc.diagnostico", 18, 52));
-            _cmbDiagnostico.Location = new Point(18, 72);
-            _cmbDiagnostico.Size = new Size(484, 28);
-            _cmbDiagnostico.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbDiagnostico.Font = new Font("Segoe UI", 10F);
-
-            Controls.Add(Etiqueta("hc.limiteInferior", 18, 112));
-            _numInferior.Location = new Point(18, 132);
-            _numInferior.Size = new Size(200, 28);
-            _numInferior.DecimalPlaces = 2;
-            _numInferior.Minimum = 0.1M;
-            _numInferior.Maximum = 20.0M;
-            _numInferior.Increment = 0.1M;
-            _numInferior.Value = 2.0M;
-            _numInferior.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("hc.limiteSuperior", 264, 112));
-            _numSuperior.Location = new Point(264, 132);
-            _numSuperior.Size = new Size(238, 28);
-            _numSuperior.DecimalPlaces = 2;
-            _numSuperior.Minimum = 0.1M;
-            _numSuperior.Maximum = 20.0M;
-            _numSuperior.Increment = 0.1M;
-            _numSuperior.Value = 3.0M;
-            _numSuperior.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("hc.medicamento", 18, 172));
-            _txtMedicamento.Location = new Point(18, 192);
-            _txtMedicamento.Size = new Size(238, 28);
-            _txtMedicamento.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("hc.dosis", 264, 172));
-            _txtDosis.Location = new Point(264, 192);
-            _txtDosis.Size = new Size(238, 28);
-            _txtDosis.Font = new Font("Segoe UI", 10.5F);
-
-            Controls.Add(Etiqueta("hc.periodicidad", 18, 232));
-            _numPeriodicidad.Location = new Point(18, 252);
-            _numPeriodicidad.Size = new Size(160, 28);
-            _numPeriodicidad.Minimum = 1;
-            _numPeriodicidad.Maximum = 365;
-            _numPeriodicidad.Value = 30;
-            _numPeriodicidad.Font = new Font("Segoe UI", 10.5F);
-
-            _chkProximoControl.Location = new Point(264, 234);
-            _chkProximoControl.Size = new Size(238, 22);
-            _chkProximoControl.Font = new Font("Segoe UI", 9.5F);
-            _chkProximoControl.CheckedChanged += (s, e) => _dtpProximoControl.Enabled = _chkProximoControl.Checked && _puedeEditar;
-
-            _dtpProximoControl.Location = new Point(264, 256);
-            _dtpProximoControl.Size = new Size(160, 28);
-            _dtpProximoControl.Format = DateTimePickerFormat.Short;
-            _dtpProximoControl.Enabled = false;
-            _dtpProximoControl.Font = new Font("Segoe UI", 10F);
-
-            var btnGuardar = new Button
+        /// <summary>Deja la pantalla en solo lectura cuando el perfil no puede modificar la historia clínica.</summary>
+        private void AplicarPermisosEdicion()
+        {
+            if (_puedeEditar)
             {
-                Text = Localizacion("comun.guardar"),
-                Location = new Point(316, 320),
-                Size = new Size(90, 36),
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.FromArgb(45, 108, 223),
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10F, FontStyle.Bold)
-            };
-            btnGuardar.FlatAppearance.BorderSize = 0;
-            btnGuardar.Click += BtnGuardar_Click;
-
-            var btnCerrar = new Button
-            {
-                Text = Localizacion("comun.cerrar"),
-                Location = new Point(414, 320),
-                Size = new Size(90, 36),
-                FlatStyle = FlatStyle.Flat
-            };
-            btnCerrar.Click += (s, e) => { DialogResult = DialogResult.Cancel; };
-
-            AcceptButton = btnGuardar;
-            CancelButton = btnCerrar;
-
-            Controls.AddRange(new Control[]
-            {
-                _lblAviso, _cmbDiagnostico, _numInferior, _numSuperior, _txtMedicamento, _txtDosis,
-                _numPeriodicidad, _chkProximoControl, _dtpProximoControl, btnGuardar, btnCerrar
-            });
-
-            if (!_puedeEditar)
-            {
-                _cmbDiagnostico.Enabled = false;
-                _numInferior.Enabled = false;
-                _numSuperior.Enabled = false;
-                _txtMedicamento.ReadOnly = true;
-                _txtDosis.ReadOnly = true;
-                _numPeriodicidad.Enabled = false;
-                _chkProximoControl.Enabled = false;
-                _dtpProximoControl.Enabled = false;
-                btnGuardar.Visible = false;
-                _lblAviso.Text = Localizacion("hc.soloLectura");
+                return;
             }
+
+            _cmbDiagnostico.Enabled = false;
+            _numInferior.Enabled = false;
+            _numSuperior.Enabled = false;
+            _txtMedicamento.ReadOnly = true;
+            _txtDosis.ReadOnly = true;
+            _numPeriodicidad.Enabled = false;
+            _chkProximoControl.Enabled = false;
+            _dtpProximoControl.Enabled = false;
+            _btnGuardar.Visible = false;
+            _lblAviso.Text = Localizacion("hc.soloLectura");
         }
 
         private void Cargar()
@@ -215,6 +130,18 @@ namespace Negocio.UI
                 _chkProximoControl.Checked = true;
                 _dtpProximoControl.Value = hc.ProximaFechaControl.Value;
             }
+        }
+
+        /// <summary>Habilita el selector de fecha solo si se marcó el control y el perfil puede editar.</summary>
+        private void ChkProximoControl_CheckedChanged(object? sender, EventArgs e)
+        {
+            _dtpProximoControl.Enabled = _chkProximoControl.Checked && _puedeEditar;
+        }
+
+        /// <summary>Cierra el diálogo sin guardar (botón Cerrar).</summary>
+        private void BtnCerrar_Click(object? sender, EventArgs e)
+        {
+            DialogResult = DialogResult.Cancel;
         }
 
         private void BtnGuardar_Click(object? sender, EventArgs e)

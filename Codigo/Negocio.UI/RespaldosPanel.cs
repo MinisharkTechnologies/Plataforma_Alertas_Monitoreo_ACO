@@ -81,6 +81,13 @@ namespace Negocio.UI
             {
                 c.BringToFront();
             }
+
+            // En tiempo de diseño (diseñador de Visual Studio) no se consulta la base de datos:
+            // alcanza con que los controles estén creados para que el panel se dibuje.
+            if (Disenio.Activo)
+            {
+                return;
+            }
             AplicarTextos();
         }
 

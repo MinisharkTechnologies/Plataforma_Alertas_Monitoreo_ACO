@@ -13,7 +13,7 @@ namespace Negocio.UI
     /// activas), protocolo progresivo de contacto (umbral de intentos fallidos → escalado al
     /// médico) y registro de decisiones clínicas (que pueden actualizar la periodicidad de la HC).
     /// </summary>
-    public class SeguimientoControl : UserControl
+    public partial class SeguimientoControl : UserControl
     {
         /// <summary>Fila del listado de casos en seguimiento.</summary>
         private sealed class FilaCaso
@@ -27,45 +27,32 @@ namespace Negocio.UI
         }
 
         private readonly int _idUsuario;
-        private readonly string _nombreUsuario;
+        private readonly string _nombreUsuario = string.Empty;
         private readonly List<FilaCaso> _casos = new();
 
-        private readonly Button _btnDetectar = new();
-        private readonly DataGridView _grillaCasos = new();
-        private readonly Label _lblSinCasos = new();
-
-        private readonly Panel _panelDetalle = new();
-        private readonly Label _lblPacienteDetalle = new();
-        private readonly Label _lblProtocolo = new();
-        private readonly Label _lblContactoSeccion = new();
-        private readonly Label _lblTipoContacto = new();
-        private readonly ComboBox _cmbTipoContacto = new();
-        private readonly Label _lblResultado = new();
-        private readonly ComboBox _cmbResultado = new();
-        private readonly Label _lblObservaciones = new();
-        private readonly TextBox _txtObservaciones = new();
-        private readonly Button _btnRegistrarIntento = new();
-        private readonly Label _lblAviso = new();
-        private readonly Label _lblDecisionSeccion = new();
-        private readonly Label _lblDecision = new();
-        private readonly ComboBox _cmbDecision = new();
-        private readonly Label _lblPeriodicidad = new();
-        private readonly NumericUpDown _numPeriodicidad = new();
-        private readonly Label _lblDetalleDecision = new();
-        private readonly TextBox _txtDetalleDecision = new();
-        private readonly Button _btnRegistrarDecision = new();
-        private readonly Label _lblHistorial = new();
-        private readonly DataGridView _grillaHistorial = new();
+        // Los controles de la interfaz se declaran en SeguimientoControl.Designer.cs
+        // (patrón estándar de Visual Studio) para que el diseñador pueda dibujarlos.
 
         private int _idPacienteSeleccionado;
         private bool _recargando;
 
-        public SeguimientoControl(int idUsuario, string nombreUsuario)
+        /// <summary>Constructor para el diseñador de Visual Studio (no se usa en ejecución).</summary>
+        public SeguimientoControl()
+        {
+            InitializeComponent();
+        }
+
+        public SeguimientoControl(int idUsuario, string nombreUsuario) : this()
         {
             _idUsuario = idUsuario;
             _nombreUsuario = nombreUsuario;
 
-            ConstruirInterfaz();
+            // En tiempo de diseño no se toca la base de datos.
+            if (Disenio.Activo)
+            {
+                return;
+            }
+
             AplicarTextos();
             Recargar();
         }
@@ -93,254 +80,31 @@ namespace Negocio.UI
             Recargar();
         }
 
-        private void ConstruirInterfaz()
+        /// <summary>Detecta los plazos vencidos y recarga.</summary>
+        private void BtnDetectar_Click(object? sender, EventArgs e) => DetectarPlazos();
+
+        /// <summary>Al cambiar la fila seleccionada, muestra el detalle del caso.</summary>
+        private void GrillaCasos_SelectionChanged(object? sender, EventArgs e)
         {
-            Dock = DockStyle.Fill;
-            BackColor = Color.FromArgb(244, 249, 254);
-            Padding = new Padding(8, 4, 8, 6);
-
-            // ---- Barra superior ----
-            var panelBarra = new Panel { Dock = DockStyle.Top, Height = 58, BackColor = BackColor };
-            _btnDetectar.Location = new Point(0, 15);
-            _btnDetectar.Size = new Size(230, 32);
-            _btnDetectar.FlatStyle = FlatStyle.Flat;
-            _btnDetectar.BackColor = Color.FromArgb(45, 108, 223);
-            _btnDetectar.ForeColor = Color.White;
-            _btnDetectar.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnDetectar.FlatAppearance.BorderSize = 0;
-            _btnDetectar.Cursor = Cursors.Hand;
-            _btnDetectar.Click += (s, e) => DetectarPlazos();
-            panelBarra.Controls.Add(_btnDetectar);
-
-            // ---- Grilla de casos ----
-            _grillaCasos.Dock = DockStyle.Fill;
-            EstiloGrilla(_grillaCasos);
-            _grillaCasos.Columns.Add("paciente", "");
-            _grillaCasos.Columns.Add("ultimo", "");
-            _grillaCasos.Columns.Add("dias", "");
-            _grillaCasos.Columns.Add("intentos", "");
-            _grillaCasos.Columns.Add("protocolo", "");
-            _grillaCasos.Columns["paciente"].FillWeight = 30;
-            _grillaCasos.Columns["ultimo"].FillWeight = 18;
-            _grillaCasos.Columns["dias"].FillWeight = 12;
-            _grillaCasos.Columns["intentos"].FillWeight = 12;
-            _grillaCasos.Columns["protocolo"].FillWeight = 28;
-            foreach (string columna in new[] { "dias", "intentos", "protocolo" })
+            if (_recargando || _grillaCasos.SelectedRows.Count == 0)
             {
-                _grillaCasos.Columns[columna].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                return;
             }
-            _grillaCasos.SelectionChanged += (s, e) =>
+            int indice = _grillaCasos.SelectedRows[0].Index;
+            if (indice >= 0 && indice < _casos.Count)
             {
-                if (_recargando || _grillaCasos.SelectedRows.Count == 0)
-                {
-                    return;
-                }
-                int indice = _grillaCasos.SelectedRows[0].Index;
-                if (indice >= 0 && indice < _casos.Count)
-                {
-                    CargarDetalle(_casos[indice].IdPaciente);
-                }
-            };
-
-            _lblSinCasos.Dock = DockStyle.Bottom;
-            _lblSinCasos.Height = 24;
-            _lblSinCasos.Font = new Font("Segoe UI", 9.5F);
-            _lblSinCasos.ForeColor = Color.FromArgb(150, 100, 40);
-
-            // ---- Panel de detalle ----
-            _panelDetalle.Dock = DockStyle.Right;
-            _panelDetalle.Width = 520;
-            _panelDetalle.BackColor = Color.White;
-            _panelDetalle.Padding = new Padding(12, 10, 12, 10);
-
-            var colorEtiqueta = Color.FromArgb(60, 85, 115);
-            Font fuenteEtiqueta = new("Segoe UI", 9F, FontStyle.Bold);
-
-            _lblPacienteDetalle.Location = new Point(14, 10);
-            _lblPacienteDetalle.Size = new Size(480, 24);
-            _lblPacienteDetalle.Font = new Font("Segoe UI", 12F, FontStyle.Bold);
-            _lblPacienteDetalle.ForeColor = Color.FromArgb(30, 66, 120);
-
-            _lblProtocolo.Location = new Point(14, 36);
-            _lblProtocolo.Size = new Size(480, 20);
-            _lblProtocolo.Font = new Font("Segoe UI", 9.5F);
-            _lblProtocolo.ForeColor = colorEtiqueta;
-
-            _lblContactoSeccion.Location = new Point(14, 64);
-            _lblContactoSeccion.Size = new Size(480, 20);
-            _lblContactoSeccion.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            _lblContactoSeccion.ForeColor = Color.FromArgb(41, 98, 176);
-
-            _lblTipoContacto.Location = new Point(14, 86);
-            _lblTipoContacto.Size = new Size(220, 16);
-            _lblTipoContacto.Font = fuenteEtiqueta;
-            _lblTipoContacto.ForeColor = colorEtiqueta;
-
-            _cmbTipoContacto.Location = new Point(14, 104);
-            _cmbTipoContacto.Size = new Size(220, 28);
-            _cmbTipoContacto.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbTipoContacto.Font = new Font("Segoe UI", 9.5F);
-
-            _lblResultado.Location = new Point(250, 86);
-            _lblResultado.Size = new Size(240, 16);
-            _lblResultado.Font = fuenteEtiqueta;
-            _lblResultado.ForeColor = colorEtiqueta;
-
-            _cmbResultado.Location = new Point(250, 104);
-            _cmbResultado.Size = new Size(240, 28);
-            _cmbResultado.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbResultado.Font = new Font("Segoe UI", 9.5F);
-
-            _lblObservaciones.Location = new Point(14, 136);
-            _lblObservaciones.Size = new Size(476, 16);
-            _lblObservaciones.Font = fuenteEtiqueta;
-            _lblObservaciones.ForeColor = colorEtiqueta;
-
-            _txtObservaciones.Name = "txtObservaciones";
-            _txtObservaciones.Location = new Point(14, 154);
-            _txtObservaciones.Size = new Size(476, 26);
-            _txtObservaciones.Font = new Font("Segoe UI", 9.5F);
-
-            _btnRegistrarIntento.Location = new Point(14, 188);
-            _btnRegistrarIntento.Size = new Size(200, 34);
-            _btnRegistrarIntento.FlatStyle = FlatStyle.Flat;
-            _btnRegistrarIntento.BackColor = Color.FromArgb(45, 108, 223);
-            _btnRegistrarIntento.ForeColor = Color.White;
-            _btnRegistrarIntento.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnRegistrarIntento.FlatAppearance.BorderSize = 0;
-            _btnRegistrarIntento.Cursor = Cursors.Hand;
-            _btnRegistrarIntento.Click += (s, e) => RegistrarIntento();
-
-            _lblAviso.Location = new Point(224, 190);
-            _lblAviso.Size = new Size(266, 44);
-            _lblAviso.Font = new Font("Segoe UI", 8.5F);
-            _lblAviso.ForeColor = Color.FromArgb(180, 40, 40);
-
-            _lblDecisionSeccion.Location = new Point(14, 234);
-            _lblDecisionSeccion.Size = new Size(480, 20);
-            _lblDecisionSeccion.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            _lblDecisionSeccion.ForeColor = Color.FromArgb(41, 98, 176);
-
-            _lblDecision.Location = new Point(14, 256);
-            _lblDecision.Size = new Size(240, 16);
-            _lblDecision.Font = fuenteEtiqueta;
-            _lblDecision.ForeColor = colorEtiqueta;
-
-            _cmbDecision.Location = new Point(14, 274);
-            _cmbDecision.Size = new Size(240, 28);
-            _cmbDecision.DropDownStyle = ComboBoxStyle.DropDownList;
-            _cmbDecision.Font = new Font("Segoe UI", 9.5F);
-            _cmbDecision.SelectedIndexChanged += (s, e) => ActualizarPeriodicidadHabilitada();
-
-            _lblPeriodicidad.Location = new Point(270, 256);
-            _lblPeriodicidad.Size = new Size(220, 16);
-            _lblPeriodicidad.Font = fuenteEtiqueta;
-            _lblPeriodicidad.ForeColor = colorEtiqueta;
-
-            _numPeriodicidad.Location = new Point(270, 274);
-            _numPeriodicidad.Size = new Size(100, 28);
-            _numPeriodicidad.Minimum = 1;
-            _numPeriodicidad.Maximum = 365;
-            _numPeriodicidad.Value = 30;
-            _numPeriodicidad.Font = new Font("Segoe UI", 9.5F);
-            _numPeriodicidad.Enabled = false;
-
-            _lblDetalleDecision.Location = new Point(14, 306);
-            _lblDetalleDecision.Size = new Size(476, 16);
-            _lblDetalleDecision.Font = fuenteEtiqueta;
-            _lblDetalleDecision.ForeColor = colorEtiqueta;
-
-            _txtDetalleDecision.Name = "txtDetalleDecision";
-            _txtDetalleDecision.Location = new Point(14, 324);
-            _txtDetalleDecision.Size = new Size(476, 26);
-            _txtDetalleDecision.Font = new Font("Segoe UI", 9.5F);
-
-            _btnRegistrarDecision.Location = new Point(14, 358);
-            _btnRegistrarDecision.Size = new Size(200, 34);
-            _btnRegistrarDecision.FlatStyle = FlatStyle.Flat;
-            _btnRegistrarDecision.BackColor = Color.FromArgb(45, 108, 223);
-            _btnRegistrarDecision.ForeColor = Color.White;
-            _btnRegistrarDecision.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            _btnRegistrarDecision.FlatAppearance.BorderSize = 0;
-            _btnRegistrarDecision.Cursor = Cursors.Hand;
-            _btnRegistrarDecision.Click += (s, e) => RegistrarDecision();
-
-            _lblHistorial.Location = new Point(14, 398);
-            _lblHistorial.Size = new Size(480, 20);
-            _lblHistorial.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-            _lblHistorial.ForeColor = Color.FromArgb(41, 98, 176);
-
-            _grillaHistorial.Dock = DockStyle.Bottom;
-            _grillaHistorial.Height = 196;
-            EstiloGrilla(_grillaHistorial);
-            _grillaHistorial.Columns.Add("fecha", "");
-            _grillaHistorial.Columns.Add("tipo", "");
-            _grillaHistorial.Columns.Add("resultado", "");
-            _grillaHistorial.Columns.Add("decision", "");
-            _grillaHistorial.Columns.Add("observaciones", "");
-            _grillaHistorial.Columns["fecha"].FillWeight = 24;
-            _grillaHistorial.Columns["tipo"].FillWeight = 16;
-            _grillaHistorial.Columns["resultado"].FillWeight = 16;
-            _grillaHistorial.Columns["decision"].FillWeight = 20;
-            _grillaHistorial.Columns["observaciones"].FillWeight = 24;
-            // Las celdas de texto largo crecen en alto para mostrar el contenido completo.
-            _grillaHistorial.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
-            _grillaHistorial.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
-
-            _panelDetalle.Controls.Add(_grillaHistorial);
-            _panelDetalle.Controls.Add(_lblPacienteDetalle);
-            _panelDetalle.Controls.Add(_lblProtocolo);
-            _panelDetalle.Controls.Add(_lblContactoSeccion);
-            _panelDetalle.Controls.Add(_lblTipoContacto);
-            _panelDetalle.Controls.Add(_cmbTipoContacto);
-            _panelDetalle.Controls.Add(_lblResultado);
-            _panelDetalle.Controls.Add(_cmbResultado);
-            _panelDetalle.Controls.Add(_lblObservaciones);
-            _panelDetalle.Controls.Add(_txtObservaciones);
-            _panelDetalle.Controls.Add(_btnRegistrarIntento);
-            _panelDetalle.Controls.Add(_lblAviso);
-            _panelDetalle.Controls.Add(_lblDecisionSeccion);
-            _panelDetalle.Controls.Add(_lblDecision);
-            _panelDetalle.Controls.Add(_cmbDecision);
-            _panelDetalle.Controls.Add(_lblPeriodicidad);
-            _panelDetalle.Controls.Add(_numPeriodicidad);
-            _panelDetalle.Controls.Add(_lblDetalleDecision);
-            _panelDetalle.Controls.Add(_txtDetalleDecision);
-            _panelDetalle.Controls.Add(_btnRegistrarDecision);
-            _panelDetalle.Controls.Add(_lblHistorial);
-
-            Controls.Add(_grillaCasos);
-            Controls.Add(_lblSinCasos);
-            Controls.Add(_panelDetalle);
-            Controls.Add(panelBarra);
+                CargarDetalle(_casos[indice].IdPaciente);
+            }
         }
 
-        private static void EstiloGrilla(DataGridView grilla)
-        {
-            grilla.ReadOnly = true;
-            grilla.AllowUserToAddRows = false;
-            grilla.AllowUserToDeleteRows = false;
-            grilla.AllowUserToResizeRows = false;
-            grilla.RowHeadersVisible = false;
-            grilla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            grilla.MultiSelect = false;
-            grilla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            grilla.BackgroundColor = Color.White;
-            grilla.BorderStyle = BorderStyle.None;
-            grilla.GridColor = Color.FromArgb(225, 235, 245);
-            grilla.EnableHeadersVisualStyles = false;
-            grilla.ColumnHeadersHeight = 34;
-            grilla.RowTemplate.Height = 32;
-            grilla.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(41, 98, 176);
-            grilla.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-            grilla.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
-            grilla.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(41, 98, 176);
-            grilla.DefaultCellStyle.Font = new Font("Segoe UI", 10F);
-            grilla.DefaultCellStyle.SelectionBackColor = Color.FromArgb(210, 230, 250);
-            grilla.DefaultCellStyle.SelectionForeColor = Color.Black;
-            grilla.DefaultCellStyle.Padding = new Padding(6, 0, 0, 0);
-            grilla.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(247, 251, 255);
-        }
+        /// <summary>Habilita la periodicidad solo cuando la decisión es cambiarla.</summary>
+        private void CmbDecision_SelectedIndexChanged(object? sender, EventArgs e) => ActualizarPeriodicidadHabilitada();
+
+        /// <summary>Registra el intento de contacto del caso seleccionado.</summary>
+        private void BtnRegistrarIntento_Click(object? sender, EventArgs e) => RegistrarIntento();
+
+        /// <summary>Registra la decisión clínica del caso seleccionado.</summary>
+        private void BtnRegistrarDecision_Click(object? sender, EventArgs e) => RegistrarDecision();
 
         private void AplicarTextos()
         {
