@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Services.DomainModel.Integridad;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
 using Services.DomainModel.Exceptions;
@@ -132,7 +133,7 @@ namespace Negocio.BLL
                             }
                             continue;
                         }
-                        if (!string.Equals(fila.Dvh, DigitoVerificador.CalcularDVH(fila.Entidad), StringComparison.Ordinal))
+                        if (!string.Equals(fila.Dvh, Services.DomainModel.DigitoVerificador.CalcularDVH(fila.Entidad), StringComparison.Ordinal))
                         {
                             alteradas++;
                             alterados.Add(new RegistroAlterado(tabla, fila.Id, "DVH inválido: datos modificados fuera del sistema"));
@@ -154,7 +155,7 @@ namespace Negocio.BLL
 
                     string? registrado = _contexto.DigitosVerificadores.AsNoTracking()
                         .FirstOrDefault(d => d.NombreTabla == tabla)?.DVV;
-                    string esperado = DigitoVerificador.CalcularDVV(tabla, registros.Select(r => (r.Id, r.Dvh)));
+                    string esperado = Services.DomainModel.DigitoVerificador.CalcularDVV(tabla, registros.Select(r => (r.Id, r.Dvh)));
                     if (registrado == null)
                     {
                         problemas.Add($"Tabla '{tabla}': sin DVV registrado (recalcular para firmarla).");
@@ -199,7 +200,7 @@ namespace Negocio.BLL
                     List<FilaAuditoria> registros = lector(true);
                     foreach (FilaAuditoria fila in registros)
                     {
-                        _contexto.Entry(fila.Entidad).Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(fila.Entidad);
+                        _contexto.Entry(fila.Entidad).Property("DVH").CurrentValue = Services.DomainModel.DigitoVerificador.CalcularDVH(fila.Entidad);
                         firmadas++;
                     }
                 }
@@ -210,7 +211,7 @@ namespace Negocio.BLL
                 foreach ((string tabla, Func<bool, List<FilaAuditoria>> lector) in _tablas)
                 {
                     List<(int Id, string? Dvh)> filas = lector(false).Select(r => (r.Id, r.Dvh)).ToList();
-                    string dvv = DigitoVerificador.CalcularDVV(tabla, filas);
+                    string dvv = Services.DomainModel.DigitoVerificador.CalcularDVV(tabla, filas);
 
                     DigitosVerificadores? registro = _contexto.DigitosVerificadores.FirstOrDefault(d => d.NombreTabla == tabla);
                     if (registro == null)

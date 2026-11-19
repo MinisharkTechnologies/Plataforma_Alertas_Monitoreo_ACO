@@ -1,4 +1,5 @@
 using System.Text.Encodings.Web;
+using Services.DomainModel.Auditoria;
 using System.Text.Json;
 using Negocio.BLL;
 using Negocio.DAL.Context;

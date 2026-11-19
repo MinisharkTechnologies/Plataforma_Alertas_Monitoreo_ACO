@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Services.Facade;
 
-namespace Negocio.DAL.Conversores
+namespace Services.DAL.Conversores
 {
     /// <summary>
     /// Conversor de almacenamiento con cifrado AES-256 determinístico: la columna guarda

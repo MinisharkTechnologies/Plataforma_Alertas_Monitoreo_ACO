@@ -1,10 +1,12 @@
 using System;
+using Services.DomainModel.Integridad;
+using Services.DAL.Auditoria;
+using Services.DomainModel.Auditoria;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Negocio.DAL.Auditoria;
 using Negocio.DomainModel;
 using Negocio.DomainModel.Enums;
 
@@ -121,7 +123,7 @@ namespace Negocio.DAL.Context
             // registros de auditoría de cambios (T06b), que también necesitan el Id real.
             foreach (EntityEntry entrada in aFirmar)
             {
-                entrada.Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(entrada.Entity);
+                entrada.Property("DVH").CurrentValue = Services.DomainModel.DigitoVerificador.CalcularDVH(entrada.Entity);
             }
 
             if (cambios.Count > 0)
@@ -178,7 +180,7 @@ namespace Negocio.DAL.Context
         private void ActualizarDigitoVertical(string tabla)
         {
             List<(int Id, string? Dvh)> filas = LeerFilasDVH(tabla);
-            string nuevo = DigitoVerificador.CalcularDVV(tabla, filas);
+            string nuevo = Services.DomainModel.DigitoVerificador.CalcularDVV(tabla, filas);
 
             DigitosVerificadores? registro = DigitosVerificadores.FirstOrDefault(d => d.NombreTabla == tabla);
             if (registro == null)
@@ -314,11 +316,11 @@ namespace Negocio.DAL.Context
                 entidad.Property(e => e.Descripcion).IsRequired();
                 entidad.Property(e => e.Descripcion).HasMaxLength(4000);
                 entidad.Property(e => e.Descripcion).HasConversion(
-                    Negocio.DAL.Conversores.CifradoDeterministico.Para("EventoAdverso:Descripcion"));
+                    Services.DAL.Conversores.CifradoDeterministico.Para("EventoAdverso:Descripcion"));
                 entidad.Property(e => e.AccionTomada).IsRequired();
                 entidad.Property(e => e.AccionTomada).HasMaxLength(4000);
                 entidad.Property(e => e.AccionTomada).HasConversion(
-                    Negocio.DAL.Conversores.CifradoDeterministico.Para("EventoAdverso:AccionTomada"));
+                    Services.DAL.Conversores.CifradoDeterministico.Para("EventoAdverso:AccionTomada"));
                 entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(e => e.Paciente).WithMany().HasForeignKey(e => e.IdPaciente)
@@ -348,10 +350,10 @@ namespace Negocio.DAL.Context
                 entidad.Property(a => a.Descripcion).IsRequired();
             entidad.Property(a => a.Descripcion).HasMaxLength(4000);
             entidad.Property(a => a.Descripcion).HasConversion(
-                Negocio.DAL.Conversores.CifradoDeterministico.Para("Alerta:Descripcion"));
+                Services.DAL.Conversores.CifradoDeterministico.Para("Alerta:Descripcion"));
             entidad.Property(a => a.AccionResolucion).HasMaxLength(4000);
             entidad.Property(a => a.AccionResolucion).HasConversion(
-                Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Alerta:AccionResolucion"));
+                Services.DAL.Conversores.CifradoDeterministico.ParaNulable("Alerta:AccionResolucion"));
             entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(a => a.Paciente).WithMany().HasForeignKey(a => a.IdPaciente)
@@ -367,7 +369,7 @@ namespace Negocio.DAL.Context
                 entidad.Property(t => t.Estado).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(t => t.Observaciones).HasMaxLength(4000);
                 entidad.Property(t => t.Observaciones).HasConversion(
-                    Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Turno:Observaciones"));
+                    Services.DAL.Conversores.CifradoDeterministico.ParaNulable("Turno:Observaciones"));
                 entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(t => t.Paciente).WithMany().HasForeignKey(t => t.IdPaciente)
@@ -383,10 +385,10 @@ namespace Negocio.DAL.Context
                 entidad.Property(s => s.DecisionClinica).HasConversion<string>().HasMaxLength(30);
                 entidad.Property(s => s.Observaciones).HasMaxLength(4000);
                 entidad.Property(s => s.Observaciones).HasConversion(
-                    Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Seguimiento:Observaciones"));
+                    Services.DAL.Conversores.CifradoDeterministico.ParaNulable("Seguimiento:Observaciones"));
                 entidad.Property(s => s.DetalleDecision).HasMaxLength(4000);
                 entidad.Property(s => s.DetalleDecision).HasConversion(
-                    Negocio.DAL.Conversores.CifradoDeterministico.ParaNulable("Seguimiento:DetalleDecision"));
+                    Services.DAL.Conversores.CifradoDeterministico.ParaNulable("Seguimiento:DetalleDecision"));
                 entidad.Property<string>("DVH").HasMaxLength(128);
 
                 entidad.HasOne(s => s.Paciente).WithMany().HasForeignKey(s => s.IdPaciente)

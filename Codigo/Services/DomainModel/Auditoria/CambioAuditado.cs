@@ -1,4 +1,4 @@
-namespace Negocio.DomainModel
+namespace Services.DomainModel.Auditoria
 {
     /// <summary>
     /// Registro de auditoría de cambios (requisito T06b): documenta quién, cuándo y qué cambió

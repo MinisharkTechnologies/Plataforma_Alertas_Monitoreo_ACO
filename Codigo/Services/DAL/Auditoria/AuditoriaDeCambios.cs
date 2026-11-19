@@ -6,7 +6,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Negocio.DAL.Auditoria
+namespace Services.DAL.Auditoria
 {
     /// <summary>
     /// Utilidades de serialización para el control de cambios (T06b): convierte el estado de

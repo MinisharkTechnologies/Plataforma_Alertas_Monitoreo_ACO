@@ -164,7 +164,7 @@ namespace Negocio.DAL.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Negocio.DomainModel.DigitosVerificadores", b =>
+            modelBuilder.Entity("Services.DomainModel.Integridad.DigitosVerificadores", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

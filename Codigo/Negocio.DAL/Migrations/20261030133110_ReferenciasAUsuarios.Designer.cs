@@ -97,7 +97,7 @@ namespace Negocio.DAL.Migrations
                     b.ToTable("Alertas", (string)null);
                 });
 
-            modelBuilder.Entity("Negocio.DomainModel.CambioAuditado", b =>
+            modelBuilder.Entity("Services.DomainModel.Auditoria.CambioAuditado", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -208,7 +208,7 @@ namespace Negocio.DAL.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Negocio.DomainModel.DigitosVerificadores", b =>
+            modelBuilder.Entity("Services.DomainModel.Integridad.DigitosVerificadores", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

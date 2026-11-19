@@ -1,6 +1,6 @@
 using Services.DomainModel.Validacion;
 
-namespace Negocio.DomainModel
+namespace Services.DomainModel.Integridad
 {
     /// <summary>
     /// Dígito verificador vertical (DVV) por tabla (integridad de datos): firma SHA-256 del

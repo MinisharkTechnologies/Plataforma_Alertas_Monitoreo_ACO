@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Negocio.DAL.Auditoria;
+using Services.DomainModel.Auditoria;
+using Services.DAL.Auditoria;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
 using Services.DomainModel.Exceptions;
