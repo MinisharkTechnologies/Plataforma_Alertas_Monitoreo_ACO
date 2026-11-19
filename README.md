@@ -20,7 +20,7 @@ La solución está construida en **C# / .NET 8 (Windows Forms)** sobre **SQL Ser
 - **Recuperación de integridad en vivo**: si DVH/DVV detecta alteraciones, la app muestra la lista de registros alterados (tabla, Id, motivo) y permite — con permiso SI004 — **restaurar un respaldo sano** o **recalcular los dígitos** antes de llegar al log-in.
 - **Cifrado simétrico AES-256 en campos clínicos**: los textos libres de eventos adversos, turnos, seguimientos y alertas se guardan cifrados en la base (`System.Security.Cryptography`), con IV derivado del contexto para que el DVH siga estable; las lecturas siguen devolviendo texto claro y los datos anteriores se cifran en su próximo guardado.
 - **Fábrica de repositorios por reflexión** (claves `Repositorio.*`), encapsulación de repositorios (`internal`) y jerarquía de **excepciones de negocio** (`ReglaNegocioException` y derivadas) con mensajes accionables.
-- **Suite «Pruebas»** (`Codigo/Pruebas/`): **103 comprobaciones** de aceptación contra una base real, todas en verde (ver LEEME allí); **Herramientas** CLI (`sembrar`, `respaldo`, `respaldo-auto`, `integridad`).
+- **Suite «Pruebas»** (`Pruebas/`): **103 comprobaciones** de aceptación contra una base real, todas en verde (ver LEEME allí); **Herramientas** CLI (`sembrar`, `respaldo`, `respaldo-auto`, `integridad`).
 - **Entregable documental completo** en este repositorio: **Carpeta de Proyecto (PDF, 153 páginas)**, manual de instalación, de usuario y de programación (PDF + ayuda `.chm`, incluida F1 desde la app), diagramas en draw.io + PNG y la carpeta **`Prueba SQL/`** con la demostración guiada de DVH/DVV y de los respaldos.
 - Build **0 errores / 0 advertencias**; smokes locales 40/40 (Negocio) y revisión completa de la solución.
 

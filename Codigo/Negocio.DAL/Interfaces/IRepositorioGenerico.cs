@@ -1,4 +1,4 @@
-namespace Negocio.DAL.Repositorios
+namespace Negocio.DAL.Interfaces
 {
     /// <summary>
     /// Contrato genérico de repositorio de la capa de datos del módulo Negocio (EF Core).

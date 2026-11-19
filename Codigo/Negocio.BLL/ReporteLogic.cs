@@ -6,6 +6,7 @@ using Negocio.DomainModel.Enums;
 using Negocio.DomainModel.Exceptions;
 using Services.DomainModel;
 using Services.Facade;
+using Services.DomainModel.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -39,11 +40,22 @@ namespace Negocio.BLL
         /// <summary>Clasifica el control de un paciente según su porcentaje de mediciones en rango.</summary>
         public static ClasificacionControl Clasificar(decimal porcentajeEnRango)
         {
-            if (porcentajeEnRango >= UmbralOptimo)
+            try
             {
-                return ClasificacionControl.Optimo;
+                if (porcentajeEnRango >= UmbralOptimo)
+                {
+                    return ClasificacionControl.Optimo;
+                }
+                return porcentajeEnRango >= UmbralSuboptimo ? ClasificacionControl.Suboptimo : ClasificacionControl.Deficiente;
             }
-            return porcentajeEnRango >= UmbralSuboptimo ? ClasificacionControl.Suboptimo : ClasificacionControl.Deficiente;
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException("No se pudo clasificar el control según el porcentaje en rango.", ex, "REPORTE_CLASIFICACION_FALLIDA");
+            }
         }
 
         /// <summary>
@@ -53,53 +65,64 @@ namespace Negocio.BLL
         /// </summary>
         public ReporteEstadistico GenerarReporteMensual(int anio, int mes, string usuarioResponsable = "")
         {
-            (DateTime inicio, DateTime fin) = ValidarPeriodo(anio, mes, usuarioResponsable);
-
-            var detalles = ObtenerDetalleDelPeriodo(inicio, fin, out int sinMediciones);
-
-            decimal indicadorGlobal = detalles.Count == 0
-                ? 0m
-                : Math.Round(detalles.Average(d => d.PorcentajeEnRango), 2);
-            int optimos = detalles.Count(d => d.Clasificacion == nameof(ClasificacionControl.Optimo));
-            int suboptimos = detalles.Count(d => d.Clasificacion == nameof(ClasificacionControl.Suboptimo));
-            int deficientes = detalles.Count(d => d.Clasificacion == nameof(ClasificacionControl.Deficiente));
-
-            var detalleCompleto = new DetalleReporteMensual
+            try
             {
-                Periodo = $"{anio:D4}-{mes:D2}",
-                IndicadorGlobalEficacia = indicadorGlobal,
-                PacientesConDatos = detalles.Count,
-                PacientesSinMediciones = sinMediciones,
-                Pacientes = detalles
-            };
+                (DateTime inicio, DateTime fin) = ValidarPeriodo(anio, mes, usuarioResponsable);
 
-            ReporteEstadistico? existente = _contexto.ReportesEstadisticos
-                .FirstOrDefault(r => r.Anio == anio && r.Mes == mes);
-            ReporteEstadistico reporte;
-            if (existente == null)
-            {
-                reporte = new ReporteEstadistico { Anio = anio, Mes = mes };
-                _contexto.ReportesEstadisticos.Add(reporte);
+                var detalles = ObtenerDetalleDelPeriodo(inicio, fin, out int sinMediciones);
+
+                decimal indicadorGlobal = detalles.Count == 0
+                    ? 0m
+                    : Math.Round(detalles.Average(d => d.PorcentajeEnRango), 2);
+                int optimos = detalles.Count(d => d.Clasificacion == nameof(ClasificacionControl.Optimo));
+                int suboptimos = detalles.Count(d => d.Clasificacion == nameof(ClasificacionControl.Suboptimo));
+                int deficientes = detalles.Count(d => d.Clasificacion == nameof(ClasificacionControl.Deficiente));
+
+                var detalleCompleto = new DetalleReporteMensual
+                {
+                    Periodo = $"{anio:D4}-{mes:D2}",
+                    IndicadorGlobalEficacia = indicadorGlobal,
+                    PacientesConDatos = detalles.Count,
+                    PacientesSinMediciones = sinMediciones,
+                    Pacientes = detalles
+                };
+
+                ReporteEstadistico? existente = _contexto.ReportesEstadisticos
+                    .FirstOrDefault(r => r.Anio == anio && r.Mes == mes);
+                ReporteEstadistico reporte;
+                if (existente == null)
+                {
+                    reporte = new ReporteEstadistico { Anio = anio, Mes = mes };
+                    _contexto.ReportesEstadisticos.Add(reporte);
+                }
+                else
+                {
+                    reporte = existente; // regeneración del período: se actualiza la misma fila
+                }
+
+                reporte.FechaGeneracion = DateTime.Now;
+                reporte.IndicadorGlobalEficacia = indicadorGlobal;
+                reporte.CantidadOptimos = optimos;
+                reporte.CantidadSuboptimos = suboptimos;
+                reporte.CantidadDeficientes = deficientes;
+                reporte.DetalleJson = JsonSerializer.Serialize(detalleCompleto);
+                _contexto.SaveChanges();
+
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Reporte mensual de eficacia {anio:D4}-{mes:D2} generado: indicador global {indicadorGlobal}% " +
+                    $"({optimos} óptimos, {suboptimos} subóptimos, {deficientes} deficientes; {sinMediciones} sin mediciones).",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
+
+                return reporte;
             }
-            else
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
             {
-                reporte = existente; // regeneración del período: se actualiza la misma fila
+                throw;
             }
-
-            reporte.FechaGeneracion = DateTime.Now;
-            reporte.IndicadorGlobalEficacia = indicadorGlobal;
-            reporte.CantidadOptimos = optimos;
-            reporte.CantidadSuboptimos = suboptimos;
-            reporte.CantidadDeficientes = deficientes;
-            reporte.DetalleJson = JsonSerializer.Serialize(detalleCompleto);
-            _contexto.SaveChanges();
-
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Reporte mensual de eficacia {anio:D4}-{mes:D2} generado: indicador global {indicadorGlobal}% " +
-                $"({optimos} óptimos, {suboptimos} subóptimos, {deficientes} deficientes; {sinMediciones} sin mediciones).",
-                null, usuarioResponsable, ReglasNegocio.Capa);
-
-            return reporte;
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException($"No se pudo generar el reporte mensual {anio:D4}-{mes:D2}.", ex, "REPORTE_MENSUAL_FALLIDO");
+            }
         }
 
         /// <summary>
@@ -109,37 +132,48 @@ namespace Negocio.BLL
         /// </summary>
         public List<FilaReporteDiagnostico> GenerarReportePorDiagnostico(int anio, int mes, int? idDiagnostico = null, string usuarioResponsable = "")
         {
-            (DateTime inicio, DateTime fin) = ValidarPeriodo(anio, mes, usuarioResponsable);
-
-            var detalles = ObtenerDetalleDelPeriodo(inicio, fin, out _);
-            var nombresDiagnosticos = _contexto.Diagnosticos.AsNoTracking().ToDictionary(d => d.Id, d => d.Nombre);
-
-            var grupos = detalles
-                .GroupBy(d => d.IdDiagnostico)
-                .Where(g => idDiagnostico == null || g.Key == idDiagnostico)
-                .Select(g => new FilaReporteDiagnostico
-                {
-                    IdDiagnostico = g.Key,
-                    NombreDiagnostico = g.Key.HasValue
-                        ? nombresDiagnosticos.GetValueOrDefault(g.Key.Value, "(desconocido)")
-                        : "Sin diagnóstico",
-                    CantidadPacientes = g.Count(),
-                    IndicadorPromedio = Math.Round(g.Average(p => p.PorcentajeEnRango), 2),
-                    CantidadOptimos = g.Count(p => p.Clasificacion == nameof(ClasificacionControl.Optimo)),
-                    CantidadSuboptimos = g.Count(p => p.Clasificacion == nameof(ClasificacionControl.Suboptimo)),
-                    CantidadDeficientes = g.Count(p => p.Clasificacion == nameof(ClasificacionControl.Deficiente))
-                })
-                .ToList();
-
-            foreach (FilaReporteDiagnostico fila in grupos)
+            try
             {
-                fila.BajoDesempeno = fila.IndicadorPromedio < UmbralBajoDesempeno;
-            }
+                (DateTime inicio, DateTime fin) = ValidarPeriodo(anio, mes, usuarioResponsable);
 
-            return grupos
-                .OrderBy(g => g.IndicadorPromedio)
-                .ThenBy(g => g.NombreDiagnostico)
-                .ToList();
+                var detalles = ObtenerDetalleDelPeriodo(inicio, fin, out _);
+                var nombresDiagnosticos = _contexto.Diagnosticos.AsNoTracking().ToDictionary(d => d.Id, d => d.Nombre);
+
+                var grupos = detalles
+                    .GroupBy(d => d.IdDiagnostico)
+                    .Where(g => idDiagnostico == null || g.Key == idDiagnostico)
+                    .Select(g => new FilaReporteDiagnostico
+                    {
+                        IdDiagnostico = g.Key,
+                        NombreDiagnostico = g.Key.HasValue
+                            ? nombresDiagnosticos.GetValueOrDefault(g.Key.Value, "(desconocido)")
+                            : "Sin diagnóstico",
+                        CantidadPacientes = g.Count(),
+                        IndicadorPromedio = Math.Round(g.Average(p => p.PorcentajeEnRango), 2),
+                        CantidadOptimos = g.Count(p => p.Clasificacion == nameof(ClasificacionControl.Optimo)),
+                        CantidadSuboptimos = g.Count(p => p.Clasificacion == nameof(ClasificacionControl.Suboptimo)),
+                        CantidadDeficientes = g.Count(p => p.Clasificacion == nameof(ClasificacionControl.Deficiente))
+                    })
+                    .ToList();
+
+                foreach (FilaReporteDiagnostico fila in grupos)
+                {
+                    fila.BajoDesempeno = fila.IndicadorPromedio < UmbralBajoDesempeno;
+                }
+
+                return grupos
+                    .OrderBy(g => g.IndicadorPromedio)
+                    .ThenBy(g => g.NombreDiagnostico)
+                    .ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException($"No se pudo generar el reporte por diagnóstico del período {anio:D4}-{mes:D2}.", ex, "REPORTE_DIAGNOSTICO_FALLIDO");
+            }
         }
 
         /// <summary>
@@ -148,47 +182,58 @@ namespace Negocio.BLL
         /// </summary>
         public List<ItemHistorial> ObtenerHistorialPaciente(int idPaciente)
         {
-            bool existe = _contexto.Pacientes.AsNoTracking().Any(p => p.Id == idPaciente);
-            if (!existe)
+            try
             {
-                throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
-            }
-
-            var items = new List<ItemHistorial>();
-
-            foreach (MedicionRIN m in _contexto.MedicionesRIN.AsNoTracking().Where(m => m.IdPaciente == idPaciente).ToList())
-            {
-                items.Add(new ItemHistorial
+                bool existe = _contexto.Pacientes.AsNoTracking().Any(p => p.Id == idPaciente);
+                if (!existe)
                 {
-                    Fecha = m.FechaMedicion,
-                    Tipo = "RIN",
-                    Descripcion = $"RIN {m.ValorRIN} (canal {m.Canal}); criticidad {(m.NivelCriticidad?.ToString() ?? "pendiente")}" +
-                                  (m.PorTendenciaPeligrosa ? ", por tendencia peligrosa." : ".")
-                });
-            }
+                    throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
+                }
 
-            foreach (Alerta a in _contexto.Alertas.AsNoTracking().Where(a => a.IdPaciente == idPaciente).ToList())
-            {
-                items.Add(new ItemHistorial
+                var items = new List<ItemHistorial>();
+
+                foreach (MedicionRIN m in _contexto.MedicionesRIN.AsNoTracking().Where(m => m.IdPaciente == idPaciente).ToList())
                 {
-                    Fecha = a.FechaGeneracion,
-                    Tipo = "Alerta",
-                    Descripcion = $"[{a.Tipo} / {a.Estado}] {a.Descripcion}" +
-                                  (string.IsNullOrWhiteSpace(a.AccionResolucion) ? "" : $" — Resolución: {a.AccionResolucion}")
-                });
-            }
+                    items.Add(new ItemHistorial
+                    {
+                        Fecha = m.FechaMedicion,
+                        Tipo = "RIN",
+                        Descripcion = $"RIN {m.ValorRIN} (canal {m.Canal}); criticidad {(m.NivelCriticidad?.ToString() ?? "pendiente")}" +
+                                      (m.PorTendenciaPeligrosa ? ", por tendencia peligrosa." : ".")
+                    });
+                }
 
-            foreach (EventoAdverso e in _contexto.EventosAdversos.AsNoTracking().Where(e => e.IdPaciente == idPaciente).ToList())
-            {
-                items.Add(new ItemHistorial
+                foreach (Alerta a in _contexto.Alertas.AsNoTracking().Where(a => a.IdPaciente == idPaciente).ToList())
                 {
-                    Fecha = e.Fecha,
-                    Tipo = "Evento adverso",
-                    Descripcion = $"{e.Tipo} ({e.Gravedad}): {e.Descripcion} — Acción: {e.AccionTomada}"
-                });
-            }
+                    items.Add(new ItemHistorial
+                    {
+                        Fecha = a.FechaGeneracion,
+                        Tipo = "Alerta",
+                        Descripcion = $"[{a.Tipo} / {a.Estado}] {a.Descripcion}" +
+                                      (string.IsNullOrWhiteSpace(a.AccionResolucion) ? "" : $" — Resolución: {a.AccionResolucion}")
+                    });
+                }
 
-            return items.OrderByDescending(i => i.Fecha).ToList();
+                foreach (EventoAdverso e in _contexto.EventosAdversos.AsNoTracking().Where(e => e.IdPaciente == idPaciente).ToList())
+                {
+                    items.Add(new ItemHistorial
+                    {
+                        Fecha = e.Fecha,
+                        Tipo = "Evento adverso",
+                        Descripcion = $"{e.Tipo} ({e.Gravedad}): {e.Descripcion} — Acción: {e.AccionTomada}"
+                    });
+                }
+
+                return items.OrderByDescending(i => i.Fecha).ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException($"No se pudo obtener el historial clínico del paciente Id {idPaciente}.", ex, "REPORTE_HISTORIAL_FALLIDO");
+            }
         }
 
         /// <summary>
@@ -198,35 +243,46 @@ namespace Negocio.BLL
         /// </summary>
         public ExportacionHistorial ExportarHistorialPaciente(int idPaciente, string formato, string usuarioResponsable = "")
         {
-            bool formatoValido = string.Equals(formato, "PDF", StringComparison.OrdinalIgnoreCase)
-                              || string.Equals(formato, "Excel", StringComparison.OrdinalIgnoreCase)
-                              || string.Equals(formato, "JSON", StringComparison.OrdinalIgnoreCase);
-            if (!formatoValido)
+            try
             {
-                throw ReglasNegocio.Rechazar(
-                    new List<string> { "El formato de exportación debe ser PDF, Excel o JSON." },
-                    $"Exportación de historial del paciente Id {idPaciente}", usuarioResponsable);
+                bool formatoValido = string.Equals(formato, "PDF", StringComparison.OrdinalIgnoreCase)
+                                  || string.Equals(formato, "Excel", StringComparison.OrdinalIgnoreCase)
+                                  || string.Equals(formato, "JSON", StringComparison.OrdinalIgnoreCase);
+                if (!formatoValido)
+                {
+                    throw ReglasNegocio.Rechazar(
+                        new List<string> { "El formato de exportación debe ser PDF, Excel o JSON." },
+                        $"Exportación de historial del paciente Id {idPaciente}", usuarioResponsable);
+                }
+
+                Paciente paciente = _contexto.Pacientes.AsNoTracking().FirstOrDefault(p => p.Id == idPaciente)
+                    ?? throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
+
+                List<ItemHistorial> items = ObtenerHistorialPaciente(idPaciente);
+                string extension = formato.ToUpperInvariant() switch
+                {
+                    "PDF" => "pdf",
+                    "EXCEL" => "xlsx",
+                    _ => "json"
+                };
+                string nombreLimpio = string.Concat(paciente.NombreCompleto.Where(char.IsLetterOrDigit));
+                string archivo = $"Historial_{nombreLimpio}_{DateTime.Now:yyyyMMdd}.{extension}";
+
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Exportación de historial solicitada para '{paciente.NombreCompleto}' (Id {paciente.Id}) en formato {formato.ToUpperInvariant()}: " +
+                    $"{items.Count} registro(s). Archivo sugerido: {archivo}",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
+
+                return new ExportacionHistorial(archivo, items);
             }
-
-            Paciente paciente = _contexto.Pacientes.AsNoTracking().FirstOrDefault(p => p.Id == idPaciente)
-                ?? throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
-
-            List<ItemHistorial> items = ObtenerHistorialPaciente(idPaciente);
-            string extension = formato.ToUpperInvariant() switch
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
             {
-                "PDF" => "pdf",
-                "EXCEL" => "xlsx",
-                _ => "json"
-            };
-            string nombreLimpio = string.Concat(paciente.NombreCompleto.Where(char.IsLetterOrDigit));
-            string archivo = $"Historial_{nombreLimpio}_{DateTime.Now:yyyyMMdd}.{extension}";
-
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Exportación de historial solicitada para '{paciente.NombreCompleto}' (Id {paciente.Id}) en formato {formato.ToUpperInvariant()}: " +
-                $"{items.Count} registro(s). Archivo sugerido: {archivo}",
-                null, usuarioResponsable, ReglasNegocio.Capa);
-
-            return new ExportacionHistorial(archivo, items);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException($"No se pudo exportar el historial del paciente Id {idPaciente}.", ex, "REPORTE_EXPORTACION_FALLIDA");
+            }
         }
 
         /// <summary>Validaciones comunes de período: mes 1-12 y no futuro. Devuelve el rango [inicio, fin).</summary>

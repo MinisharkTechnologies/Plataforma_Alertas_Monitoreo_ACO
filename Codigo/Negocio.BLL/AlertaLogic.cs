@@ -5,6 +5,7 @@ using Negocio.DomainModel.Enums;
 using Negocio.DomainModel.Exceptions;
 using Services.DomainModel;
 using Services.Facade;
+using Negocio.BLL.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -24,43 +25,80 @@ namespace Negocio.BLL
 
         /// <summary>Alertas activas (pendientes de resolución), de la más reciente a la más antigua.</summary>
         public List<Alerta> ObtenerActivas()
-            => _contexto.Alertas.AsNoTracking()
-                .Where(a => a.Estado == EstadoAlerta.Activa)
-                .OrderByDescending(a => a.FechaGeneracion)
-                .ToList();
+        {
+            try
+            {
+                return _contexto.Alertas.AsNoTracking()
+                    .Where(a => a.Estado == EstadoAlerta.Activa)
+                    .OrderByDescending(a => a.FechaGeneracion)
+                    .ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new AlertaNoEncontradaException(null, ex);
+            }
+        }
 
         /// <summary>Todas las alertas de un paciente, de la más reciente a la más antigua.</summary>
         public List<Alerta> ObtenerPorPaciente(int idPaciente)
-            => _contexto.Alertas.AsNoTracking()
-                .Where(a => a.IdPaciente == idPaciente)
-                .OrderByDescending(a => a.FechaGeneracion)
-                .ToList();
+        {
+            try
+            {
+                return _contexto.Alertas.AsNoTracking()
+                    .Where(a => a.IdPaciente == idPaciente)
+                    .OrderByDescending(a => a.FechaGeneracion)
+                    .ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new AlertaNoEncontradaException(null, ex);
+            }
+        }
 
         /// <summary>Registra la acción de resolución del médico y cierra la alerta.</summary>
         public void Resolver(int idAlerta, string accionResolucion, string usuarioResponsable = "")
         {
-            Alerta alerta = _contexto.Alertas.Find(idAlerta)
-                ?? throw new ValidacionNegocioException($"No existe la alerta con Id {idAlerta}.");
-            if (alerta.Estado == EstadoAlerta.Resuelta)
+            try
             {
-                throw new ValidacionNegocioException("La alerta ya se encuentra resuelta.");
+                Alerta alerta = _contexto.Alertas.Find(idAlerta)
+                    ?? throw new ValidacionNegocioException($"No existe la alerta con Id {idAlerta}.");
+                if (alerta.Estado == EstadoAlerta.Resuelta)
+                {
+                    throw new ValidacionNegocioException("La alerta ya se encuentra resuelta.");
+                }
+                if (string.IsNullOrWhiteSpace(accionResolucion))
+                {
+                    throw ReglasNegocio.Rechazar(
+                        new List<string> { "La acción de resolución es obligatoria." },
+                        $"Resolución de alerta Id {idAlerta}", usuarioResponsable);
+                }
+
+                alerta.Estado = EstadoAlerta.Resuelta;
+                alerta.FechaResolucion = DateTime.Now;
+                alerta.AccionResolucion = accionResolucion.Trim();
+                alerta.IdUsuarioResolucion = ObtenerIdUsuario(usuarioResponsable);
+                _contexto.SaveChanges();
+
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Alerta Id {alerta.Id} resuelta: {alerta.AccionResolucion}",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
             }
-            if (string.IsNullOrWhiteSpace(accionResolucion))
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
             {
-                throw ReglasNegocio.Rechazar(
-                    new List<string> { "La acción de resolución es obligatoria." },
-                    $"Resolución de alerta Id {idAlerta}", usuarioResponsable);
+                throw;
             }
-
-            alerta.Estado = EstadoAlerta.Resuelta;
-            alerta.FechaResolucion = DateTime.Now;
-            alerta.AccionResolucion = accionResolucion.Trim();
-            alerta.IdUsuarioResolucion = ObtenerIdUsuario(usuarioResponsable);
-            _contexto.SaveChanges();
-
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Alerta Id {alerta.Id} resuelta: {alerta.AccionResolucion}",
-                null, usuarioResponsable, ReglasNegocio.Capa);
+            catch (Exception ex)
+            {
+                throw new AlertaNoEncontradaException(idAlerta, ex);
+            }
         }
 
         /// <summary>Busca el Id del usuario de Negocio por su nombre (auditoría de resoluciones).</summary>

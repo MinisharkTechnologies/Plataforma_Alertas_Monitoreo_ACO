@@ -16,7 +16,7 @@ Write-Host "1/4 Publicando la aplicación y las herramientas"
 $pub = Join-Path $trabajo "publish"
 dotnet publish (Join-Path $codigo "Negocio.UI\Negocio.UI.csproj") -c Release -r win-x64 --self-contained true -o $pub | Out-Null
 if ($LASTEXITCODE -ne 0) { throw "Falló la publicación de Negocio.UI" }
-dotnet publish (Join-Path $codigo "Herramientas\Herramientas.csproj") -c Release -r win-x64 --self-contained true -o $pub | Out-Null
+dotnet publish (Join-Path $raiz "Herramientas\Herramientas.csproj") -c Release -r win-x64 --self-contained true -o $pub | Out-Null
 if ($LASTEXITCODE -ne 0) { throw "Falló la publicación de Herramientas" }
 
 # Ayuda en línea (D02): se copia junto a la aplicación para que el botón Ayuda y F1 la encuentren.

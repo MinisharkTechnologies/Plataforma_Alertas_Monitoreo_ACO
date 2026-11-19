@@ -1,6 +1,7 @@
 using Negocio.DomainModel.Exceptions;
 using Services.DomainModel;
 using Services.Facade;
+using Services.DomainModel.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -17,10 +18,21 @@ namespace Negocio.BLL
         /// <summary>Registra el rechazo en bitácora y devuelve la excepción lista para lanzar.</summary>
         public static ValidacionNegocioException Rechazar(List<string> errores, string contexto, string usuarioResponsable)
         {
-            BitacoraService.Registrar(LogLevel.Warning,
-                $"Rechazado: {contexto} — {string.Join(" | ", errores)}",
-                null, usuarioResponsable, Capa);
-            return new ValidacionNegocioException(errores);
+            try
+            {
+                BitacoraService.Registrar(LogLevel.Warning,
+                    $"Rechazado: {contexto} — {string.Join(" | ", errores)}",
+                    null, usuarioResponsable, Capa);
+                return new ValidacionNegocioException(errores);
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException("No se pudo registrar el rechazo de la operación en la bitácora.", ex, "REGLA_NEGOCIO_BITACORA_FALLIDA");
+            }
         }
     }
 }

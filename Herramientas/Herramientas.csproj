@@ -7,8 +7,8 @@
     <AssemblyName>OpenRIN.Herramientas</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="../Services/Services.csproj" />
-    <ProjectReference Include="../Negocio.BLL/Negocio.BLL.csproj" />
-    <ProjectReference Include="../Negocio.DAL/Negocio.DAL.csproj" />
+    <ProjectReference Include="../Codigo/Services/Services.csproj" />
+    <ProjectReference Include="../Codigo/Negocio.BLL/Negocio.BLL.csproj" />
+    <ProjectReference Include="../Codigo/Negocio.DAL/Negocio.DAL.csproj" />
   </ItemGroup>
 </Project>

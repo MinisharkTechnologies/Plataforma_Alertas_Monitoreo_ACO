@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
 using Negocio.DomainModel.Enums;
+using Services.DomainModel.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -24,45 +25,56 @@ namespace Negocio.BLL
         /// <summary>Obtiene el ranking de monitoreo de todos los pacientes activos.</summary>
         public List<FilaPanelMonitoreo> ObtenerPanel()
         {
-            var pacientes = _contexto.Pacientes.AsNoTracking()
-                .Where(p => p.Estado == EstadoPaciente.Activo)
-                .Select(p => new { p.Id, p.NombreCompleto, p.DNI })
-                .ToList();
-
-            var mediciones = _contexto.MedicionesRIN.AsNoTracking()
-                .OrderByDescending(m => m.FechaMedicion).ThenByDescending(m => m.Id)
-                .ToList();
-
-            var alertasActivas = _contexto.Alertas.AsNoTracking()
-                .Where(a => a.Estado == EstadoAlerta.Activa)
-                .Select(a => a.IdPaciente)
-                .Distinct()
-                .ToHashSet();
-
-            var filas = new List<FilaPanelMonitoreo>();
-            foreach (var p in pacientes)
+            try
             {
-                MedicionRIN? ultima = mediciones.FirstOrDefault(m => m.IdPaciente == p.Id);
-                filas.Add(new FilaPanelMonitoreo
-                {
-                    IdPaciente = p.Id,
-                    NombreCompleto = p.NombreCompleto,
-                    DNI = p.DNI,
-                    UltimoValorRIN = ultima?.ValorRIN,
-                    FechaUltimoReporte = ultima?.FechaMedicion,
-                    NivelCriticidad = ultima?.NivelCriticidad,
-                    PorTendenciaPeligrosa = ultima?.PorTendenciaPeligrosa ?? false,
-                    TieneAlertaActiva = alertasActivas.Contains(p.Id),
-                    DiasDesdeUltimoReporte = ultima == null
-                        ? null
-                        : (int)(DateTime.Today - ultima.FechaMedicion.Date).TotalDays
-                });
-            }
+                var pacientes = _contexto.Pacientes.AsNoTracking()
+                    .Where(p => p.Estado == EstadoPaciente.Activo)
+                    .Select(p => new { p.Id, p.NombreCompleto, p.DNI })
+                    .ToList();
 
-            return filas
-                .OrderBy(f => OrdenDeCriticidad(f.NivelCriticidad))
-                .ThenBy(f => f.FechaUltimoReporte ?? DateTime.MaxValue)
-                .ToList();
+                var mediciones = _contexto.MedicionesRIN.AsNoTracking()
+                    .OrderByDescending(m => m.FechaMedicion).ThenByDescending(m => m.Id)
+                    .ToList();
+
+                var alertasActivas = _contexto.Alertas.AsNoTracking()
+                    .Where(a => a.Estado == EstadoAlerta.Activa)
+                    .Select(a => a.IdPaciente)
+                    .Distinct()
+                    .ToHashSet();
+
+                var filas = new List<FilaPanelMonitoreo>();
+                foreach (var p in pacientes)
+                {
+                    MedicionRIN? ultima = mediciones.FirstOrDefault(m => m.IdPaciente == p.Id);
+                    filas.Add(new FilaPanelMonitoreo
+                    {
+                        IdPaciente = p.Id,
+                        NombreCompleto = p.NombreCompleto,
+                        DNI = p.DNI,
+                        UltimoValorRIN = ultima?.ValorRIN,
+                        FechaUltimoReporte = ultima?.FechaMedicion,
+                        NivelCriticidad = ultima?.NivelCriticidad,
+                        PorTendenciaPeligrosa = ultima?.PorTendenciaPeligrosa ?? false,
+                        TieneAlertaActiva = alertasActivas.Contains(p.Id),
+                        DiasDesdeUltimoReporte = ultima == null
+                            ? null
+                            : (int)(DateTime.Today - ultima.FechaMedicion.Date).TotalDays
+                    });
+                }
+
+                return filas
+                    .OrderBy(f => OrdenDeCriticidad(f.NivelCriticidad))
+                    .ThenBy(f => f.FechaUltimoReporte ?? DateTime.MaxValue)
+                    .ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException("No se pudo obtener el panel de monitoreo.", ex, "PANEL_MONITOREO_FALLIDO");
+            }
         }
 
         private static int OrdenDeCriticidad(NivelCriticidad? nivel) => nivel switch

@@ -172,7 +172,7 @@ $config = @"
     <add key="Repositorio.ILoggerRepository.Archivo" value="Services.DAL.Implementations.FileLoggerRepository" />
     <add key="Repositorio.IBackupRepository" value="Services.DAL.Implementations.SqlBackupRepository" />
     <add key="Repositorio.IRespaldoRegistroRepository" value="Services.DAL.Implementations.SqlRespaldoRegistroRepository" />
-    <add key="Repositorio.IPacienteRepositorio" value="Negocio.DAL.Repositorios.PacienteRepositorio" />
+    <add key="Repositorio.IPacienteRepositorio" value="Negocio.DAL.Implementaciones.PacienteRepositorio" />
   </appSettings>
 </configuration>
 "@

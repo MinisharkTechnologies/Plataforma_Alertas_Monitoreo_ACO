@@ -1,6 +1,6 @@
 using Negocio.DomainModel;
 
-namespace Negocio.DAL.Repositorios
+namespace Negocio.DAL.Interfaces
 {
     /// <summary>
     /// Operaciones específicas de acceso a datos de pacientes (REQ-FUNC-001).

@@ -20,7 +20,7 @@ The solution is built in **C# / .NET 8 (Windows Forms)** on **SQL Server**, with
 - **Live integrity recovery**: if DVH/DVV detects tampering, the app shows the altered records (table, Id, reason) and — with SI004 — can **restore a healthy backup** or **recalculate the check digits** before reaching login.
 - **AES-256 symmetric encryption for clinical fields**: free-text fields in adverse events, appointments, follow-ups and alerts are stored encrypted (`System.Security.Cryptography`), with a context-derived IV so the check-digit integrity (DVH) stays stable; reads still return plaintext and pre-existing rows are encrypted on their next save.
 - **Reflection-based repository factory** (`Repositorio.*` keys), `internal` repository encapsulation, and a hierarchy of **business exceptions** (`ReglaNegocioException` and derivatives) with actionable messages.
-- **«Pruebas» acceptance suite** (`Codigo/Pruebas/`): **103 checks** against a real database, all green (see LEEME there); **Herramientas** CLI (`sembrar`, `respaldo`, `respaldo-auto`, `integridad`).
+- **«Pruebas» acceptance suite** (`Pruebas/`): **103 checks** against a real database, all green (see LEEME there); **Herramientas** CLI (`sembrar`, `respaldo`, `respaldo-auto`, `integridad`).
 - **Complete deliverable documentation** in this repository: **Project Folder (PDF, 153 pages)**, installation, user and programming manuals (PDF + `.chm` online help, also bound to F1 in the app), draw.io + PNG diagrams, and the **`Prueba SQL/`** folder with the guided DVH/DVV and backup demo.
 - Build **0 errors / 0 warnings**; local smokes 40/40 (Negocio) and full solution review.
 

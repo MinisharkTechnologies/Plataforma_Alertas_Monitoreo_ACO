@@ -5,6 +5,7 @@ using Negocio.DomainModel.Enums;
 using Negocio.DomainModel.Exceptions;
 using Services.DomainModel;
 using Services.Facade;
+using Negocio.BLL.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -25,52 +26,76 @@ namespace Negocio.BLL
         /// <summary>Registra un evento adverso en la historia clínica del paciente.</summary>
         public EventoAdverso Registrar(EventoAdverso evento, string usuarioResponsable = "")
         {
-            if (evento == null)
+            try
             {
-                throw new ArgumentNullException(nameof(evento));
-            }
+                if (evento == null)
+                {
+                    throw new ArgumentNullException(nameof(evento));
+                }
 
-            Paciente paciente = _contexto.Pacientes.Find(evento.IdPaciente)
-                ?? throw new ValidacionNegocioException($"No existe el paciente con Id {evento.IdPaciente}.");
-            if (paciente.Estado != EstadoPaciente.Activo)
-            {
-                throw new ValidacionNegocioException("Solo pueden registrarse eventos adversos de pacientes activos.");
-            }
-            if (!_contexto.HistoriasClinicas.Any(h => h.IdPaciente == evento.IdPaciente))
-            {
-                throw new ValidacionNegocioException("El paciente no posee una historia clínica configurada.");
-            }
+                Paciente paciente = _contexto.Pacientes.Find(evento.IdPaciente)
+                    ?? throw new ValidacionNegocioException($"No existe el paciente con Id {evento.IdPaciente}.");
+                if (paciente.Estado != EstadoPaciente.Activo)
+                {
+                    throw new ValidacionNegocioException("Solo pueden registrarse eventos adversos de pacientes activos.");
+                }
+                if (!_contexto.HistoriasClinicas.Any(h => h.IdPaciente == evento.IdPaciente))
+                {
+                    throw new ValidacionNegocioException("El paciente no posee una historia clínica configurada.");
+                }
 
-            var errores = new List<string>();
-            if (!ConsistenciaService.ValidarEntidad(evento, out List<string> erroresAtributos))
-            {
-                errores.AddRange(erroresAtributos);
-            }
-            if (evento.Fecha.Date > DateTime.Today)
-            {
-                errores.Add("La fecha del evento no puede ser futura.");
-            }
-            if (errores.Count > 0)
-            {
-                throw ReglasNegocio.Rechazar(errores, $"Registro de evento adverso del paciente Id {evento.IdPaciente}", usuarioResponsable);
-            }
+                var errores = new List<string>();
+                if (!ConsistenciaService.ValidarEntidad(evento, out List<string> erroresAtributos))
+                {
+                    errores.AddRange(erroresAtributos);
+                }
+                if (evento.Fecha.Date > DateTime.Today)
+                {
+                    errores.Add("La fecha del evento no puede ser futura.");
+                }
+                if (errores.Count > 0)
+                {
+                    throw ReglasNegocio.Rechazar(errores, $"Registro de evento adverso del paciente Id {evento.IdPaciente}", usuarioResponsable);
+                }
 
-            evento.FechaRegistro = DateTime.Now;
-            _contexto.EventosAdversos.Add(evento);
-            _contexto.SaveChanges();
+                evento.FechaRegistro = DateTime.Now;
+                _contexto.EventosAdversos.Add(evento);
+                _contexto.SaveChanges();
 
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Evento adverso registrado: {evento.Tipo} ({evento.Gravedad}) para el paciente '{paciente.NombreCompleto}' (Id {paciente.Id}).",
-                null, usuarioResponsable, ReglasNegocio.Capa);
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Evento adverso registrado: {evento.Tipo} ({evento.Gravedad}) para el paciente '{paciente.NombreCompleto}' (Id {paciente.Id}).",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
 
-            return evento;
+                return evento;
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new EventoAdversoInvalidoException($"No se pudo registrar el evento adverso del paciente Id {evento?.IdPaciente ?? 0}.", ex);
+            }
         }
 
         /// <summary>Eventos adversos de un paciente, del más reciente al más antiguo.</summary>
         public List<EventoAdverso> ObtenerPorPaciente(int idPaciente)
-            => _contexto.EventosAdversos.AsNoTracking()
-                .Where(e => e.IdPaciente == idPaciente)
-                .OrderByDescending(e => e.Fecha)
-                .ToList();
+        {
+            try
+            {
+                return _contexto.EventosAdversos.AsNoTracking()
+                    .Where(e => e.IdPaciente == idPaciente)
+                    .OrderByDescending(e => e.Fecha)
+                    .ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new EventoAdversoInvalidoException($"No se pudieron obtener los eventos adversos del paciente Id {idPaciente}.", ex);
+            }
+        }
     }
 }

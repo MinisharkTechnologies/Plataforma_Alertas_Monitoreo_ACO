@@ -250,7 +250,7 @@ Check("usuario inexistente lanza RegistroNoEncontrado", noExiste);
 
 Titulo("Factory con reflexión");
 Check("crea un repositorio configurado", Try("crear IUsuarioRepository", () => Services.DAL.Factory.RepositorioFactory.Crear<Services.DAL.Interfaces.IUsuarioRepository>()) != null);
-Check("repositorio con constructor con argumentos", Try("crear IPacienteRepositorio", () => { using var cx = new NegocioDbContext(); return Services.DAL.Factory.RepositorioFactory.Crear<Negocio.DAL.Repositorios.IPacienteRepositorio>(null, cx); }) != null);
+Check("repositorio con constructor con argumentos", Try("crear IPacienteRepositorio", () => { using var cx = new NegocioDbContext(); return Services.DAL.Factory.RepositorioFactory.Crear<Negocio.DAL.Interfaces.IPacienteRepositorio>(null, cx); }) != null);
 bool Falla(string? nombre, object[]? args = null) { try { Services.DAL.Factory.RepositorioFactory.CrearDesdeNombre<IDisposable>("Repositorio.IDisposable", nombre, args ?? Array.Empty<object>()); return false; } catch (Services.DomainModel.Exceptions.ConfiguracionInvalidaException) { return true; } }
 Check("clave ausente lanza ConfiguracionInvalida", Falla(null));
 Check("clase inexistente lanza ConfiguracionInvalida", Falla("No.Existe.Clase"));
@@ -258,7 +258,7 @@ Check("clase abstracta lanza ConfiguracionInvalida", Falla("System.IO.Stream"));
 Check("clase que no implementa la interfaz lanza ConfiguracionInvalida", Falla("System.Text.StringBuilder"));
 Check("clase sin el constructor pedido lanza ConfiguracionInvalida", Falla("System.IO.StringWriter", new object[] { 1, 2, 3 }));
 Check("clase válida con constructor sin parámetros", !Falla("System.IO.StringWriter"));
-bool sinCtor = false; try { Services.DAL.Factory.RepositorioFactory.Crear<Negocio.DAL.Repositorios.IPacienteRepositorio>(); } catch (Services.DomainModel.Exceptions.ConfiguracionInvalidaException) { sinCtor = true; }
+bool sinCtor = false; try { Services.DAL.Factory.RepositorioFactory.Crear<Negocio.DAL.Interfaces.IPacienteRepositorio>(); } catch (Services.DomainModel.Exceptions.ConfiguracionInvalidaException) { sinCtor = true; }
 Check("pedir un repositorio sin su argumento lanza ConfiguracionInvalida", sinCtor);
 
 Titulo("Respaldos (COPY_ONLY, CHECKSUM, tabla Respaldos)");

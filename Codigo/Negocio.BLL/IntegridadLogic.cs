@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
+using Services.DomainModel.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -104,71 +105,82 @@ namespace Negocio.BLL
         /// </summary>
         public ResultadoAuditoria Auditar()
         {
-            var verificadas = new List<string>();
-            var problemas = new List<string>();
-            var alterados = new List<RegistroAlterado>();
-            int filasAuditadas = 0;
-
-            foreach ((string tabla, Func<bool, List<FilaAuditoria>> lector) in _tablas)
+            try
             {
-                List<FilaAuditoria> registros = lector(false);
-                filasAuditadas += registros.Count;
+                var verificadas = new List<string>();
+                var problemas = new List<string>();
+                var alterados = new List<RegistroAlterado>();
+                int filasAuditadas = 0;
 
-                int sinDvh = 0;
-                int alteradas = 0;
-                var idsEjemplo = new List<int>();
-                foreach (FilaAuditoria fila in registros)
+                foreach ((string tabla, Func<bool, List<FilaAuditoria>> lector) in _tablas)
                 {
-                    if (string.IsNullOrEmpty(fila.Dvh))
+                    List<FilaAuditoria> registros = lector(false);
+                    filasAuditadas += registros.Count;
+
+                    int sinDvh = 0;
+                    int alteradas = 0;
+                    var idsEjemplo = new List<int>();
+                    foreach (FilaAuditoria fila in registros)
                     {
-                        sinDvh++;
-                        alterados.Add(new RegistroAlterado(tabla, fila.Id, "Sin DVH (fila no firmada)"));
-                        if (idsEjemplo.Count < 3)
+                        if (string.IsNullOrEmpty(fila.Dvh))
                         {
-                            idsEjemplo.Add(fila.Id);
+                            sinDvh++;
+                            alterados.Add(new RegistroAlterado(tabla, fila.Id, "Sin DVH (fila no firmada)"));
+                            if (idsEjemplo.Count < 3)
+                            {
+                                idsEjemplo.Add(fila.Id);
+                            }
+                            continue;
                         }
-                        continue;
+                        if (!string.Equals(fila.Dvh, DigitoVerificador.CalcularDVH(fila.Entidad), StringComparison.Ordinal))
+                        {
+                            alteradas++;
+                            alterados.Add(new RegistroAlterado(tabla, fila.Id, "DVH inválido: datos modificados fuera del sistema"));
+                            if (idsEjemplo.Count < 3)
+                            {
+                                idsEjemplo.Add(fila.Id);
+                            }
+                        }
                     }
-                    if (!string.Equals(fila.Dvh, DigitoVerificador.CalcularDVH(fila.Entidad), StringComparison.Ordinal))
+
+                    if (sinDvh > 0)
                     {
-                        alteradas++;
-                        alterados.Add(new RegistroAlterado(tabla, fila.Id, "DVH inválido: datos modificados fuera del sistema"));
-                        if (idsEjemplo.Count < 3)
-                        {
-                            idsEjemplo.Add(fila.Id);
-                        }
+                        problemas.Add($"Tabla '{tabla}': {sinDvh} fila(s) sin DVH (recalcular para firmarlas).");
+                    }
+                    if (alteradas > 0)
+                    {
+                        problemas.Add($"Tabla '{tabla}': {alteradas} fila(s) con DVH inválido — datos modificados fuera de la aplicación (Id: {string.Join(", ", idsEjemplo)}).");
+                    }
+
+                    string? registrado = _contexto.DigitosVerificadores.AsNoTracking()
+                        .FirstOrDefault(d => d.NombreTabla == tabla)?.DVV;
+                    string esperado = DigitoVerificador.CalcularDVV(tabla, registros.Select(r => (r.Id, r.Dvh)));
+                    if (registrado == null)
+                    {
+                        problemas.Add($"Tabla '{tabla}': sin DVV registrado (recalcular para firmarla).");
+                        alterados.Add(new RegistroAlterado(tabla, 0, "Sin DVV registrado"));
+                    }
+                    else if (!string.Equals(registrado, esperado, StringComparison.Ordinal))
+                    {
+                        problemas.Add($"Tabla '{tabla}': el DVV no coincide con el conjunto de sus filas — tabla alterada.");
+                        alterados.Add(new RegistroAlterado(tabla, 0, "DVV no coincide: filas agregadas, eliminadas o DVV modificado"));
+                    }
+                    else if (sinDvh == 0 && alteradas == 0)
+                    {
+                        verificadas.Add(tabla);
                     }
                 }
 
-                if (sinDvh > 0)
-                {
-                    problemas.Add($"Tabla '{tabla}': {sinDvh} fila(s) sin DVH (recalcular para firmarlas).");
-                }
-                if (alteradas > 0)
-                {
-                    problemas.Add($"Tabla '{tabla}': {alteradas} fila(s) con DVH inválido — datos modificados fuera de la aplicación (Id: {string.Join(", ", idsEjemplo)}).");
-                }
-
-                string? registrado = _contexto.DigitosVerificadores.AsNoTracking()
-                    .FirstOrDefault(d => d.NombreTabla == tabla)?.DVV;
-                string esperado = DigitoVerificador.CalcularDVV(tabla, registros.Select(r => (r.Id, r.Dvh)));
-                if (registrado == null)
-                {
-                    problemas.Add($"Tabla '{tabla}': sin DVV registrado (recalcular para firmarla).");
-                    alterados.Add(new RegistroAlterado(tabla, 0, "Sin DVV registrado"));
-                }
-                else if (!string.Equals(registrado, esperado, StringComparison.Ordinal))
-                {
-                    problemas.Add($"Tabla '{tabla}': el DVV no coincide con el conjunto de sus filas — tabla alterada.");
-                    alterados.Add(new RegistroAlterado(tabla, 0, "DVV no coincide: filas agregadas, eliminadas o DVV modificado"));
-                }
-                else if (sinDvh == 0 && alteradas == 0)
-                {
-                    verificadas.Add(tabla);
-                }
+                return new ResultadoAuditoria(verificadas, problemas, filasAuditadas, alterados);
             }
-
-            return new ResultadoAuditoria(verificadas, problemas, filasAuditadas, alterados);
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException("No se pudo auditar la integridad de los datos.", ex, "INTEGRIDAD_AUDITORIA_FALLIDA");
+            }
         }
 
         /// <summary>
@@ -179,43 +191,54 @@ namespace Negocio.BLL
         /// </summary>
         public int RecalcularTodo()
         {
-            int firmadas = 0;
-            foreach ((_, Func<bool, List<FilaAuditoria>> lector) in _tablas)
+            try
             {
-                List<FilaAuditoria> registros = lector(true);
-                foreach (FilaAuditoria fila in registros)
+                int firmadas = 0;
+                foreach ((_, Func<bool, List<FilaAuditoria>> lector) in _tablas)
                 {
-                    _contexto.Entry(fila.Entidad).Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(fila.Entidad);
-                    firmadas++;
-                }
-            }
-            _contexto.SaveChanges();
-
-            // Los DVV se recalculan aquí de forma explícita: leer las filas (ya firmadas) tal
-            // como las lee la auditoría garantiza que "esperado" y "registrado" coincidan.
-            foreach ((string tabla, Func<bool, List<FilaAuditoria>> lector) in _tablas)
-            {
-                List<(int Id, string? Dvh)> filas = lector(false).Select(r => (r.Id, r.Dvh)).ToList();
-                string dvv = DigitoVerificador.CalcularDVV(tabla, filas);
-
-                DigitosVerificadores? registro = _contexto.DigitosVerificadores.FirstOrDefault(d => d.NombreTabla == tabla);
-                if (registro == null)
-                {
-                    _contexto.DigitosVerificadores.Add(new DigitosVerificadores
+                    List<FilaAuditoria> registros = lector(true);
+                    foreach (FilaAuditoria fila in registros)
                     {
-                        NombreTabla = tabla,
-                        DVV = dvv,
-                        FechaCalculo = DateTime.Now
-                    });
+                        _contexto.Entry(fila.Entidad).Property("DVH").CurrentValue = DigitoVerificador.CalcularDVH(fila.Entidad);
+                        firmadas++;
+                    }
                 }
-                else if (!string.Equals(registro.DVV, dvv, StringComparison.Ordinal))
+                _contexto.SaveChanges();
+
+                // Los DVV se recalculan aquí de forma explícita: leer las filas (ya firmadas) tal
+                // como las lee la auditoría garantiza que "esperado" y "registrado" coincidan.
+                foreach ((string tabla, Func<bool, List<FilaAuditoria>> lector) in _tablas)
                 {
-                    registro.DVV = dvv;
-                    registro.FechaCalculo = DateTime.Now;
+                    List<(int Id, string? Dvh)> filas = lector(false).Select(r => (r.Id, r.Dvh)).ToList();
+                    string dvv = DigitoVerificador.CalcularDVV(tabla, filas);
+
+                    DigitosVerificadores? registro = _contexto.DigitosVerificadores.FirstOrDefault(d => d.NombreTabla == tabla);
+                    if (registro == null)
+                    {
+                        _contexto.DigitosVerificadores.Add(new DigitosVerificadores
+                        {
+                            NombreTabla = tabla,
+                            DVV = dvv,
+                            FechaCalculo = DateTime.Now
+                        });
+                    }
+                    else if (!string.Equals(registro.DVV, dvv, StringComparison.Ordinal))
+                    {
+                        registro.DVV = dvv;
+                        registro.FechaCalculo = DateTime.Now;
+                    }
                 }
+                _contexto.SaveChanges();
+                return firmadas;
             }
-            _contexto.SaveChanges();
-            return firmadas;
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException("No se pudo recalcular la integridad de los datos.", ex, "INTEGRIDAD_RECALCULO_FALLIDO");
+            }
         }
     }
 }

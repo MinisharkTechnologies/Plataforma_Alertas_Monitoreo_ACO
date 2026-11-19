@@ -8,8 +8,8 @@ namespace Services.DomainModel.Exceptions
     /// </summary>
     public class AccesoADatosException : ReglaNegocioException
     {
-        public AccesoADatosException(string mensaje, Exception? innerException = null)
-            : base(mensaje, innerException)
+        public AccesoADatosException(string mensaje, Exception? innerException = null, string codigo = "ACCESO_A_DATOS")
+            : base(mensaje, innerException, codigo)
         {
         }
     }

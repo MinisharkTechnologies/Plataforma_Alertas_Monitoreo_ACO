@@ -3,12 +3,13 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Negocio.DAL.Context;
-using Negocio.DAL.Repositorios;
+using Negocio.DAL.Interfaces;
 using Negocio.DomainModel;
 using Negocio.DomainModel.Enums;
 using Negocio.DomainModel.Exceptions;
 using Services.DomainModel;
 using Services.Facade;
+using Negocio.BLL.Exceptions;
 using Usuario = Negocio.DomainModel.Usuario;
 
 namespace Negocio.BLL
@@ -32,14 +33,42 @@ namespace Negocio.BLL
         public PacienteLogic(NegocioDbContext contexto)
         {
             _contexto = contexto;
-            _repositorio = RepositorioFactory.Crear<IPacienteRepositorio>(null, contexto);
+            _repositorio = Negocio.DAL.Factory.NegocioRepositorioFactory.Crear<IPacienteRepositorio>(contexto);
         }
 
         /// <summary>Pacientes activos ordenados por nombre.</summary>
-        public List<Paciente> BuscarActivos() => _repositorio.BuscarActivos();
+        public List<Paciente> BuscarActivos()
+        {
+            try
+            {
+                return _repositorio.BuscarActivos();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new PacienteDatosInvalidosException("No se pudieron obtener los pacientes activos.", ex);
+            }
+        }
 
         /// <summary>Busca un paciente por documento, sin importar su estado.</summary>
-        public Paciente? BuscarPorDNI(string dni) => _repositorio.BuscarPorDNI(dni);
+        public Paciente? BuscarPorDNI(string dni)
+        {
+            try
+            {
+                return _repositorio.BuscarPorDNI(dni);
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new PacienteNoEncontradoException(dni, ex);
+            }
+        }
 
         /// <summary>
         /// Pacientes según filtro de nombre/documento (vacío = todos), ordenados por nombre,
@@ -47,17 +76,28 @@ namespace Negocio.BLL
         /// </summary>
         public List<Paciente> Buscar(string? filtro, bool incluirInactivos)
         {
-            string patron = (filtro ?? string.Empty).Trim();
-            IQueryable<Paciente> consulta = _contexto.Pacientes.AsNoTracking();
-            if (!incluirInactivos)
+            try
             {
-                consulta = consulta.Where(p => p.Estado == EstadoPaciente.Activo);
+                string patron = (filtro ?? string.Empty).Trim();
+                IQueryable<Paciente> consulta = _contexto.Pacientes.AsNoTracking();
+                if (!incluirInactivos)
+                {
+                    consulta = consulta.Where(p => p.Estado == EstadoPaciente.Activo);
+                }
+                if (patron.Length > 0)
+                {
+                    consulta = consulta.Where(p => p.NombreCompleto.Contains(patron) || p.DNI.Contains(patron));
+                }
+                return consulta.OrderBy(p => p.NombreCompleto).ToList();
             }
-            if (patron.Length > 0)
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
             {
-                consulta = consulta.Where(p => p.NombreCompleto.Contains(patron) || p.DNI.Contains(patron));
+                throw;
             }
-            return consulta.OrderBy(p => p.NombreCompleto).ToList();
+            catch (Exception ex)
+            {
+                throw new PacienteDatosInvalidosException("No se pudo realizar la búsqueda de pacientes.", ex);
+            }
         }
 
         /// <summary>
@@ -66,71 +106,82 @@ namespace Negocio.BLL
         /// </summary>
         public CredencialesPortal RegistrarPaciente(Paciente paciente, string usuarioResponsable = "")
         {
-            if (paciente == null)
-            {
-                throw new ArgumentNullException(nameof(paciente));
-            }
-
-            List<string> errores = ValidarDatosBasicos(paciente);
-            if (_repositorio.ExisteDNIActivo(paciente.DNI))
-            {
-                errores.Add($"Ya existe un paciente activo con el documento '{paciente.DNI}'.");
-            }
-            if (paciente.IdObraSocial.HasValue && !_contexto.ObrasSociales.Any(o => o.Id == paciente.IdObraSocial.Value))
-            {
-                errores.Add("La obra social indicada no existe.");
-            }
-            if (errores.Count > 0)
-            {
-                throw ReglasNegocio.Rechazar(errores, $"Alta de paciente DNI {paciente.DNI}", usuarioResponsable);
-            }
-
-            string nombreUsuario = GenerarNombreUsuarioUnico(paciente.DNI);
-            string passwordTemporal = GenerarPasswordTemporal();
-
-            // Las credenciales viven en el módulo Services (fuente única de autenticación).
-            SeguridadService.RegistrarUsuario(nombreUsuario, paciente.NombreCompleto, passwordTemporal, "paciente", paciente.Email);
-
             try
             {
-                using var transaccion = _contexto.Database.BeginTransaction();
-
-                paciente.Estado = EstadoPaciente.Activo;
-                paciente.FechaAlta = DateTime.Now;
-                _contexto.Pacientes.Add(paciente);
-                _contexto.SaveChanges();
-
-                var usuarioPortal = new Usuario
+                if (paciente == null)
                 {
-                    NombreUsuario = nombreUsuario,
-                    NombreCompleto = paciente.NombreCompleto,
-                    Perfil = "paciente",
-                    Email = paciente.Email,
-                    Telefono = paciente.Telefono,
-                    Activo = true
-                };
-                _contexto.Usuarios.Add(usuarioPortal);
-                _contexto.SaveChanges();
+                    throw new ArgumentNullException(nameof(paciente));
+                }
 
-                paciente.IdUsuarioPortal = usuarioPortal.Id;
-                _contexto.SaveChanges();
+                List<string> errores = ValidarDatosBasicos(paciente);
+                if (_repositorio.ExisteDNIActivo(paciente.DNI))
+                {
+                    errores.Add($"Ya existe un paciente activo con el documento '{paciente.DNI}'.");
+                }
+                if (paciente.IdObraSocial.HasValue && !_contexto.ObrasSociales.Any(o => o.Id == paciente.IdObraSocial.Value))
+                {
+                    errores.Add("La obra social indicada no existe.");
+                }
+                if (errores.Count > 0)
+                {
+                    throw ReglasNegocio.Rechazar(errores, $"Alta de paciente DNI {paciente.DNI}", usuarioResponsable);
+                }
 
-                transaccion.Commit();
+                string nombreUsuario = GenerarNombreUsuarioUnico(paciente.DNI);
+                string passwordTemporal = GenerarPasswordTemporal();
+
+                // Las credenciales viven en el módulo Services (fuente única de autenticación).
+                SeguridadService.RegistrarUsuario(nombreUsuario, paciente.NombreCompleto, passwordTemporal, "paciente", paciente.Email);
+
+                try
+                {
+                    using var transaccion = _contexto.Database.BeginTransaction();
+
+                    paciente.Estado = EstadoPaciente.Activo;
+                    paciente.FechaAlta = DateTime.Now;
+                    _contexto.Pacientes.Add(paciente);
+                    _contexto.SaveChanges();
+
+                    var usuarioPortal = new Usuario
+                    {
+                        NombreUsuario = nombreUsuario,
+                        NombreCompleto = paciente.NombreCompleto,
+                        Perfil = "paciente",
+                        Email = paciente.Email,
+                        Telefono = paciente.Telefono,
+                        Activo = true
+                    };
+                    _contexto.Usuarios.Add(usuarioPortal);
+                    _contexto.SaveChanges();
+
+                    paciente.IdUsuarioPortal = usuarioPortal.Id;
+                    _contexto.SaveChanges();
+
+                    transaccion.Commit();
+                }
+                catch (Exception ex)
+                {
+                    // Si la escritura local falla, la credencial recién creada queda auditada como huérfana.
+                    BitacoraService.Registrar(LogLevel.Error,
+                        $"Alta de paciente '{paciente.NombreCompleto}' fallida tras crear la credencial del portal '{nombreUsuario}': {ex.Message}",
+                        ex, usuarioResponsable, ReglasNegocio.Capa);
+                    throw;
+                }
+
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Paciente registrado: '{paciente.NombreCompleto}' (DNI {paciente.DNI}); credenciales del portal '{nombreUsuario}' generadas.",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
+
+                return new CredencialesPortal(nombreUsuario, passwordTemporal);
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                // Si la escritura local falla, la credencial recién creada queda auditada como huérfana.
-                BitacoraService.Registrar(LogLevel.Error,
-                    $"Alta de paciente '{paciente.NombreCompleto}' fallida tras crear la credencial del portal '{nombreUsuario}': {ex.Message}",
-                    ex, usuarioResponsable, ReglasNegocio.Capa);
-                throw;
+                throw new PacienteDatosInvalidosException($"No se pudo completar el alta del paciente con DNI {paciente?.DNI ?? "(sin documento)"}.", ex);
             }
-
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Paciente registrado: '{paciente.NombreCompleto}' (DNI {paciente.DNI}); credenciales del portal '{nombreUsuario}' generadas.",
-                null, usuarioResponsable, ReglasNegocio.Capa);
-
-            return new CredencialesPortal(nombreUsuario, passwordTemporal);
         }
 
         /// <summary>
@@ -139,39 +190,50 @@ namespace Negocio.BLL
         /// </summary>
         public void ModificarPaciente(Paciente paciente, string usuarioResponsable = "")
         {
-            if (paciente == null)
+            try
             {
-                throw new ArgumentNullException(nameof(paciente));
-            }
+                if (paciente == null)
+                {
+                    throw new ArgumentNullException(nameof(paciente));
+                }
 
-            Paciente existente = _repositorio.ObtenerPorId(paciente.Id)
-                ?? throw new ValidacionNegocioException($"No existe el paciente con Id {paciente.Id}.");
-            if (existente.Estado != EstadoPaciente.Activo)
+                Paciente existente = _repositorio.ObtenerPorId(paciente.Id)
+                    ?? throw new ValidacionNegocioException($"No existe el paciente con Id {paciente.Id}.");
+                if (existente.Estado != EstadoPaciente.Activo)
+                {
+                    throw new ValidacionNegocioException("Solo pueden modificarse pacientes activos.");
+                }
+
+                List<string> errores = ValidarDatosBasicos(paciente);
+                if (_repositorio.ExisteDNIActivo(paciente.DNI, paciente.Id))
+                {
+                    errores.Add($"Ya existe otro paciente activo con el documento '{paciente.DNI}'.");
+                }
+                if (errores.Count > 0)
+                {
+                    throw ReglasNegocio.Rechazar(errores, $"Modificación de paciente Id {paciente.Id}", usuarioResponsable);
+                }
+
+                existente.NombreCompleto = paciente.NombreCompleto;
+                existente.DNI = paciente.DNI;
+                existente.Telefono = paciente.Telefono;
+                existente.Email = paciente.Email;
+                existente.IdObraSocial = paciente.IdObraSocial;
+                existente.NumeroAfiliado = paciente.NumeroAfiliado;
+                _repositorio.Modificar(existente);
+
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Paciente modificado: '{existente.NombreCompleto}' (Id {existente.Id}, DNI {existente.DNI}).",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
             {
-                throw new ValidacionNegocioException("Solo pueden modificarse pacientes activos.");
+                throw;
             }
-
-            List<string> errores = ValidarDatosBasicos(paciente);
-            if (_repositorio.ExisteDNIActivo(paciente.DNI, paciente.Id))
+            catch (Exception ex)
             {
-                errores.Add($"Ya existe otro paciente activo con el documento '{paciente.DNI}'.");
+                throw new PacienteDatosInvalidosException($"No se pudo modificar el paciente con DNI {paciente?.DNI ?? "(sin documento)"}.", ex);
             }
-            if (errores.Count > 0)
-            {
-                throw ReglasNegocio.Rechazar(errores, $"Modificación de paciente Id {paciente.Id}", usuarioResponsable);
-            }
-
-            existente.NombreCompleto = paciente.NombreCompleto;
-            existente.DNI = paciente.DNI;
-            existente.Telefono = paciente.Telefono;
-            existente.Email = paciente.Email;
-            existente.IdObraSocial = paciente.IdObraSocial;
-            existente.NumeroAfiliado = paciente.NumeroAfiliado;
-            _repositorio.Modificar(existente);
-
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Paciente modificado: '{existente.NombreCompleto}' (Id {existente.Id}, DNI {existente.DNI}).",
-                null, usuarioResponsable, ReglasNegocio.Capa);
         }
 
         /// <summary>
@@ -180,38 +242,49 @@ namespace Negocio.BLL
         /// </summary>
         public void DarDeBajaPaciente(int idPaciente, string motivo, string usuarioResponsable = "")
         {
-            Paciente paciente = _repositorio.ObtenerPorId(idPaciente)
-                ?? throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
-            if (paciente.Estado != EstadoPaciente.Activo)
+            try
             {
-                throw new ValidacionNegocioException("El paciente ya se encuentra dado de baja.");
-            }
-            if (string.IsNullOrWhiteSpace(motivo))
-            {
-                throw ReglasNegocio.Rechazar(
-                    new List<string> { "El motivo de la baja es obligatorio." },
-                    $"Baja de paciente Id {idPaciente}", usuarioResponsable);
-            }
-
-            paciente.Estado = EstadoPaciente.Inactivo;
-            paciente.MotivoBaja = motivo.Trim();
-            paciente.FechaBaja = DateTime.Now;
-            _repositorio.Modificar(paciente);
-
-            if (paciente.IdUsuarioPortal.HasValue)
-            {
-                Usuario? usuarioPortal = _contexto.Usuarios.Find(paciente.IdUsuarioPortal.Value);
-                if (usuarioPortal != null)
+                Paciente paciente = _repositorio.ObtenerPorId(idPaciente)
+                    ?? throw new ValidacionNegocioException($"No existe el paciente con Id {idPaciente}.");
+                if (paciente.Estado != EstadoPaciente.Activo)
                 {
-                    usuarioPortal.Activo = false;
-                    _contexto.SaveChanges();
-                    SeguridadService.CambiarEstadoUsuario(usuarioPortal.NombreUsuario, false, $"Baja del paciente (Id {paciente.Id}).");
+                    throw new ValidacionNegocioException("El paciente ya se encuentra dado de baja.");
                 }
-            }
+                if (string.IsNullOrWhiteSpace(motivo))
+                {
+                    throw ReglasNegocio.Rechazar(
+                        new List<string> { "El motivo de la baja es obligatorio." },
+                        $"Baja de paciente Id {idPaciente}", usuarioResponsable);
+                }
 
-            BitacoraService.Registrar(LogLevel.Info,
-                $"Paciente dado de baja: '{paciente.NombreCompleto}' (Id {paciente.Id}). Motivo: {paciente.MotivoBaja}. Credenciales del portal deshabilitadas.",
-                null, usuarioResponsable, ReglasNegocio.Capa);
+                paciente.Estado = EstadoPaciente.Inactivo;
+                paciente.MotivoBaja = motivo.Trim();
+                paciente.FechaBaja = DateTime.Now;
+                _repositorio.Modificar(paciente);
+
+                if (paciente.IdUsuarioPortal.HasValue)
+                {
+                    Usuario? usuarioPortal = _contexto.Usuarios.Find(paciente.IdUsuarioPortal.Value);
+                    if (usuarioPortal != null)
+                    {
+                        usuarioPortal.Activo = false;
+                        _contexto.SaveChanges();
+                        SeguridadService.CambiarEstadoUsuario(usuarioPortal.NombreUsuario, false, $"Baja del paciente (Id {paciente.Id}).");
+                    }
+                }
+
+                BitacoraService.Registrar(LogLevel.Info,
+                    $"Paciente dado de baja: '{paciente.NombreCompleto}' (Id {paciente.Id}). Motivo: {paciente.MotivoBaja}. Credenciales del portal deshabilitadas.",
+                    null, usuarioResponsable, ReglasNegocio.Capa);
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new PacienteDatosInvalidosException($"No se pudo dar de baja al paciente Id {idPaciente}.", ex);
+            }
         }
 
         private List<string> ValidarDatosBasicos(Paciente paciente)

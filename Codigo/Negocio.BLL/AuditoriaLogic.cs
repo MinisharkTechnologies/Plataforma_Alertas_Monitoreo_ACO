@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Negocio.DAL.Auditoria;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
+using Services.DomainModel.Exceptions;
 
 namespace Negocio.BLL
 {
@@ -27,12 +28,23 @@ namespace Negocio.BLL
         /// </summary>
         public List<CambioAuditado> ObtenerHistorial(string? entidad = null, int? idRegistro = null, int maximo = 200)
         {
-            return _contexto.AuditoriaCambios.AsNoTracking()
-                .Where(c => (entidad == null || c.Entidad == entidad)
-                    && (idRegistro == null || c.IdRegistro == idRegistro))
-                .OrderByDescending(c => c.Id)
-                .Take(maximo)
-                .ToList();
+            try
+            {
+                return _contexto.AuditoriaCambios.AsNoTracking()
+                    .Where(c => (entidad == null || c.Entidad == entidad)
+                        && (idRegistro == null || c.IdRegistro == idRegistro))
+                    .OrderByDescending(c => c.Id)
+                    .Take(maximo)
+                    .ToList();
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException("No se pudo obtener el historial de cambios auditados.", ex, "AUDITORIA_CONSULTA_FALLIDA");
+            }
         }
 
         /// <summary>
@@ -42,28 +54,39 @@ namespace Negocio.BLL
         /// </summary>
         public (bool Ok, string Mensaje) Restaurar(int idCambio, string usuario)
         {
-            CambioAuditado? cambio = _contexto.AuditoriaCambios.AsNoTracking()
-                .FirstOrDefault(c => c.Id == idCambio);
-            if (cambio == null)
+            try
             {
-                return (false, "El registro de auditoría indicado no existe.");
-            }
-            if (string.IsNullOrEmpty(cambio.DatosAnteriores))
-            {
-                return (false, "Este cambio no tiene un estado anterior recomponible (es un alta).");
-            }
+                CambioAuditado? cambio = _contexto.AuditoriaCambios.AsNoTracking()
+                    .FirstOrDefault(c => c.Id == idCambio);
+                if (cambio == null)
+                {
+                    return (false, "El registro de auditoría indicado no existe.");
+                }
+                if (string.IsNullOrEmpty(cambio.DatosAnteriores))
+                {
+                    return (false, "Este cambio no tiene un estado anterior recomponible (es un alta).");
+                }
 
-            (object? entidad, bool existe) = CargarEntidad(cambio.Entidad, cambio.IdRegistro);
-            if (!existe || entidad == null)
-            {
-                return (false, "El registro original ya no existe en la base de datos (no puede recomponerse sobre una fila eliminada).");
-            }
+                (object? entidad, bool existe) = CargarEntidad(cambio.Entidad, cambio.IdRegistro);
+                if (!existe || entidad == null)
+                {
+                    return (false, "El registro original ya no existe en la base de datos (no puede recomponerse sobre una fila eliminada).");
+                }
 
-            var entrada = _contexto.Entry(entidad);
-            AuditoriaDeCambios.Aplicar(entrada, cambio.DatosAnteriores);
-            _contexto.UsuarioAuditoria = usuario;
-            _contexto.SaveChanges();
-            return (true, "Estado anterior recompuesto correctamente.");
+                var entrada = _contexto.Entry(entidad);
+                AuditoriaDeCambios.Aplicar(entrada, cambio.DatosAnteriores);
+                _contexto.UsuarioAuditoria = usuario;
+                _contexto.SaveChanges();
+                return (true, "Estado anterior recompuesto correctamente.");
+            }
+            catch (Services.DomainModel.Exceptions.ReglaNegocioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new ReglaNegocioException($"No se pudo restaurar el estado anterior del cambio de auditoría Id {idCambio}.", ex, "AUDITORIA_RESTAURACION_FALLIDA");
+            }
         }
 
         /// <summary>Carga la entidad indicada por nombre de tabla y número de registro.</summary>
