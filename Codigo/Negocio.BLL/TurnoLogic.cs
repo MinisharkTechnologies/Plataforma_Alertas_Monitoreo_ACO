@@ -6,7 +6,7 @@ using Negocio.DomainModel.Exceptions;
 using Services.DomainModel;
 using Services.Facade;
 using Negocio.BLL.Exceptions;
-using Usuario = Negocio.DomainModel.Usuario;
+using Usuario = Services.DomainModel.Usuario;
 
 namespace Negocio.BLL
 {

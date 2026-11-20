@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Negocio.BLL;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
+using Usuario = Services.DomainModel.Usuario;
 using Negocio.DomainModel.Enums;
 using Services.Facade;
 using Negocio.DomainModel.Exceptions;

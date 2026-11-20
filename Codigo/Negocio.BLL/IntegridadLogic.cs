@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Services.DomainModel.Integridad;
 using Negocio.DAL.Context;
 using Negocio.DomainModel;
+using Usuario = Services.DomainModel.Usuario;
 using Services.DomainModel.Exceptions;
 
 namespace Negocio.BLL

@@ -614,7 +614,7 @@ namespace Negocio.DAL.Migrations
                     b.ToTable("Turnos", (string)null);
                 });
 
-            modelBuilder.Entity("Negocio.DomainModel.Usuario", b =>
+            modelBuilder.Entity("Services.DomainModel.Usuario", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

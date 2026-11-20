@@ -670,7 +670,7 @@ namespace Negocio.DAL.Migrations
                     b.ToTable("Turnos", (string)null);
                 });
 
-            modelBuilder.Entity("Negocio.DomainModel.Usuario", b =>
+            modelBuilder.Entity("Services.DomainModel.Usuario", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -743,7 +743,7 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioResolucion")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -761,7 +761,7 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioRegistro")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -795,7 +795,7 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioRegistro")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -810,7 +810,7 @@ namespace Negocio.DAL.Migrations
                         .HasForeignKey("IdObraSocial")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioPortal")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -826,12 +826,12 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioDecision")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioRegistro")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -847,7 +847,7 @@ namespace Negocio.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Negocio.DomainModel.Usuario", null)
+                    b.HasOne("Services.DomainModel.Usuario", null)
                         .WithMany()
                         .HasForeignKey("IdUsuarioMedico")
                         .OnDelete(DeleteBehavior.Restrict)

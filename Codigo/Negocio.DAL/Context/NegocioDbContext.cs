@@ -2,6 +2,7 @@ using System;
 using Services.DomainModel.Integridad;
 using Services.DAL.Auditoria;
 using Services.DomainModel.Auditoria;
+using Services.DomainModel;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -259,6 +260,15 @@ namespace Negocio.DAL.Context
             modelBuilder.Entity<Usuario>(entidad =>
             {
                 entidad.ToTable("Usuarios");
+                // La clase Usuario es ahora la única del dominio (Services.DomainModel) e incluye
+                // propiedades que la tabla Usuarios de OpenRIN_Negocio no tiene: se excluyen del
+                // mapeo. Telefono y FechaAlta SÍ son columnas de Negocio y se mapean normalmente.
+                entidad.Ignore(u => u.HashPassword);
+                entidad.Ignore(u => u.PreguntaSeguridad);
+                entidad.Ignore(u => u.RespuestaHash);
+                entidad.Ignore(u => u.Idioma);
+                entidad.Ignore(u => u.IntentosFallidos);
+                entidad.Ignore(u => u.BloqueadoHasta);
                 entidad.Property(u => u.NombreUsuario).HasMaxLength(50).IsRequired();
                 entidad.HasIndex(u => u.NombreUsuario).IsUnique();
                 entidad.Property(u => u.NombreCompleto).HasMaxLength(300).IsRequired();
