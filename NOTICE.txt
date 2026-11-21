@@ -1,5 +1,5 @@
 OpenRIN — Plataforma Integral de Alertas y Monitoreo para Pacientes Anticoagulados
-Copyright (C) 2026 Carlos Santiago Muñiz Cortés
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés (Minishark Technologies)
 
    Este programa es software libre: usted puede redistribuirlo y/o modificarlo
    bajo los términos de la GNU Affero General Public License publicada por la

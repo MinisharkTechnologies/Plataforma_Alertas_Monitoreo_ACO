@@ -1,6 +1,6 @@
 # OpenRIN — 抗凝患者综合预警与监测平台
 
-**作者：** Carlos Santiago Muñiz Cortés
+**作者：** Carlos Santiago Muñiz Cortés · **Minishark Technologies**
 **教师：** Gastón Matías Weingand
 **院校：** Colegio Leonardo Da Vinci
 **课程：** Prácticas Profesionalizantes III（职业实践 III） · **年份：** 2026
@@ -77,7 +77,7 @@ OpenRIN 是一款面向血液科诊所的桌面平台，专注于抗凝患者的
 
 ## 许可证
 
-Copyright (C) 2026 Carlos Santiago Muñiz Cortés。依据 **GNU Affero General Public License v3.0** 发布（见 [`LICENSE`](LICENSE) 与 [`NOTICE.txt`](NOTICE.txt)）。可依据 AGPLv3 分发 OpenRIN 及其衍生作品：衍生作品必须在同一许可证下保持开源（强 copyleft 传染性），**且若作为网络服务提供，必须向服务使用者公开其源代码**。第三方依赖保留其自身许可证（QuestPDF Community License，面向开源项目与小型实体免费；其余为 MIT）。
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés (Minishark Technologies)。依据 **GNU Affero General Public License v3.0** 发布（见 [`LICENSE`](LICENSE) 与 [`NOTICE.txt`](NOTICE.txt)）。可依据 AGPLv3 分发 OpenRIN 及其衍生作品：衍生作品必须在同一许可证下保持开源（强 copyleft 传染性），**且若作为网络服务提供，必须向服务使用者公开其源代码**。第三方依赖保留其自身许可证（QuestPDF Community License，面向开源项目与小型实体免费；其余为 MIT）。
 
 > 项目在 2026-11-20 前采用 **GPLv3**，自 2026-11-21 起改为 **AGPLv3**，以填补软件即服务（SaaS）的授权空档。
 

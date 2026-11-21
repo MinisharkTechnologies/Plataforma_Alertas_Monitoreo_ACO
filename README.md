@@ -1,6 +1,6 @@
 # OpenRIN — Plataforma Integral de Alertas y Monitoreo para Pacientes Anticoagulados
 
-**Autor:** Carlos Santiago Muñiz Cortés
+**Autor:** Carlos Santiago Muñiz Cortés · **Minishark Technologies**
 **Profesor:** Gastón Matías Weingand
 **Institución:** Colegio Leonardo Da Vinci
 **Materia:** Prácticas Profesionalizantes III · **Año:** 2026
@@ -77,7 +77,7 @@ La **[Carpeta de Proyecto](Documentacion/)** contiene el documento entregable co
 
 ## Licencia
 
-Copyright (C) 2026 Carlos Santiago Muñiz Cortés. Publicado bajo la **GNU Affero General Public License v3.0** (ver [`LICENSE`](LICENSE) y [`NOTICE.txt`](NOTICE.txt)). Puede redistribuir OpenRIN y sus derivados bajo los términos de la AGPLv3: los derivados deben mantenerse abiertos bajo la misma licencia (copyleft fuerte) **y, si se ofrecen como servicio accesible por red, deben publicar su código fuente a los usuarios del servicio**. Las dependencias de terceros conservan sus licencias propias (QuestPDF Community License, gratuita para proyectos open source y entidades pequeñas; el resto, MIT).
+Copyright (C) 2026 Carlos Santiago Muñiz Cortés (Minishark Technologies). Publicado bajo la **GNU Affero General Public License v3.0** (ver [`LICENSE`](LICENSE) y [`NOTICE.txt`](NOTICE.txt)). Puede redistribuir OpenRIN y sus derivados bajo los términos de la AGPLv3: los derivados deben mantenerse abiertos bajo la misma licencia (copyleft fuerte) **y, si se ofrecen como servicio accesible por red, deben publicar su código fuente a los usuarios del servicio**. Las dependencias de terceros conservan sus licencias propias (QuestPDF Community License, gratuita para proyectos open source y entidades pequeñas; el resto, MIT).
 
 > El proyecto estuvo bajo **GPLv3** hasta el 20/11/2026 y se relicenció a **AGPLv3** el 21/11/2026 para cerrar el supuesto del software como servicio.
 

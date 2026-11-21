@@ -275,7 +275,7 @@ $k = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OpenRIN"
 New-Item -Path $k -Force | Out-Null
 Set-ItemProperty $k DisplayName "OpenRIN 1.2"
 Set-ItemProperty $k DisplayVersion "1.2"
-Set-ItemProperty $k Publisher "Muñiz Cortés, Carlos Santiago - UAI"
+Set-ItemProperty $k Publisher "Minishark Technologies (Carlos Santiago Muñiz Cortés)"
 Set-ItemProperty $k InstallLocation $Destino
 Set-ItemProperty $k UninstallString "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$Destino\Desinstalar.ps1`""
 Set-ItemProperty $k DisplayIcon (Join-Path $Destino "Negocio.UI.exe")
