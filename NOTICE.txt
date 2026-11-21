@@ -2,13 +2,19 @@ OpenRIN — Plataforma Integral de Alertas y Monitoreo para Pacientes Anticoagul
 Copyright (C) 2026 Carlos Santiago Muñiz Cortés
 
    Este programa es software libre: usted puede redistribuirlo y/o modificarlo
-   bajo los términos de la GNU General Public License publicada por la Free
-   Software Foundation, bien en su versión 3 de la licencia, o bien (a su
-   elección) con cualquier versión posterior.
+   bajo los términos de la GNU Affero General Public License publicada por la
+   Free Software Foundation, en su versión 3.
    Este programa se distribuye con la esperanza de que sea útil, pero SIN
    NINGUNA GARANTÍA; sin siquiera la garantía implícita de COMERCIALIZACIÓN o
-   IDONEIDAD PARA UN PROPÓSITO PARTICULAR. Consulte la GNU General Public
-   License para más detalles, en el archivo LICENSE de este repositorio.
+   IDONEIDAD PARA UN PROPÓSITO PARTICULAR. Consulte la GNU Affero General
+   Public License para más detalles, en el archivo LICENSE de este repositorio.
+
+   La GNU AGPL extiende el copyleft de la GPL a la ejecución en red: quien
+   ofrezca OpenRIN (o una versión modificada) como servicio accesible por red
+   debe ofrecer también el código fuente correspondiente a sus usuarios.
+
+   Historial: las versiones publicadas hasta el 20/11/2026 se distribuyeron
+   bajo GNU GPLv3; desde el 21/11/2026 el proyecto se relicencia a GNU AGPLv3.
 
 ========================================================================
 AVISOS DE TERCEROS (las dependencias conservan sus propias licencias):
