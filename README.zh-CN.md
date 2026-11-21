@@ -20,7 +20,7 @@ OpenRIN 是一款面向血液科诊所的桌面平台，专注于抗凝患者的
 - **完整性在线恢复**：若 DVH/DVV 检测到篡改，应用会列出被篡改的记录（表、Id、原因），并可用 SI004 权限在进入登录前**恢复健康备份**或**重算校验位**。
 - **临床字段 AES-256 对称加密**：不良事件、预约、随访与预警的自由文本字段在数据库中加密保存（`System.Security.Cryptography`），IV 由字段上下文派生，使校验位（DVH）保持稳定；读取时恢复明文，旧数据在下次保存时自动加密。
 - **基于反射的仓储工厂**（`Repositorio.*` 键）、仓储封装为 `internal`、以及 **业务异常层级**（`ReglaNegocioException` 及其派生类），提示信息可操作。
-- **「Pruebas」验收测试套件**（`Pruebas/`）：针对真实数据库的 **103 项检查**全部通过（详见其中的 LEEME）；**Herramientas** 命令行（`sembrar`、`respaldo`、`respaldo-auto`、`integridad`）。
+- **「Pruebas」验收测试套件**（`Pruebas/`）：针对真实数据库的 **109 项检查**全部通过（详见其中的 LEEME）；**Herramientas** 命令行（`sembrar`、`respaldo`、`respaldo-auto`、`integridad`）。
 - **本仓库内完整的交付文档**：**项目文档册（PDF，153 页）**、安装手册、用户手册与程序员手册（PDF + `.chm` 联机帮助，应用内 F1 同样可用）、draw.io + PNG 图表，以及 **`Prueba SQL/`** 演示文件夹（DVH/DVV 与备份的引导式演示）。
 - 编译 **0 错误 / 0 警告**；本地冒烟测试 40/40（Negocio），解决方案已完成全部复核。
 
@@ -35,7 +35,7 @@ OpenRIN 是一款面向血液科诊所的桌面平台，专注于抗凝患者的
 
 ## 仓库结构
 
-- `Codigo/` —— .NET 解决方案：`Negocio.UI`（Windows Forms）、`Negocio.BLL`、`Negocio.DAL`、`Negocio.DomainModel`、`Services`（DomainModel、BLL、DAL、Facade），以及 **`Pruebas/`**（103 项检查）与 **`Herramientas/`**（CLI）。
+- `Codigo/` —— .NET 解决方案：`Negocio.UI`（Windows Forms）、`Negocio.BLL`、`Negocio.DAL`、`Negocio.DomainModel`、`Services`（DomainModel、BLL、DAL、Facade），以及 **`Pruebas/`**（109 项检查）与 **`Herramientas/`**（CLI）。
 - `Documentacion/` —— **项目文档册（PDF，153 页）** 与手册（[`Manuales/`](Documentacion/Manuales/)：安装、用户、程序员及 `.chm` 帮助）。
   - `Documentacion/Revision/` —— 教师意见与已应用更正的明细。
   - `Documentacion Antigua antes de Septiembre/` —— 历史分析与设计交付物（勿改动）。
