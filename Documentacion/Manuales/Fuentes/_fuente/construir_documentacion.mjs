@@ -24,6 +24,20 @@ fs.mkdirSync(SALIDA, { recursive: true });
 
 const FECHA = '30/10/2026';
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+// Quita las etiquetas XML de los comentarios /// recorriendo el texto carácter a carácter.
+// No se usa un regex de saneamiento tipo /<[^>]+>/g porque con entradas anidadas (por
+// ejemplo '<<b>script>') puede dejar restos sin limpiar; CodeQL lo marca como
+// "incomplete multi-character sanitization". Un recorrido secuencial no tiene ese problema.
+const sinEtiquetas = (s) => {
+  let out = '';
+  let dentro = false;
+  for (const ch of String(s)) {
+    if (ch === '<') { dentro = true; continue; }
+    if (ch === '>') { dentro = false; continue; }
+    if (!dentro) out += ch;
+  }
+  return out.replace(/\s+/g, ' ').trim();
+};
 const pngSize = (f) => { const b = fs.readFileSync(f); return [b.readUInt32BE(16), b.readUInt32BE(20)]; };
 
 // ============================================================ HTML (CHM)
@@ -89,7 +103,7 @@ function referenciaApi() {
       const re = /((?:\s*\/\/\/[^\n]*\n)+)\s*(?:\[[^\]]*\]\s*)*(public|internal)\s+(?:static\s+|sealed\s+|abstract\s+|partial\s+)*(class|record|enum|interface|struct)\s+(\w+)/g;
       let m;
       while ((m = re.exec(t))) {
-        const sum = (m[1].match(/<summary>([\s\S]*?)<\/summary>/) || [, ''])[1].replace(/\s*\/\/\/\s?/g, ' ').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+        const sum = sinEtiquetas((m[1].match(/<summary>([\s\S]*?)<\/summary>/) || [, ''])[1].replace(/\s*\/\/\/\s?/g, ' '));
         filas.push([m[4], m[3], sum || '—']);
       }
     }
