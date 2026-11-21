@@ -1,4 +1,4 @@
-<#
+﻿<#
  OpenRIN - Instalador (A01)
  Instala la aplicación, el motor de base de datos (SQL Server Express si no hay ninguna instancia),
  las bases OpenRIN_Services y OpenRIN_Negocio con su esquema y los datos de demostración.
@@ -51,7 +51,7 @@ function Fallar($mensaje) {
 }
 
 Write-Host "=============================================" -ForegroundColor Green
-Write-Host " OpenRIN 1.0 - Instalación" -ForegroundColor Green
+Write-Host " OpenRIN 1.2 - Instalación" -ForegroundColor Green
 Write-Host " Plataforma de alertas y monitoreo ACO" -ForegroundColor Green
 Write-Host "=============================================" -ForegroundColor Green
 
@@ -201,22 +201,46 @@ $linea = ($salidaSembrar | Select-String -Pattern 'respuesta a .*?: (\S+)\s*$' |
 if ($linea) { $respuestaRecuperacion = $linea.Matches[0].Groups[1].Value }
 
 $rutaCredenciales = Join-Path ([Environment]::GetFolderPath("Desktop")) "OpenRIN - Credenciales demo.txt"
+# «sembrar» es idempotente: no restablece contraseñas de usuarios existentes, así que la
+# clave generada sólo aplica a los usuarios que se crean en esta corrida. Se distingue
+# cada caso para que el archivo del Escritorio no induzca a error al reinstalar.
+$creados = @($salidaSembrar | Select-String -Pattern 'usuario creado: (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value })
+$existentes = @($salidaSembrar | Select-String -Pattern 'usuario existente.*?: (\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value })
+if ($creados.Count -eq 0) {
 $textoCredenciales = @"
 OpenRIN - credenciales de la instalación
 =========================================
-Usuarios de demostración (perfiles): sysadmin / medico / recepcion
-Contraseña: $ClaveDemo
+Todos los usuarios de demostración YA EXISTÍAN: conservan sus contraseñas anteriores.
+La contraseña generada en esta instalación no se aplicó a ningún usuario.
+
+Usuarios existentes: $($existentes -join ', ')
+
+Notas:
+- Si olvidó la contraseña, un administrador puede restablecerla con
+  OpenRIN.Herramientas.exe o desde el módulo Sistema y Bitácora.
+- Para la demostración de integridad (DVH/DVV): altere un dato con SSMS, abra
+  OpenRIN, ingrese con 'sysadmin' (permiso SI004) y restaure el respaldo sano.
+"@
+} else {
+$textoCredenciales = @"
+OpenRIN - credenciales de la instalación
+=========================================
+Usuarios NUEVOS creados en esta instalación: $($creados -join ', ')
+Contraseña para ellos: $ClaveDemo
 
 Pregunta de recuperación: ¿Clave de recuperación de demostración?
 Respuesta: $respuestaRecuperacion
 
+Usuarios que ya existían (conservan su contraseña anterior): $(if ($existentes.Count) { $existentes -join ', ' } else { 'ninguno' })
+
 Notas:
-- Estas credenciales valen para esta instalación. Cámbielas después de la prueba.
+- Cámbielas después de la prueba.
 - La contraseña es aleatoria y no está en ningún repositorio: si se pierde, un
   administrador puede restablecerla con la herramienta OpenRIN.Herramientas.exe.
 - Para la demostración de integridad (DVH/DVV): altere un dato con SSMS, abra
   OpenRIN, ingrese con 'sysadmin' (permiso SI004) y restaure el respaldo sano.
 "@
+}
 try {
     [IO.File]::WriteAllText($rutaCredenciales, $textoCredenciales, (New-Object Text.UTF8Encoding($true)))
     Write-Host "  Credenciales guardadas en: $rutaCredenciales" -ForegroundColor Yellow
@@ -249,8 +273,8 @@ Paso 9 "Registrando la desinstalación"
 Copy-Item (Join-Path $aqui "Desinstalar.ps1") (Join-Path $Destino "Desinstalar.ps1") -Force
 $k = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\OpenRIN"
 New-Item -Path $k -Force | Out-Null
-Set-ItemProperty $k DisplayName "OpenRIN 1.0"
-Set-ItemProperty $k DisplayVersion "1.0"
+Set-ItemProperty $k DisplayName "OpenRIN 1.2"
+Set-ItemProperty $k DisplayVersion "1.2"
 Set-ItemProperty $k Publisher "Muñiz Cortés, Carlos Santiago - UAI"
 Set-ItemProperty $k InstallLocation $Destino
 Set-ItemProperty $k UninstallString "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$Destino\Desinstalar.ps1`""
@@ -265,17 +289,23 @@ Write-Host "Instalación finalizada." -ForegroundColor Green
 Write-Host "  Aplicación   : $Destino"
 Write-Host "  Base de datos: $Servidor  (OpenRIN_Services, OpenRIN_Negocio)"
 Write-Host "  Usuarios de demostración: sysadmin, medico, recepcion"
-if ($claveGenerada) {
+if ($claveGenerada -and $creados.Count -gt 0) {
     Write-Host ""
     Write-Host "  ================= CREDENCIALES DE LA DEMO (anótelas) =================" -ForegroundColor Yellow
-    Write-Host "   Usuarios        : sysadmin / medico / recepcion" -ForegroundColor Yellow
+    Write-Host "   Usuarios nuevos : $($creados -join ' / ')" -ForegroundColor Yellow
     Write-Host "   Contraseña      : $ClaveDemo" -ForegroundColor Yellow
+    if ($existentes.Count -gt 0) { Write-Host "   Ya existían (conservan su clave): $($existentes -join ', ')" -ForegroundColor Yellow }
     Write-Host "   Recuperación    : pregunta «¿Clave de recuperación de demostración?»" -ForegroundColor Yellow
     if ($respuestaRecuperacion) { Write-Host "   Respuesta       : $respuestaRecuperacion" -ForegroundColor Yellow }
     else { Write-Host "   Respuesta       : (ver la salida de OpenRIN.Herramientas.exe sembrar)" -ForegroundColor Yellow }
     Write-Host "   También quedaron guardadas en el Escritorio:" -ForegroundColor Yellow
     Write-Host "   $rutaCredenciales" -ForegroundColor Yellow
     Write-Host "  =====================================================================" -ForegroundColor Yellow
+} elseif ($claveGenerada) {
+    Write-Host ""
+    Write-Host "  Aviso: todos los usuarios de demostración ya existían." -ForegroundColor Yellow
+    Write-Host "  Conservan sus contraseñas anteriores; la clave generada no se aplicó." -ForegroundColor Yellow
+    Write-Host "  Detalle en: $rutaCredenciales" -ForegroundColor Yellow
 } else {
     Write-Host "  (Clave de demostración indicada con -ClaveDemo; cámbiela después de probar.)"
     Write-Host "  (Credenciales guardadas en: $rutaCredenciales)" }
